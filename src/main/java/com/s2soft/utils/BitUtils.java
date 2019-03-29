@@ -1,8 +1,6 @@
-package com.s2soft.tinygb;
+package com.s2soft.utils;
 
-import java.io.IOException;
-
-public class Main {
+public class BitUtils {
 
 	//   ============================ Constants ==============================
 
@@ -13,10 +11,17 @@ public class Main {
 	//	 ========================== Access methods ===========================
 
 	//	 ========================= Treatment methods =========================
+	
+	public final static boolean isSet(byte value, int index) {
+		return ((value >> index) & 0x01) != 0;
+	}
 
-	public static void main(String[] args) throws IOException {
-		GameBoy gameBoy = new GameBoy();
-		gameBoy.start();
+	public final static byte toByte(int value) {
+		return (byte)(value & 0x0FF);
+	}
+
+	public static int toUInt(byte v) {
+		return 0x00FF & v;
 	}
 }
 
