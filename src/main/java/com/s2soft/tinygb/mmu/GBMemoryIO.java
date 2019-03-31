@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Instruction;
-import com.s2soft.tinygb.gpu.GBGpu;
+import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.utils.BitUtils;
 
 /**
@@ -32,7 +32,7 @@ public class GBMemoryIO implements IAddressable {
 	private byte m_bootROMLockRegister = 0;
 	
 	private GBMemory m_gbMemory;
-	private GBGpu m_gpu;
+	private GBGPU m_gpu;
 
 	private GameBoy m_gameBoy;
 
@@ -43,6 +43,7 @@ public class GBMemoryIO implements IAddressable {
 		addRegister(0xFF40, "LCDC", () -> m_gpu.getLCDControl() , (v) -> { m_gpu.setLCDControl(v); } );
 		addRegister(0xFF41, "STAT", () -> m_gpu.getLCDStatus() , (v) -> { m_gpu.setLCDStatus(v); } );
 		addRegister(0xFF42, "SCY", () -> BitUtils.toByte(m_gpu.getScrollY()) , (v) -> { m_gpu.setScrollY(BitUtils.toUInt(v)); } );
+		addRegister(0xFF43, "SCX", () -> BitUtils.toByte(m_gpu.getScrollX()) , (v) -> { m_gpu.setScrollX(BitUtils.toUInt(v)); } );
 		addRegister(0xFF44, "LY", () -> getLCDY() , (v) -> {} );
 		addRegister(0xFF47, "BGP", () -> m_gpu.getBGPaletteData() , (v) -> { m_gpu.setBGPaletteData(v); });
 		addRegister(0xFF50, "BOOTRomLock", () -> m_bootROMLockRegister , (v) -> { setBootRommLockRegister(v); });
@@ -96,7 +97,7 @@ public class GBMemoryIO implements IAddressable {
 	/**
 	 * BOOT_OFF can only transition from 0b0 to 0b1, so once 0b1 has been written, the boot ROM is
 	 * permanently disabled until the next system reset. Writing 0b0 when BOOT_OFF is 0b0 has no
-	 * effect and doesn’t lock the boot ROM
+	 * effect and doesnï¿½t lock the boot ROM
 	 * @param value
 	 */
 	private void setBootRommLockRegister(byte value) {

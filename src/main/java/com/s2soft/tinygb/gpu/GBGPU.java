@@ -1,11 +1,10 @@
 package com.s2soft.tinygb.gpu;
 
-import javax.swing.plaf.synth.SynthSpinnerUI;
-
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.utils.BitUtils;
 
-public class GBGpu {
+public class GBGPU {
 
 	//   ============================ Constants ==============================
 	
@@ -19,22 +18,36 @@ public class GBGpu {
 	//	 =========================== Attributes ==============================
 
 	private GameBoy m_gameBoy;
-
+	private GBMemory m_memory;
+	
 	private byte m_lcdControl;
 	private byte m_lcdStatus;
 
 	private GPUPhase m_phase = null;
 	
 	private int m_scanLine = 0;
+	private int m_scrollX = 0;
 	private int m_scrollY = 0;
+
+	private long m_lineStartClock;
+
+	private GPUFetcher m_fetcher;
+	private GPUFifo m_pixelsFifo;
 
 	//	 =========================== Constructor =============================
 
-	public GBGpu(GameBoy gameBoy) {
+	public GBGPU(GameBoy gameBoy) {
 		m_gameBoy = gameBoy;
+		m_memory = m_gameBoy.getMemory();
+		m_fetcher = new GPUFetcher(this);
+		m_pixelsFifo = new GPUFifo();
 	}
 
 	//	 ========================== Access methods ===========================
+
+	public GBMemory getMemory() {
+		return m_memory;
+	}
 
 	public void setScanLine(int scanLine) {
 		if (TRACE) {
@@ -52,8 +65,17 @@ public class GBGpu {
 	}
 
 	public void setScrollY(int value) {
-		System.out.println(value);
+		System.out.println("Set ScrollY="+value);
 		m_scrollY = value;
+	}
+
+	public int getScrollX() {
+		return m_scrollY;
+	}
+
+	public void setScrollX(int value) {
+		System.out.println("Set ScrollX="+value);
+		m_scrollX = value;
 	}
 
 	public void setLCDControl(byte v) {
@@ -68,9 +90,30 @@ public class GBGpu {
 					"WindowTileMap["+(BitUtils.isSet(v, 6) ? "$9C00-$9FFF" : "$9800-$9BFF")+"], " +
 					"LCD["+(BitUtils.isSet(v, 7) ? "ON" : "OFF")+"]");
 		}
+		
+		byte oldControl = m_lcdControl;
 		m_lcdControl = v;
+		if (BitUtils.isSet(oldControl, 7) != BitUtils.isSet(v, 7)) {
+			setLCDEnable(BitUtils.isSet(v, 7));
+		}
 	}
 
+	/**
+     * 
+	 * @return 0 if BGTileMap is at $9800-$9BFF, 1 if BGTileMap is at $9C00-$9FFF
+	 */
+	public int getBGMapIndex() {
+		return BitUtils.isSet(getLCDControl(), 3) ? 1 : 0;
+	}
+	
+	/**
+     * 
+	 * @return 0 if BGTilesData is at $8800-$97FF, 1 if BGTilesData is at $8000-$8FFF
+	 */
+	public int getBGTilesAreaIndex() {
+		return BitUtils.isSet(getLCDControl(), 4) ? 1 : 0;
+	}
+	
 	public byte getLCDControl() {
 		return m_lcdControl;
 	}
@@ -96,13 +139,41 @@ public class GBGpu {
 	public long getClockCount() {
 		return m_gameBoy.getClockCount();
 	}
+	
+	public void setLCDEnable(boolean set) {
+		boolean oldState = isLCDEnabled();
+		setLCDStatus(BitUtils.setBit(getLCDStatus(), 7));
+		if (!set && (set != oldState)) {
+			setScanLine(0);
+		}
+		else if (set && (set != oldState)) {
+			enterPhase(PHASE_FETCH_OAM);
+		}
+	}
+
+	public boolean isLCDEnabled() {
+		return BitUtils.isSet(m_lcdStatus, 7);
+	}
+	
+	public void setLineStartClock(long enterClock) {
+		m_lineStartClock = enterClock;
+	}
+	
+	public long getLineStartClock() {
+		return m_lineStartClock;
+	}
+
+	public GPUFifo getPixelsFifo() {
+		return m_pixelsFifo;
+	}
+
+	public GPUFetcher getFetcher() {
+		return m_fetcher;
+	}
 
 	//	 ========================= Treatment methods =========================
 
 	public void enterPhase(GPUPhase phase) {
-		if (phase == PHASE_FETCH_OAM) {
-			Thread.yield();
-		}
 		if (TRACE) {
 			System.out.println("GPU entering phase : " + phase.getName());
 		}
@@ -111,6 +182,24 @@ public class GBGpu {
 	}
 	
 	public void step() {
+		if (!isLCDEnabled()) { return; } 
+		
+		// Fifo is running at machine clock speed (4.194304Mhz)
+		if (m_pixelsFifo.canPull()) {
+			byte pixel = m_pixelsFifo.pullPixel();
+			if (pixel != 0) {
+				System.out.println("Can read pixel " + pixel);
+			}
+		}
+		
+		// Each access to VRAM (B, 0, 1, s) takes 2 cycles to occur.  A "cycle" is
+		// exactly 1 period of the main input clock to the gameboy CPU chip.  This
+		// is nominally 4.19MHz approximately.
+		// Skip odd clock to run the GPU at 2.097152Mhz
+		if (((m_gameBoy.getClockCount() - m_phase.getEnterClock()) % 2) == 1) {
+			return;
+		}
+		
 		m_phase.step();
 	}
 

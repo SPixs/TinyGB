@@ -23,5 +23,10 @@ public class BitUtils {
 	public static int toUInt(byte v) {
 		return 0x00FF & v;
 	}
+
+	public static byte setBit(byte status, int index) {
+		status |= (1 << index);
+		return status;
+	}
 }
 

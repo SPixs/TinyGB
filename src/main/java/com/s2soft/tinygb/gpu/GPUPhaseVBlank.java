@@ -35,7 +35,7 @@ public class GPUPhaseVBlank extends GPUPhase {
 		}
 		if (elapsedClockCount >= 4560) {
 			getGpu().setScanLine(0);
-			setPhase(GBGpu.PHASE_READ_VRAM);
+			setPhase(GBGPU.PHASE_FETCH_OAM);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package com.s2soft.tinygb;
 
 import com.s2soft.tinygb.cpu.GBCpu;
-import com.s2soft.tinygb.gpu.GBGpu;
+import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.tinygb.mmu.GBMemory;
 
 public class GameBoy {
@@ -14,12 +14,12 @@ public class GameBoy {
 
 	private GBMemory m_memory;
 	private GBCpu m_cpu;
-	private GBGpu m_gpu;
+	private GBGPU m_gpu;
 	private int m_clockCount;
 
 	public GameBoy() {
-		m_gpu = new GBGpu(this);
 		m_memory = new GBMemory(this);
+		m_gpu = new GBGPU(this);
 		m_cpu = new GBCpu(this);
 		reset();
 	}
@@ -34,7 +34,7 @@ public class GameBoy {
 		return m_cpu;
 	}
 
-	public GBGpu getGpu() {
+	public GBGPU getGpu() {
 		return m_gpu;
 	}
 	
@@ -64,7 +64,9 @@ public class GameBoy {
 			
 //			System.out.println("GPU clock : " + m_clockCount + " CPU clock : " + cpuClockCount);
 			
-			while(m_clockCount >= cpuClockCount * 4) {
+			// CPU is running at 4.194304Mhz but instructions take a multiple of 4 to be executed.
+			// Hence, the CPU behaves as clocked at 1.048576Mhz
+			while(m_clockCount >= cpuClockCount) {
 				cpuClockCount += m_cpu.step();
 			}
 			m_gpu.step();

@@ -2,7 +2,7 @@ package com.s2soft.tinygb.gpu;
 
 public abstract class GPUPhase {
 
-	private GBGpu m_gpu;
+	private GBGPU m_gpu;
 	
 	private long m_enterClock;
 
@@ -16,16 +16,20 @@ public abstract class GPUPhase {
 		return m_name;
 	}
 
-	protected GBGpu getGpu() {
+	protected GBGPU getGpu() {
 		return m_gpu;
 	}
 
-	public void enter(GBGpu gbGpu) {
+	public void enter(GBGPU gbGpu) {
 		m_gpu = gbGpu;
 		m_enterClock = m_gpu.getClockCount();
 		enterImpl();
 	}
 	
+	public long getEnterClock() {
+		return m_enterClock;
+	}
+
 	public void setPhase(GPUPhase phase) {
 		m_gpu.enterPhase(phase);
 	}
