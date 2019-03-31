@@ -23,14 +23,15 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 
 	@Override
 	protected void enterImpl() {
-		// TODO Auto-generated method stub
-		
+		getGpu().setLineStartClock(getEnterClock());
+		getGpu().getPixelsFifo().clear();
+		getGpu().getFetcher().reset();
 	}
 
 	@Override
 	protected void stepImpl(long elapsedClockCount) {
 		if (elapsedClockCount >= 80) {
-			setPhase(GBGpu.PHASE_READ_VRAM);
+			setPhase(GBGPU.PHASE_READ_VRAM);
 			getGpu().step();
 		}
 	}

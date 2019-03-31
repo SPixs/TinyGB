@@ -29,15 +29,18 @@ public class GPUPhaseHBlank extends GPUPhase {
 
 	@Override
 	protected void stepImpl(long elapsedClockCount) {
-		if (elapsedClockCount >= 204) {
+		if (getGpu().getClockCount() - getGpu().getLineStartClock() >= 456) {
+//		if (elapsedClockCount >= 204) {
+//			System.out.println(getGpu().getClockCount()-getGpu().getLineStartClock());
 			final int scanLine = getGpu().getScanLine();
 			if (scanLine == 143) {
-				setPhase(GBGpu.PHASE_VBLANK);
+				setPhase(GBGPU.PHASE_VBLANK);
 				getGpu().step();
 			}
 			else {
 				getGpu().setScanLine(scanLine+1);
-				setPhase(GBGpu.PHASE_FETCH_OAM);
+				setPhase(GBGPU.PHASE_FETCH_OAM);
+				getGpu().step();
 			}
 		}
 	}

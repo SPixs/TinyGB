@@ -23,16 +23,26 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {
-		// TODO Auto-generated method stub
-		
+		// compute base BG tile address for current line
+		int tilesBaseAddress = (getGpu().getBGMapIndex() == 0) ? 0x09800 : 0x09C00;
+		int currentLine = getGpu().getScanLine();
+		int scrollX = getGpu().getScrollX();
+		int scrollY = getGpu().getScrollY();
+		int tileX = scrollX / 8;
+		int tileY = (currentLine + scrollY) / 8;
+		getGpu().getFetcher().setTileAddress(tilesBaseAddress + tileX + tileY * 32);
 	}
 
 	@Override
 	protected void stepImpl(long elapsedClockCount) {
-		if (elapsedClockCount >= 172) {
-			setPhase(GBGpu.PHASE_HBLANK);
-			getGpu().step();
-		}
+		// Actually, in this phase VRAM access take from 173.5 to 180.5 cycles.
+//		if (elapsedClockCount >= 172) {
+//			setPhase(GBGPU.PHASE_HBLANK);
+//			getGpu().step();
+//		}
+//		else {
+			getGpu().getFetcher().step();
+//		}
 	}
 }
 

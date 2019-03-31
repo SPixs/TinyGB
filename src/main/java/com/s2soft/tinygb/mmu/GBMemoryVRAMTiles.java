@@ -40,7 +40,7 @@ public class GBMemoryVRAMTiles implements IAddressable {
 		int offset = address - BASE_ADDRESS;
 		int blockIndex = offset / 0x800;
 		int tileIndex = offset / 0x10;
-		System.out.println("Reading from VRAM Tiles, block " + blockIndex + ", tile " + tileIndex);
+//		System.out.println("Reading from VRAM Tiles, block " + blockIndex + ", tile " + tileIndex);
 		return m_vram[offset];
 	}
 }
