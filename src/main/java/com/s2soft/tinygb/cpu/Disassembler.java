@@ -1,8 +1,5 @@
 package com.s2soft.tinygb.cpu;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.mmu.GBMemory;
 
@@ -13,8 +10,12 @@ public class Disassembler {
 	private GBMemory m_memory;
 
 	public Disassembler(GameBoy gameBoy) {
-		m_cpu = gameBoy.getCpu();
-		m_memory = gameBoy.getMemory();
+		this(gameBoy.getCpu(), gameBoy.getMemory());
+	}
+	
+	public Disassembler(GBCpu cpu, GBMemory memory) {
+		m_cpu = cpu;
+		m_memory = memory;
 	}
 
 	public void disassemble(short startAddress, short endAddress) {

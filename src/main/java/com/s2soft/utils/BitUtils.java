@@ -28,5 +28,9 @@ public class BitUtils {
 		status |= (1 << index);
 		return status;
 	}
+
+	public static int toUShort(byte lsb, byte msb) {
+		return (lsb & 0x00FF) | msb << 8;
+	}
 }
 

@@ -146,7 +146,9 @@ public class GBCpu {
 		m_instructions.add(new InstrLDI());
 		m_instructions.add(new InstrJR());
 		m_instructions.add(new InstrJRCond());
-		m_instructions.add(new InstrLDAN());
+		m_instructions.add(new InstrJPImm());
+		m_instructions.add(new InstrLDrr());
+		m_instructions.add(new InstrLDAn());
 		m_instructions.add(new InstrLDNA());
 		m_instructions.add(new InstrLDAC());
 		m_instructions.add(new InstrLDCA());
@@ -163,6 +165,13 @@ public class GBCpu {
 		m_instructions.add(new InstrSUB());
 		m_instructions.add(new InstrADD());
 		m_instructions.add(new InstrRLA());
+		m_instructions.add(new InstrNOP());
+		m_instructions.add(new InstrAND());
+		m_instructions.add(new InstrDAA());
+		m_instructions.add(new InstrADCAn());
+		m_instructions.add(new InstrRETcc());
+		m_instructions.add(new InstrDI());
+		m_instructions.add(new InstrEI());
 		
 		m_extraInstructions.add(new InstrBit());
 		m_extraInstructions.add(new InstrRL());
@@ -228,9 +237,15 @@ public class GBCpu {
 				throw new IllegalArgumentException("Illegal opcode : " + Instruction.toHexByte(opcode) + " at " + Instruction.toHexShort(getPC()));
 			}
 		}
+		
+//		if (m_cyclesCount % 1000 == 0) {
+//			System.out.println("PC = " + Instruction.toHexShort(getPC()));
+//		}
 
+		int previousPC = getPC();
+		
 		String disassembledLine = null;
-		if (TRACE) {
+		if (TRACE)  {
 			disassembledLine = ">$" + Disassembler.shortToHex(getPC()) + " " + instruction.disassemble(m_memory, getPC());
 			while (disassembledLine.length() < 24) disassembledLine += " ";
 			for (Register8Bits reg8 : Register8Bits.values()) {
@@ -251,10 +266,19 @@ public class GBCpu {
 			setPC(getPC() + 1);
 		}
 		
-		int executionCycles = instruction.execute(opcode, this, additionalBytes);
-		m_cyclesCount += executionCycles;
-		
-		return executionCycles;
+		try {
+			int executionCycles = instruction.execute(opcode, this, additionalBytes);
+			m_cyclesCount += executionCycles;
+			return executionCycles;
+		}
+		catch (Exception ex) {
+			System.out.println("------------------------");
+			System.out.println("----- FATAL ERROR ------");
+			System.out.println("- Last cpu instruction -");
+			new Disassembler(this, m_memory).disassemble((short)previousPC, (short)previousPC);
+			System.out.println("------------------------");
+			throw ex;
+		}
 	}
 	
 	private void processInterrupts() {
@@ -262,39 +286,6 @@ public class GBCpu {
 		
 	}
 
-//	public void run() {
-//
-//		m_running = true;
-//		resetCyclesCounter();
-//		// CPU is running at 4.194304Mhz (Clock cycles) or 1.048576Mhz (Machine cycles) 
-//		// Cpu and instruction speed are described in machine cycles
-//		double cpuClock = 4.194304e6 / 4.0;
-//		
-//		m_runningThread = Thread.currentThread();
-//		while (true && m_running && !m_runningThread.isInterrupted()) {
-//			step();
-//			
-//			if (m_cyclesCount % 1000 == 0) {
-//				long elapsed = System.currentTimeMillis() - m_runStartTimer;
-//				
-//				// Clock speed on DMG GB is 4.19430Mhz
-//				long wait = (long) (m_cyclesCount * (1000.0/cpuClock) - elapsed);
-//				System.out.println(wait);
-//				if (wait > 0) {
-//					try { Thread.sleep(wait); } 	
-//					catch (InterruptedException e) {
-//						m_runningThread.interrupt();
-//					}
-//				}
-//			}
-//		}
-//		
-//		synchronized (this) {
-//			m_running = false;
-//			notify();
-//		}
-//	}
-	
 	public void stop() {
 		synchronized (this) {
 			if (m_running) {

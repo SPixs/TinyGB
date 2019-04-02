@@ -53,6 +53,8 @@ public class GBMemory {
 		m_ramMemory = new GBMemoryRAM();
 		m_hram = new GBMemoryRAM();
 		m_ie = new GBMemoryIE();
+		m_oam = new GBMemoryOAM();
+		m_naMemory = new GBMemoryNA();
 		m_ramMirror = new GBMemoryMirror(m_ramMemory, -0x2000);
 	}
 
@@ -121,7 +123,11 @@ public class GBMemory {
 	}
 	
 	public void setByte(int address, byte b) {
-		getAddressable(address).setByte(address, b);
+		final IAddressable addressable = getAddressable(address);
+		if (addressable == null) {
+			throw new IllegalStateException("No memory mapped at : " + Instruction.toHexShort(address));
+		}
+		addressable.setByte(address, b);
 	}
 	
 	public byte getByte(int address) {

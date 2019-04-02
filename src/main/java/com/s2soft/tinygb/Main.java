@@ -7,6 +7,8 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import com.s2soft.tinygb.cpu.Disassembler;
+import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.display.LCDDisplay;
 
 public class Main {
@@ -28,6 +30,15 @@ public class Main {
 		Cartidge cartidge = new Cartidge();
 		cartidge.read(Main.class.getResourceAsStream("/Tetris.gb"));
 		gameBoy.setCartidge(cartidge);
+		
+//		new Disassembler(gameBoy).disassemble((short)0x021D, (short)0x02FF);
+//		System.exit(0);
+		
+//		for (int i=0x0104;i<0x0104+(0x00D8-0x00A8);i++) {
+//			System.out.println("CART LOGO " + i + "\t" + Instruction.toHexByte(cartidge.getROMByte(i)) );
+//		}
+//		
+//		System.exit(0);
 		
 		JFrame mainFrame = new JFrame("TinyGB");
 		mainFrame.setIconImages(Arrays.asList(new BufferedImage[] {

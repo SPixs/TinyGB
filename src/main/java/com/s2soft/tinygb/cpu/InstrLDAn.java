@@ -2,7 +2,7 @@ package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
 
-public class InstrLDAN extends Instruction {
+public class InstrLDAn extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {

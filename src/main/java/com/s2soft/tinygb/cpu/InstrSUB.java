@@ -30,8 +30,8 @@ public class InstrSUB extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
 		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
-		int result = (cpu.getA() & 0x0FF) - value;
-		cpu.setA((byte)(result & 0x0FF));
+		byte result = (byte)(((cpu.getA() & 0x0FF) - value) & 0x0FF);
+		cpu.setA(result);
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(true);

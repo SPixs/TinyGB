@@ -1,6 +1,7 @@
 package com.s2soft.tinygb.gpu;
 
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.cpu.Disassembler;
 import com.s2soft.tinygb.display.IDisplay;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.utils.BitUtils;
@@ -92,6 +93,7 @@ public class GBGPU {
 					"Window["+(BitUtils.isSet(v, 5) ? "ON" : "OFF")+"], " +
 					"WindowTileMap["+(BitUtils.isSet(v, 6) ? "$9C00-$9FFF" : "$9800-$9BFF")+"], " +
 					"LCD["+(BitUtils.isSet(v, 7) ? "ON" : "OFF")+"]");
+			new Disassembler(m_gameBoy).disassemble((short)m_gameBoy.getCpu().getPc(), (short)m_gameBoy.getCpu().getPc());
 		}
 		
 		byte oldControl = m_lcdControl;
@@ -147,7 +149,7 @@ public class GBGPU {
 	
 	public void setLCDEnable(boolean set) {
 		boolean oldState = isLCDEnabled();
-		setLCDStatus(BitUtils.setBit(getLCDStatus(), 7));
+		setLCDControl(BitUtils.setBit(getLCDControl(), 7));
 		if (!set && (set != oldState)) {
 			setScanLine(0);
 		}
@@ -157,7 +159,7 @@ public class GBGPU {
 	}
 
 	public boolean isLCDEnabled() {
-		return BitUtils.isSet(m_lcdStatus, 7);
+		return BitUtils.isSet(m_lcdControl, 7);
 	}
 	
 	public void setLineStartClock(long enterClock) {
@@ -189,7 +191,9 @@ public class GBGPU {
 	int pixelsCount = 0;
 	
 	public void step() {
-		if (!isLCDEnabled()) { return; } 
+		if (!isLCDEnabled()) { 
+			return; 
+		} 
 
 		long elapsedClockCountInPhase = m_phase.getElapsedClockCountInPhase();
 		
