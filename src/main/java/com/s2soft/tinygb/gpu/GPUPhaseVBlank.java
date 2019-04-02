@@ -23,8 +23,7 @@ public class GPUPhaseVBlank extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {
-		// TODO Auto-generated method stub
-		
+		getGpu().getDisplay().refresh();
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package com.s2soft.tinygb;
 
 import com.s2soft.tinygb.cpu.GBCpu;
+import com.s2soft.tinygb.display.IDisplay;
 import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.tinygb.mmu.GBMemory;
 
@@ -10,14 +11,16 @@ public class GameBoy {
 
 	//	 =========================== Attributes ==============================
 
-	//	 =========================== Constructor =============================
-
 	private GBMemory m_memory;
 	private GBCpu m_cpu;
 	private GBGPU m_gpu;
 	private int m_clockCount;
+	private IDisplay m_display;
 
-	public GameBoy() {
+	//	 =========================== Constructor =============================
+
+	public GameBoy(IDisplay display) {
+		m_display = display;
 		m_memory = new GBMemory(this);
 		m_gpu = new GBGPU(this);
 		m_cpu = new GBCpu(this);
@@ -42,8 +45,16 @@ public class GameBoy {
 		return m_clockCount;
 	}
 	
+	public IDisplay getDisplay() {
+		return m_display;
+	}
+	
 	//	 ========================= Treatment methods =========================
 
+	public void setCartidge(Cartidge cartidge) {
+		m_memory.setCartidge(cartidge);
+	}
+	
 	public void reset() {
 		m_memory.reset();
 		m_clockCount = 0;

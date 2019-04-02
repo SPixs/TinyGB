@@ -13,9 +13,15 @@ public class GPUFifo {
 	private byte[] m_queue = new byte[16];
 	
 	private int m_usedSpace = 0;
+
+	private GBGPU m_gpu;
 	
 	//	 =========================== Constructor =============================
 	
+	public GPUFifo(GBGPU gbgpu) {
+		m_gpu = gbgpu;
+	}
+
 	//	 ========================== Access methods ===========================
 		
 	//	 ========================= Treatment methods =========================
@@ -33,9 +39,13 @@ public class GPUFifo {
 			throw new IllegalStateException("Cannot pull pixel fifo. Size must be > 8 : " + m_usedSpace);
 		}
 		byte pixelValue = m_queue[0];
-		System.arraycopy(m_queue, 1, m_queue, 0, 7);
+		System.arraycopy(m_queue, 1, m_queue, 0, 15);
 		m_usedSpace--;
-		return pixelValue;
+		
+		byte bgPalette = m_gpu.getBGPaletteData(); // fix me multi palette must be handled
+		byte coloredPixel = (byte) (bgPalette >> (2 * pixelValue) & 0x3);
+		
+		return coloredPixel;
 	}
 	
 	/**
@@ -46,7 +56,7 @@ public class GPUFifo {
 		if (!canPut()) {
 			throw new IllegalStateException("Cannot put pixel fifo. Size must be <= 8 : " + m_usedSpace);
 		}
-		for (int i=0;i<8;i++) {
+		for (int i=7;i>=0;i--) {
 			byte pixelValue = (byte) (BitUtils.isSet(data2, i) ? 0x10 : 0x00) ;
 			pixelValue |= BitUtils.isSet(data1, i) ? 0x01 : 0x0;
 			m_queue[m_usedSpace++] = pixelValue;
