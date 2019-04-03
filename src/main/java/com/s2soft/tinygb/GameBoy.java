@@ -6,6 +6,7 @@ import com.s2soft.tinygb.cpu.GBCpu;
 import com.s2soft.tinygb.display.IDisplay;
 import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.tinygb.mmu.GBMemory;
+import com.s2soft.tinygb.timer.Timers;
 
 public class GameBoy {
 
@@ -19,6 +20,7 @@ public class GameBoy {
 	private int m_clockCount;
 	private IDisplay m_display;
 	private JoypadHandler m_joypadHandler;
+	private Timers m_timers;
 
 	//	 =========================== Constructor =============================
 
@@ -28,6 +30,7 @@ public class GameBoy {
 		m_gpu = new GBGPU(this);
 		m_cpu = new GBCpu(this);
 		m_joypadHandler = new JoypadHandler(joypad);
+		m_timers = new Timers(this);
 		reset();
 	}
 
@@ -55,6 +58,10 @@ public class GameBoy {
 	
 	public JoypadHandler getJoypadHandler() {
 		return m_joypadHandler;
+	}
+
+	public Timers getTimers() {
+		return m_timers;
 	}
 
 	//	 ========================= Treatment methods =========================
@@ -89,7 +96,9 @@ public class GameBoy {
 				cpuClockCount += m_cpu.step();
 			}
 			m_gpu.step();
+			m_timers.step();
 			
+			// Ensure emulation is synchronized with real time
 			if (m_clockCount % 1000 == 0) {
 				long elapsed = System.currentTimeMillis() - runStartTimer;
 				

@@ -41,6 +41,10 @@ public class GBMemoryIO implements IAddressable {
 	public GBMemoryIO(GameBoy gameBoy) {
 		m_gameBoy = gameBoy;
 		addRegister(0xFF00, "JOYP", () -> m_gameBoy.getJoypadHandler().read() , (v) -> { m_gameBoy.getJoypadHandler().write(v); } );
+		addRegister(0xFF04, "DIV", () -> m_gameBoy.getTimers().getDividerRegister() , (v) -> { m_gameBoy.getTimers().resetDividerRegister(); } );
+		addRegister(0xFF05, "TIMA", () -> m_gameBoy.getTimers().getTimerRegister() , (v) -> { m_gameBoy.getTimers().setTimerRegister(v); } );
+		addRegister(0xFF06, "TMA", () -> m_gameBoy.getTimers().getTimerModulo() , (v) -> { m_gameBoy.getTimers().setTimerModulo(v); } );
+		addRegister(0xFF07, "TAC", () -> getTimerControl() , (v) -> { setTimerControl(v); } );
 		addRegister(0xFF0F, "IF", () -> m_gbMemory.getInterruptFlag() , (v) -> { m_gbMemory.setInterruptFlag(v); } );
 		addRegister(0xFF40, "LCDC", () -> m_gpu.getLCDControl() , (v) -> { m_gpu.setLCDControl(v); } );
 		addRegister(0xFF41, "STAT", () -> m_gpu.getLCDStatus() , (v) -> { m_gpu.setLCDStatus(v); } );
@@ -94,6 +98,29 @@ public class GBMemoryIO implements IAddressable {
 	 */
 	private byte getLCDY() {
 		return ((byte)(m_gpu.getScanLine() & 0x0FF));
+	}
+
+	/**
+	 * Bit  2   - Timer Enable
+	 * Bits 1-0 - Input Clock Select
+	 * 00: CPU Clock / 1024 (DMG, CGB:   4096 Hz, SGB:   ~4194 Hz)
+	 * 01: CPU Clock / 16   (DMG, CGB: 262144 Hz, SGB: ~268400 Hz)
+	 * 10: CPU Clock / 64   (DMG, CGB:  65536 Hz, SGB:  ~67110 Hz)
+	 * 11: CPU Clock / 256  (DMG, CGB:  16384 Hz, SGB:  ~16780 Hz)
+	 * 
+	 * Note: The "Timer Enable" bit only affects the timer, the divider is ALWAYS counting.
+	 * 
+	 * @param v
+	 */
+	private void setTimerControl(byte v) {
+		m_gameBoy.getTimers().setTimerEnabled(BitUtils.isSet(v, 2));
+		m_gameBoy.getTimers().setInputClock((byte)(v & 0x03));
+	}
+
+	private byte getTimerControl() {
+		byte timerControl = m_gameBoy.getTimers().getInputClock();
+		timerControl = BitUtils.setBit(timerControl, 3, m_gameBoy.getTimers().isTimerEnabled());
+		return timerControl;
 	}
 
 	/**
