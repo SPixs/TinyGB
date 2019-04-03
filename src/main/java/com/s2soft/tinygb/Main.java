@@ -25,13 +25,15 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		LCDDisplay lcdDisplay = new LCDDisplay();
-		GameBoy gameBoy = new GameBoy(lcdDisplay);
+		SwingJoypad joypad = new SwingJoypad();
+		GameBoy gameBoy = new GameBoy(lcdDisplay, joypad);
 		
 		Cartidge cartidge = new Cartidge();
 		cartidge.read(Main.class.getResourceAsStream("/Tetris.gb"));
 		gameBoy.setCartidge(cartidge);
 		
-//		new Disassembler(gameBoy).disassemble((short)0x021D, (short)0x02FF);
+//		gameBoy.getMemory().setBootROMLock(false);
+//		new Disassembler(gameBoy).disassemble((short)0x2820, (short)(0x2820+0x0ff));
 //		System.exit(0);
 		
 //		for (int i=0x0104;i<0x0104+(0x00D8-0x00A8);i++) {
@@ -45,6 +47,7 @@ public class Main {
 				ImageIO.read(Main.class.getResourceAsStream("/icon.png")),
 				ImageIO.read(Main.class.getResourceAsStream("/icon_32.png"))
 		}));
+		mainFrame.addKeyListener(joypad);
 		GameboyEnclosurePanel panel = new GameboyEnclosurePanel(lcdDisplay);
 		mainFrame.getContentPane().add(panel);
 		mainFrame.pack();

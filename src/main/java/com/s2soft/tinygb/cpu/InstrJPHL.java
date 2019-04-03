@@ -1,14 +1,9 @@
 package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
+import com.s2soft.utils.BitUtils;
 
-/**
- * This instruction disables interrupts but not immediately. 
- * Interrupts are disabled after instruction after DI is executed.
- * 
- * @author smametz
- */
-public class InstrDI extends Instruction {
+public class InstrJPHL extends Instruction {
 
 	//   ============================ Constants ==============================
 
@@ -22,18 +17,19 @@ public class InstrDI extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {
-		return opcode == (byte)0xF3;
+		return opcode == (byte)0xE9;
 	}
 	
 	@Override
 	public String disassemble(GBMemory memory, int address) {
-		return "DI";
+		return "JP (HL)";
 	}
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		// interrupts deactivation must be delayed after next instruction
-		cpu.setInterruptEnabled(false, true);
+		int address = Register16Bits.HL.getValue(cpu);
+		cpu.setPC(address);
+
 		return 4;
 	}
 

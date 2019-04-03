@@ -23,6 +23,7 @@ public class GPUPhaseVBlank extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {
+		getGpu().getMemory().requestInterrupt(0); // VBlank interrupt request
 		getGpu().getDisplay().refresh();
 	}
 	

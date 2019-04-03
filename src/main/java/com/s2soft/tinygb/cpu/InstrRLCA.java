@@ -1,14 +1,9 @@
 package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
+import com.s2soft.utils.BitUtils;
 
-/**
- * This instruction disables interrupts but not immediately. 
- * Interrupts are disabled after instruction after DI is executed.
- * 
- * @author smametz
- */
-public class InstrDI extends Instruction {
+public class InstrRLCA extends Instruction {
 
 	//   ============================ Constants ==============================
 
@@ -22,18 +17,27 @@ public class InstrDI extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {
-		return opcode == (byte)0xF3;
+		return opcode == (byte)0x07;
 	}
 	
 	@Override
 	public String disassemble(GBMemory memory, int address) {
-		return "DI";
+		return "RLCA";
 	}
 
 	@Override
-	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		// interrupts deactivation must be delayed after next instruction
-		cpu.setInterruptEnabled(false, true);
+	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
+		byte valueToRotate = cpu.getA();
+		byte newValue = (byte) (valueToRotate << 1);
+		newValue |= BitUtils.isSet(valueToRotate, 7) ? 1 : 0;
+
+		cpu.setA(newValue);
+
+		cpu.setFlagZero(newValue == 0);
+		cpu.setFlagSubtract(false);
+		cpu.setFlagHalfCarry(false);
+		cpu.setFlagCarry(BitUtils.isSet(valueToRotate, 7));
+		
 		return 4;
 	}
 

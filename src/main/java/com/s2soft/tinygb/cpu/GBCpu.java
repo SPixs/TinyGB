@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.mmu.GBMemory;
+import com.s2soft.utils.BitUtils;
 
 
 public class GBCpu {
@@ -33,6 +34,11 @@ public class GBCpu {
 	 * Stack pointer
 	 */
 	int m_sp;
+	
+	/**
+	 * The master interrupt enabled flag
+	 */
+	private boolean m_ime = true;
 
 	private long m_runStartTimer;
 
@@ -41,6 +47,16 @@ public class GBCpu {
 	private boolean m_running;
 
 	private Thread m_runningThread;
+
+	/**
+	 * Counter to delay the master interrupt enable flag modification
+	 */
+	private int m_delayedInterruptCount = -1;
+	
+	/**
+	 * Delayed state of the master interrupt enable flag
+	 */
+	private boolean m_delayedInterruptState = false;
 
 	public GBCpu(GameBoy gameBoy) {
 		m_memory = gameBoy.getMemory();
@@ -130,11 +146,26 @@ public class GBCpu {
 		m_sp = sp & 0x0FFFF;
 	}
 	
+	public boolean isInterruptEnabled() {
+		return m_ime;
+	}
+
+	public void setInterruptEnabled(boolean enabled, boolean delay) {
+		if (delay) {
+			m_delayedInterruptCount = 1;
+			m_delayedInterruptState = enabled;
+		}
+		else {
+			m_ime = enabled;
+		}
+	}
+
 	// ============================== threatment methods ================================
 	
 	public void reset() {
 		m_sp = 0; // fix me !
 		m_pc = 0;
+		m_ime = true;
 		resetCyclesCounter();
 	}
 
@@ -154,6 +185,7 @@ public class GBCpu {
 		m_instructions.add(new InstrLDCA());
 		m_instructions.add(new InstrINC());
 		m_instructions.add(new InstrDEC());
+		m_instructions.add(new InstrDECnn());
 		m_instructions.add(new InstrINCnn());
 		m_instructions.add(new InstrLDHnA());
 		m_instructions.add(new InstrLDHAn());
@@ -161,20 +193,36 @@ public class GBCpu {
 		m_instructions.add(new InstrPUSH());
 		m_instructions.add(new InstrPOP());
 		m_instructions.add(new InstrRET());
+		m_instructions.add(new InstrRETI());
 		m_instructions.add(new InstrCP());
 		m_instructions.add(new InstrSUB());
+		m_instructions.add(new InstrSBC());
 		m_instructions.add(new InstrADD());
+		m_instructions.add(new InstrADDAn());
 		m_instructions.add(new InstrRLA());
+		m_instructions.add(new InstrRLCA());
 		m_instructions.add(new InstrNOP());
 		m_instructions.add(new InstrAND());
+		m_instructions.add(new InstrOR());
 		m_instructions.add(new InstrDAA());
+		m_instructions.add(new InstrCPL());
 		m_instructions.add(new InstrADCAn());
 		m_instructions.add(new InstrRETcc());
-		m_instructions.add(new InstrDI());
+		m_instructions.add(new InstrRETcc());
 		m_instructions.add(new InstrEI());
+		m_instructions.add(new InstrDI());
+		m_instructions.add(new InstrADDHL());
+		m_instructions.add(new InstrRST());
+		m_instructions.add(new InstrJPHL());
+		m_instructions.add(new InstrJPCond());
 		
-		m_extraInstructions.add(new InstrBit());
+		m_extraInstructions.add(new InstrBIT());
+		m_extraInstructions.add(new InstrRES());
+		m_extraInstructions.add(new InstrSET());
 		m_extraInstructions.add(new InstrRL());
+		m_extraInstructions.add(new InstrRR());
+		m_extraInstructions.add(new InstrSRL());
+		m_extraInstructions.add(new InstrSWAP());
 		
 //		m_instructions.add(new InstrRET());
 //		m_instructions.add(new InstrSYS());
@@ -212,12 +260,37 @@ public class GBCpu {
 //		m_instructions.add(new InstrLDRegFromI());
 	}
 	
+	private boolean startTrace = false;
+	
 	public int step() {
 
 		processInterrupts();
 		
+		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x2820 && getPC() <= 0x2839;
+		
 		if (getPC() == 0x0028) {
-			Thread.yield();
+			System.out.println(">>> Tetris main loop");
+		}
+		if (getPC() == 0x0033) {
+			System.out.println(">>> Tetris executing machine state at " + Instruction.toHexShort(Register16Bits.HL.getValue(this)));
+		}
+		
+		// Check for interrupt
+		if (isInterruptEnabled() && getMemory().isInterruptRequested()) {
+			// keep interrupts that are not masked
+			byte interruptsToHandle = (byte) (getMemory().getInterruptEnable() &  getMemory().getInterruptFlag());
+			
+			// For the moment, only handle VBL interrupts
+			if (BitUtils.isSet(interruptsToHandle, 0)) {
+				// Clear this interrupt flag
+				getMemory().setInterruptFlag(BitUtils.setBit(getMemory().getInterruptFlag(), 0, false));
+				
+				// Disable further interrupts
+	    	    setInterruptEnabled(false, false);
+	    	    pushShort(getPC());
+	    	    setPC(0x0040);
+	    	    return 12; // 12 cycles to process interrupt flag
+			}
 		}
 		
 		byte opcode = getMemory().getByte(getPC());
@@ -245,7 +318,7 @@ public class GBCpu {
 		int previousPC = getPC();
 		
 		String disassembledLine = null;
-		if (TRACE)  {
+		if (TRACE || startTrace)  {
 			disassembledLine = ">$" + Disassembler.shortToHex(getPC()) + " " + instruction.disassemble(m_memory, getPC());
 			while (disassembledLine.length() < 24) disassembledLine += " ";
 			for (Register8Bits reg8 : Register8Bits.values()) {
@@ -256,6 +329,7 @@ public class GBCpu {
 			}
 			disassembledLine += " Cycles=" + m_cyclesCount;
 			System.out.println(disassembledLine);
+			Thread.yield();
 		}
 		
 		setPC(getPC() + 1);
@@ -266,10 +340,14 @@ public class GBCpu {
 			setPC(getPC() + 1);
 		}
 		
+		int executionCycles = 0;
+		
 		try {
-			int executionCycles = instruction.execute(opcode, this, additionalBytes);
+			executionCycles = instruction.execute(opcode, this, additionalBytes);
 			m_cyclesCount += executionCycles;
-			return executionCycles;
+			if (instruction instanceof InstrRETI) {
+				Thread.yield();
+			}
 		}
 		catch (Exception ex) {
 			System.out.println("------------------------");
@@ -279,6 +357,12 @@ public class GBCpu {
 			System.out.println("------------------------");
 			throw ex;
 		}
+
+		if (m_delayedInterruptCount >= 0 && m_delayedInterruptCount-- == 0) {
+			setInterruptEnabled(m_delayedInterruptState, false);
+		}
+		
+		return executionCycles;
 	}
 	
 	private void processInterrupts() {

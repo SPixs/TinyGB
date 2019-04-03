@@ -2,7 +2,7 @@ package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
 
-public class InstrBit extends Instruction {
+public class InstrBIT extends Instruction {
 
 	//   ============================ Constants ==============================
 
@@ -63,7 +63,7 @@ public class InstrBit extends Instruction {
 		cpu.setFlagHalfCarry(true);
 		
 		int lowerNibble = (opcode & 0x0F);
-		if ((lowerNibble & 0x07) == 0x06) return 16;
+		if ((lowerNibble & 0x0F) == 0x06) return 16;
 		return 8;
 	}
 

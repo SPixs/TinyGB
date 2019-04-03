@@ -32,7 +32,8 @@ public class InstrEI extends Instruction {
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		// TODO : implement interrupts
+		// interrupts activation must be delayed after next instruction
+		cpu.setInterruptEnabled(true, true);
 		return 4;
 	}
 

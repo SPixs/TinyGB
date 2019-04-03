@@ -2,7 +2,7 @@ package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
 
-public class InstrAND extends Instruction {
+public class InstrOR extends Instruction {
 
 	//   ============================ Constants ==============================
 
@@ -21,15 +21,15 @@ public class InstrAND extends Instruction {
 	
 	private IAddressingMode getAddressingMode(byte opcode) {
 		switch (opcode) {
-			case (byte)0xA7: return new RegisterAddressingMode(Register8Bits.A);
-			case (byte)0xA0: return new RegisterAddressingMode(Register8Bits.B);
-			case (byte)0xA1: return new RegisterAddressingMode(Register8Bits.C);
-			case (byte)0xA2: return new RegisterAddressingMode(Register8Bits.D);
-			case (byte)0xA3: return new RegisterAddressingMode(Register8Bits.E);
-			case (byte)0xA4: return new RegisterAddressingMode(Register8Bits.H);
-			case (byte)0xA5: return new RegisterAddressingMode(Register8Bits.L);
-			case (byte)0xA6: return new IndirectAddressMode(Register16Bits.HL);
-			case (byte)0xE6: return new ImmediateAddressMode();
+			case (byte)0xB7: return new RegisterAddressingMode(Register8Bits.A);
+			case (byte)0xB0: return new RegisterAddressingMode(Register8Bits.B);
+			case (byte)0xB1: return new RegisterAddressingMode(Register8Bits.C);
+			case (byte)0xB2: return new RegisterAddressingMode(Register8Bits.D);
+			case (byte)0xB3: return new RegisterAddressingMode(Register8Bits.E);
+			case (byte)0xB4: return new RegisterAddressingMode(Register8Bits.H);
+			case (byte)0xB5: return new RegisterAddressingMode(Register8Bits.L);
+			case (byte)0xB6: return new IndirectAddressMode(Register16Bits.HL);
+			case (byte)0xF6: return new ImmediateAddressMode();
 		}
 		return null;
 	}
@@ -38,18 +38,18 @@ public class InstrAND extends Instruction {
 	public String disassemble(GBMemory memory, int address) {
 		byte opcode = memory.getByte(address);
 		IAddressingMode addressingMode = getAddressingMode(opcode);
-		return "AND " + addressingMode.asText(new byte[] { memory.getByte(address+1), memory.getByte(address+2) });
+		return "OR " + addressingMode.asText(new byte[] { memory.getByte(address+1), memory.getByte(address+2) });
 	}
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		byte valueToAND = getAddressingMode(opcode).readByte(cpu, additionnalBytes);
-		byte newValue = (byte) (cpu.getA() & valueToAND);
+		byte newValue = (byte) (cpu.getA() | valueToAND);
 		cpu.setA(newValue);
 
 		cpu.setFlagZero(newValue == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry(true);
+		cpu.setFlagHalfCarry(false);
 		cpu.setFlagCarry(false);
 		
 		if (opcode == (byte)0xA6) return 8;

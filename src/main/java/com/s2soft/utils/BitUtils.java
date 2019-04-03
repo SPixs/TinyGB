@@ -24,8 +24,10 @@ public class BitUtils {
 		return 0x00FF & v;
 	}
 
-	public static byte setBit(byte status, int index) {
-		status |= (1 << index);
+	public static byte setBit(byte status, int index, boolean value) {
+		byte mask = (byte) (1 << index);
+		status &= ~mask;
+		if (value) status |= mask;
 		return status;
 	}
 

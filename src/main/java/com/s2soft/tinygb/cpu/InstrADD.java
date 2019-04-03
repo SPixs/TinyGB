@@ -55,7 +55,7 @@ public class InstrADD extends Instruction {
 	@Override
 	public int getLengthInBytes(byte opcode) {
 		switch (opcode) {
-			case (byte)0xD6: return 2;
+			case (byte)0xC6: return 2;
 			default : return 1;
 		}
 	}

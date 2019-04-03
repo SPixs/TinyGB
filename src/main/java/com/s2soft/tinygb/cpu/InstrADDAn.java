@@ -3,7 +3,7 @@ package com.s2soft.tinygb.cpu;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.utils.BitUtils;
 
-public class InstrADCAn extends Instruction {
+public class InstrADDAn extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {
@@ -13,15 +13,15 @@ public class InstrADCAn extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x8F: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x88: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x89: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x8A: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x8B: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x8C: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x8D: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x8E: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xCE: return new ImmediateAddressMode();
+			case 0x87: return new RegisterAddressingMode(Register8Bits.A);
+			case 0x80: return new RegisterAddressingMode(Register8Bits.B);
+			case 0x81: return new RegisterAddressingMode(Register8Bits.C);
+			case 0x82: return new RegisterAddressingMode(Register8Bits.D);
+			case 0x83: return new RegisterAddressingMode(Register8Bits.E);
+			case 0x84: return new RegisterAddressingMode(Register8Bits.H);
+			case 0x85: return new RegisterAddressingMode(Register8Bits.L);
+			case 0x86: return new IndirectAddressMode(Register16Bits.HL);
+			case 0xC6: return new ImmediateAddressMode();
 		}
 		
 		return null;
@@ -31,7 +31,7 @@ public class InstrADCAn extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
 		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
-		int result = BitUtils.toUInt(cpu.getA()) + value + (cpu.getFlagCarry() ? 1 : 0);
+		int result = BitUtils.toUInt(cpu.getA()) + value;
 
 		cpu.setA(BitUtils.toByte(result));
 		
@@ -41,8 +41,8 @@ public class InstrADCAn extends Instruction {
 		cpu.setFlagCarry(result > 0x0FF);
 		
 		switch ((int)opcode) {
-			case 0x8D:
-			case 0xCE: return 8;
+			case 0x86:
+			case 0xC6: return 8;
 			default : return 4;
 		}
 	}
@@ -51,7 +51,7 @@ public class InstrADCAn extends Instruction {
 	public String disassemble(GBMemory memory, int address) {
 		byte opcode = memory.getByte(address);
 		IAddressingMode addressingMode = getAddressingMode(opcode);
-		return "ADC A," + addressingMode.asText(new byte[] { memory.getByte(address+1) });
+		return "ADD A," + addressingMode.asText(new byte[] { memory.getByte(address+1) });
 	}
 
 	@Override

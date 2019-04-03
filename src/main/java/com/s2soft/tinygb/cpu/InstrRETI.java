@@ -2,13 +2,7 @@ package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
 
-/**
- * This instruction disables interrupts but not immediately. 
- * Interrupts are disabled after instruction after DI is executed.
- * 
- * @author smametz
- */
-public class InstrDI extends Instruction {
+public class InstrRETI extends Instruction {
 
 	//   ============================ Constants ==============================
 
@@ -22,19 +16,21 @@ public class InstrDI extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {
-		return opcode == (byte)0xF3;
+		return opcode == (byte)0xD9;
 	}
 	
 	@Override
 	public String disassemble(GBMemory memory, int address) {
-		return "DI";
+		return "RETI";
 	}
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		// interrupts deactivation must be delayed after next instruction
-		cpu.setInterruptEnabled(false, true);
-		return 4;
+		int pulledValue = cpu.pullValue();
+		cpu.setPC(pulledValue);
+		cpu.setInterruptEnabled(true, false);
+
+		return 8;
 	}
 
 	@Override

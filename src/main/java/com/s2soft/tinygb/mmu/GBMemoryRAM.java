@@ -22,7 +22,10 @@ public class GBMemoryRAM implements IAddressable {
 
 	public void setByte(int address, byte b) {
 		m_memory[address] = b;
-		System.out.println("Set " + Instruction.toHexByte((byte)(b & 0x0FF)) + " at " + Instruction.toHexShort(address) );
+		if (address == 0xFF85) {
+			Thread.yield();
+			System.out.println("Set " + Instruction.toHexByte((byte)(b & 0x0FF)) + " at " + Instruction.toHexShort(address) );
+		}
 	}
 	
 	public byte getByte(int address) {

@@ -149,7 +149,7 @@ public class GBGPU {
 	
 	public void setLCDEnable(boolean set) {
 		boolean oldState = isLCDEnabled();
-		setLCDControl(BitUtils.setBit(getLCDControl(), 7));
+		setLCDControl(BitUtils.setBit(getLCDControl(), 7, set));
 		if (!set && (set != oldState)) {
 			setScanLine(0);
 		}

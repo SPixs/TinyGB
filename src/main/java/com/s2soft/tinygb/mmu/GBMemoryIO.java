@@ -40,6 +40,8 @@ public class GBMemoryIO implements IAddressable {
 	
 	public GBMemoryIO(GameBoy gameBoy) {
 		m_gameBoy = gameBoy;
+		addRegister(0xFF00, "JOYP", () -> m_gameBoy.getJoypadHandler().read() , (v) -> { m_gameBoy.getJoypadHandler().write(v); } );
+		addRegister(0xFF0F, "IF", () -> m_gbMemory.getInterruptFlag() , (v) -> { m_gbMemory.setInterruptFlag(v); } );
 		addRegister(0xFF40, "LCDC", () -> m_gpu.getLCDControl() , (v) -> { m_gpu.setLCDControl(v); } );
 		addRegister(0xFF41, "STAT", () -> m_gpu.getLCDStatus() , (v) -> { m_gpu.setLCDStatus(v); } );
 		addRegister(0xFF42, "SCY", () -> BitUtils.toByte(m_gpu.getScrollY()) , (v) -> { m_gpu.setScrollY(BitUtils.toUInt(v)); } );

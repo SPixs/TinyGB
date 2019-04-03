@@ -1,5 +1,7 @@
 package com.s2soft.tinygb;
 
+import com.s2soft.tinygb.control.IJoypad;
+import com.s2soft.tinygb.control.JoypadHandler;
 import com.s2soft.tinygb.cpu.GBCpu;
 import com.s2soft.tinygb.display.IDisplay;
 import com.s2soft.tinygb.gpu.GBGPU;
@@ -16,14 +18,16 @@ public class GameBoy {
 	private GBGPU m_gpu;
 	private int m_clockCount;
 	private IDisplay m_display;
+	private JoypadHandler m_joypadHandler;
 
 	//	 =========================== Constructor =============================
 
-	public GameBoy(IDisplay display) {
+	public GameBoy(IDisplay display, IJoypad joypad) {
 		m_display = display;
 		m_memory = new GBMemory(this);
 		m_gpu = new GBGPU(this);
 		m_cpu = new GBCpu(this);
+		m_joypadHandler = new JoypadHandler(joypad);
 		reset();
 	}
 
@@ -49,6 +53,10 @@ public class GameBoy {
 		return m_display;
 	}
 	
+	public JoypadHandler getJoypadHandler() {
+		return m_joypadHandler;
+	}
+
 	//	 ========================= Treatment methods =========================
 
 	public void setCartidge(Cartidge cartidge) {

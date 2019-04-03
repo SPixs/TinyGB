@@ -57,8 +57,8 @@ public class GPUFifo {
 			throw new IllegalStateException("Cannot put pixel fifo. Size must be <= 8 : " + m_usedSpace);
 		}
 		for (int i=7;i>=0;i--) {
-			byte pixelValue = (byte) (BitUtils.isSet(data2, i) ? 0x10 : 0x00) ;
-			pixelValue |= BitUtils.isSet(data1, i) ? 0x01 : 0x0;
+			byte pixelValue = (byte) (BitUtils.isSet(data2, i) ? 0b01 : 0b00) ;
+			pixelValue |= BitUtils.isSet(data1, i) ? 0b10 : 0b00;
 			m_queue[m_usedSpace++] = pixelValue;
 		}
 	}

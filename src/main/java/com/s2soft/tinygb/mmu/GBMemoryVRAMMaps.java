@@ -8,6 +8,8 @@ public class GBMemoryVRAMMaps implements IAddressable {
 
 	//   ============================ Constants ==============================
 
+	private final static boolean TRACE = false;
+	
 	private static final int BASE_ADDRESS = 0x9800;
 
 	//	 =========================== Attributes ==============================
@@ -31,8 +33,10 @@ public class GBMemoryVRAMMaps implements IAddressable {
 		int mapIndex = offset / 0x400;
 		int tileX = (offset % 0x400) % 32;
 		int tileY = (offset % 0x400) / 32;
-		System.out.println("Writing to VRAM Map[" + mapIndex + "] tileX=" + tileX + "  tileY=" + tileY +" , value=" +
-				Instruction.toHexByte(value));
+		if (TRACE) {
+			System.out.println("Writing to VRAM Map[" + mapIndex + "] tileX=" + tileX + "  tileY=" + tileY +" , value=" +
+					Instruction.toHexByte(value));
+		}
 		m_vram[offset] = value;
 	}
 

@@ -16,7 +16,7 @@ public class AbsoluteAddressingMode implements IAddressingMode {
 	//	 ========================= Treatment methods =========================
 
 	public byte readByte(GBCpu cpu, byte[] additionalBytes) {
-		int address = (short) ((additionalBytes[0] & 0x0ff) | ((additionalBytes[1] << 8) & 0xFF00));
+		int address = ((additionalBytes[0] & 0x0ff) | ((additionalBytes[1] << 8) & 0xFF00));
 		return cpu.getMemory().getByte(address);
 	}
 
