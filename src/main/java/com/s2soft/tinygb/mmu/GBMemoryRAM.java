@@ -22,9 +22,8 @@ public class GBMemoryRAM implements IAddressable {
 
 	public void setByte(int address, byte b) {
 		m_memory[address] = b;
-		if (address == 0xFF85) {
-			Thread.yield();
-			System.out.println("Set " + Instruction.toHexByte((byte)(b & 0x0FF)) + " at " + Instruction.toHexShort(address) );
+		if (address == 0xFFE1) {
+			System.out.println(">>> Tetris set machine state : " + b);
 		}
 	}
 	
