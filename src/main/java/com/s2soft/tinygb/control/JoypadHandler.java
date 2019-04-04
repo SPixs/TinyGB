@@ -26,13 +26,15 @@ public class JoypadHandler implements IJoypadButtonListener {
 	//	 ========================= Treatment methods =========================
 
 	public synchronized byte read() {
-		byte result = (byte)(0b11001111 | m_matrixColumnSelection);
+		byte result = (byte) 0xFF;//(byte)(0b11001111 | m_matrixColumnSelection);
 		for (JoypadButton pressedButton : m_pressedButton) {
 			if ((pressedButton.getJ() &  m_matrixColumnSelection) == 0) {
 				result &= ~pressedButton.getI();
-				System.out.println(Instruction.toHexByte(result) + " " + m_pressedButton.iterator().next());
 				Thread.yield();
 			}
+		}
+		if (!m_pressedButton.isEmpty()) {
+			System.out.println(Instruction.toHexByte(result) + " " + Integer.toBinaryString(result & 0x0FF) + " " + m_pressedButton.iterator().next());
 		}
 		return result;
 	}

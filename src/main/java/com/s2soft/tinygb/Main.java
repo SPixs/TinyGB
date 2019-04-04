@@ -30,7 +30,7 @@ public class Main {
 		
 		Cartidge cartidge = new Cartidge();
 		cartidge.read(Main.class.getResourceAsStream("/Tetris.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/Bomb Jack (U).gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/Game Boy Controller Kensa Cartridge.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/Tennis (W) [!].gb"));
 		gameBoy.setCartidge(cartidge);
 		

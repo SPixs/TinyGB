@@ -44,6 +44,7 @@ public class InstrSWAP extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		byte value = getAddressingMode(opcode).readByte(cpu, additionnalBytes);
 		byte result = (byte) ((value & 0x0F) << 4 | (value & 0x0F0) >> 4);
+		getAddressingMode(opcode).setByte(cpu, result, additionnalBytes);
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(false);
