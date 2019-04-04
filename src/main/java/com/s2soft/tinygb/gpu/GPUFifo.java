@@ -85,4 +85,10 @@ public class GPUFifo {
 	public boolean isEnabled() {
 		return m_enabled;
 	}
+
+	public void overlaySprite() {
+		for (int i=0;i<8;i++) {
+			m_queue[i] = (byte)(4*Math.random());
+		}
+	}
 }

@@ -95,6 +95,7 @@ public class GPUFetcher {
 	            break;
            case PUSH_SPRITE:
         	   m_scheduledSprite = null;
+        	   m_gpu.getPixelsFifo().overlaySprite();
                m_state = STATE.READ_TILE_ID;
 		}
 	}

@@ -3,6 +3,8 @@ package com.s2soft.tinygb.control;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.s2soft.tinygb.cpu.Instruction;
+
 public class JoypadHandler implements IJoypadButtonListener {
 
 	//   ============================ Constants ==============================
@@ -24,10 +26,12 @@ public class JoypadHandler implements IJoypadButtonListener {
 	//	 ========================= Treatment methods =========================
 
 	public synchronized byte read() {
-		byte result = (byte) 0xEF;
+		byte result = (byte)(0b11001111 | m_matrixColumnSelection);
 		for (JoypadButton pressedButton : m_pressedButton) {
-			if (pressedButton.getJ() == m_matrixColumnSelection) {
+			if ((pressedButton.getJ() &  m_matrixColumnSelection) == 0) {
 				result &= ~pressedButton.getI();
+				System.out.println(Instruction.toHexByte(result) + " " + m_pressedButton.iterator().next());
+				Thread.yield();
 			}
 		}
 		return result;
