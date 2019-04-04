@@ -91,6 +91,7 @@ public class GPUFetcher {
 		}
 	}
 
+	
 	public boolean hasSpriteSchedule() {
 		// TODO Auto-generated method stub
 		return false;
