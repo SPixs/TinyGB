@@ -1,7 +1,5 @@
 package com.s2soft.tinygb.gpu;
 
-import com.s2soft.tinygb.cpu.Instruction;
-
 public class GPUFetcher {
 
 	//   ============================ Constants ==============================
@@ -22,6 +20,12 @@ public class GPUFetcher {
 		READ_FIRST_BITPLANE,
 		READ_SECOND_BITPLANE,
 		IDLE,
+		
+		READ_SPRITE_TILE_ID,
+		READ_SPRITE_FLAGS,
+		READ_SPRITE_DATA_1,
+		READ_SPRITE_DATA_2,
+		PUSH_SPRITE
 	}
 	
 	private STATE m_state;
@@ -30,6 +34,8 @@ public class GPUFetcher {
 
 	private byte m_firstBitplaneData;
 	private byte m_secondBitplaneData;
+
+	private Object m_scheduledSprite;
 
 
 	//	 =========================== Constructor =============================
@@ -75,6 +81,21 @@ public class GPUFetcher {
 					step();
 				}
 				break;
+		   case READ_SPRITE_TILE_ID:
+			   m_state = STATE.READ_SPRITE_FLAGS;
+			   break;
+		   case READ_SPRITE_FLAGS:
+			   m_state = STATE.READ_SPRITE_DATA_1;
+                break;
+           case READ_SPRITE_DATA_1:
+        	   m_state = STATE.READ_SPRITE_DATA_2;
+                break;
+           case READ_SPRITE_DATA_2:
+        	   m_state = STATE.PUSH_SPRITE;
+	            break;
+           case PUSH_SPRITE:
+        	   m_scheduledSprite = null;
+               m_state = STATE.READ_TILE_ID;
 		}
 	}
 
@@ -91,14 +112,12 @@ public class GPUFetcher {
 		}
 	}
 
-	
-	public boolean hasSpriteSchedule() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean hasScheduledSprite() {
+		return m_scheduledSprite != null;
 	}
 
 	public void scheduleSprite(GPUSprite sprite) {
-		// TODO Auto-generated method stub
-		
+		m_scheduledSprite = sprite;
+		m_state = STATE.READ_SPRITE_TILE_ID;
 	}
 }

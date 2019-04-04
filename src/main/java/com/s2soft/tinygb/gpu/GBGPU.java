@@ -238,15 +238,18 @@ public class GBGPU {
 
 		long elapsedClockCountInPhase = m_phase.getElapsedClockCountInPhase();
 		
-		if (areSpritesEnabled()) {
+		if (areSpritesEnabled() && m_pixelsFifo.canPull()) {
+			GPUSprite visibleSprite = null;
 			for (GPUSprite sprite : m_visibleSprites) {
-				if (!m_fetcher.hasSpriteSchedule() && sprite.getX() - 8 == pixelsCount) { // TODO : handle offscreen sprites with partial visibility
+				if (!m_fetcher.hasScheduledSprite() && sprite.getX() - 8 == pixelsCount) { // TODO : handle offscreen sprites with partial visibility
 					m_fetcher.scheduleSprite(sprite);
+					visibleSprite = sprite;
 				}
 			}
+			m_visibleSprites.remove(visibleSprite);
 		}
 		
-		m_pixelsFifo.setEnabled(!m_fetcher.hasSpriteSchedule());
+		m_pixelsFifo.setEnabled(!m_fetcher.hasScheduledSprite());
 		
 		// Fifo is running at machine clock speed (4.194304Mhz)
 		if (m_pixelsFifo.isEnabled() && m_pixelsFifo.canPull()) {

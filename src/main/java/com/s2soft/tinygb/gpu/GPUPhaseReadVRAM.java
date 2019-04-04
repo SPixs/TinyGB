@@ -22,7 +22,7 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 	//	 ========================= Treatment methods =========================
 	
 	@Override
-	protected void enterImpl() {
+	protected void enterImpl() {  
 		// compute base BG tile address for current line
 		int tilesBaseAddress = (getGpu().getBGMapIndex() == 0) ? 0x09800 : 0x09C00;
 		int currentLine = getGpu().getScanLine();
