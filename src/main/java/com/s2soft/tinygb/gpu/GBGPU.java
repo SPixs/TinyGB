@@ -1,5 +1,8 @@
 package com.s2soft.tinygb.gpu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Disassembler;
 import com.s2soft.tinygb.display.IDisplay;
@@ -37,6 +40,11 @@ public class GBGPU {
 	private GPUFifo m_pixelsFifo;
 
 	private byte m_bgPalette;
+	private byte m_oamPalette2;
+	private byte m_oamPalette1;
+	
+	private GPUSprite[] m_sprites;
+	private ArrayList<GPUSprite> m_visibleSprites = new ArrayList<GPUSprite>(10);
 
 	//	 =========================== Constructor =============================
 
@@ -45,6 +53,11 @@ public class GBGPU {
 		m_memory = m_gameBoy.getMemory();
 		m_fetcher = new GPUFetcher(this);
 		m_pixelsFifo = new GPUFifo(this);
+		
+		m_sprites = new GPUSprite[40];
+		for (int i=0;i<40;i++) {
+			m_sprites[i] = new GPUSprite(this, i);
+		}
 	}
 
 	//	 ========================== Access methods ===========================
@@ -98,9 +111,20 @@ public class GBGPU {
 		
 		byte oldControl = m_lcdControl;
 		m_lcdControl = v;
-		if (BitUtils.isSet(oldControl, 7) != BitUtils.isSet(v, 7)) {
-			setLCDEnable(BitUtils.isSet(v, 7));
+		if (BitUtils.isSet(oldControl, 7) != BitUtils.isSet(m_lcdControl, 7)) {
+			if (!BitUtils.isSet(m_lcdControl, 7)) {
+				setScanLine(0);
+			}
+			else {
+				enterPhase(PHASE_FETCH_OAM);
+			}
 		}
+//		setLCDEnable(BitUtils.isSet(v, 7));
+//		}
+	}
+	
+	public GPUSprite getSprite(int index) {
+		return m_sprites[index];
 	}
 
 	/**
@@ -131,6 +155,22 @@ public class GBGPU {
 		m_bgPalette = v;
 	}
 	
+	public byte getOMAPalette1Data() {
+		return m_oamPalette1;
+	}
+
+	public void setOMAPalette1Data(byte v) {
+		m_oamPalette2 = v;
+	}
+
+	public void setOMAPalette2Data(byte v) {
+		m_oamPalette2 = v;
+	}
+
+	public byte getOMAPalette2Data() {
+		return m_oamPalette2;
+	}
+
 	public byte getLCDStatus() {
 		return m_lcdStatus;
 	}
@@ -149,12 +189,8 @@ public class GBGPU {
 	
 	public void setLCDEnable(boolean set) {
 		boolean oldState = isLCDEnabled();
-		setLCDControl(BitUtils.setBit(getLCDControl(), 7, set));
-		if (!set && (set != oldState)) {
-			setScanLine(0);
-		}
-		else if (set && (set != oldState)) {
-			enterPhase(PHASE_FETCH_OAM);
+		if (set != oldState) {
+			setLCDControl(BitUtils.setBit(getLCDControl(), 7, set));
 		}
 	}
 
@@ -162,6 +198,10 @@ public class GBGPU {
 		return BitUtils.isSet(m_lcdControl, 7);
 	}
 	
+	public boolean areSpritesEnabled() {
+		return BitUtils.isSet(getLCDControl(), 1);
+	}
+
 	public void setLineStartClock(long enterClock) {
 		m_lineStartClock = enterClock;
 	}
@@ -189,7 +229,8 @@ public class GBGPU {
 	}
 	
 	int pixelsCount = 0;
-	
+	int pixelsTrashed = 0;
+
 	public void step() {
 		if (!isLCDEnabled()) { 
 			return; 
@@ -197,15 +238,27 @@ public class GBGPU {
 
 		long elapsedClockCountInPhase = m_phase.getElapsedClockCountInPhase();
 		
+		if (areSpritesEnabled()) {
+			for (GPUSprite sprite : m_visibleSprites) {
+				if (!m_fetcher.hasSpriteSchedule() && sprite.getX() - 8 == pixelsCount) { // TODO : handle offscreen sprites with partial visibility
+					m_fetcher.scheduleSprite(sprite);
+				}
+			}
+		}
+		
+		m_pixelsFifo.setEnabled(!m_fetcher.hasSpriteSchedule());
+		
 		// Fifo is running at machine clock speed (4.194304Mhz)
-		if (m_pixelsFifo.canPull()) {
+		if (m_pixelsFifo.isEnabled() && m_pixelsFifo.canPull()) {
 //			System.out.println("Elapsed clock in ReadVRAM : " + m_phase.getElapsedClockCountInPhase());
 			byte pixel = m_pixelsFifo.pullPixel();
-			getDisplay().putPixel(pixel);
-//			if (pixel != 0) {
-//				System.out.println("Can read pixel " + pixel);
-//			}
-			pixelsCount++;
+			if (pixelsTrashed < getScrollX()) {
+				pixelsTrashed++;
+			}
+			else {
+				getDisplay().putPixel(pixel);
+				pixelsCount++;
+			}
 		}
 
 		// Each access to VRAM (B, 0, 1, s) takes 2 cycles to occur.  A "cycle" is
@@ -219,16 +272,34 @@ public class GBGPU {
 					System.out.println("Elapsed clock in ReadVRAM : " + elapsedClockCountInPhase);
 				}
 				pixelsCount = 0;
+				pixelsTrashed = 0;
 				enterPhase(PHASE_HBLANK);
 			}
 			m_phase.step();
 		}
-		
+	}
+
+	/**
+	 * Add up to 10 sprites to the list of visible sprites on current raster line
+	 * @param sprite
+	 */
+	public void addVisibleSprite(GPUSprite sprite) {
+		System.out.println("Adding visible sprite " + sprite.getIndex());
+		if (m_visibleSprites.size() < 10) {
+			m_visibleSprites.add(sprite);
+		}
+	}
+
+	public void clearVisibleSprites() {
+		m_visibleSprites.clear();
 	}
 
 	public void reset() {
+		m_pixelsFifo.setEnabled(true);
+		pixelsCount = 0;
 		setScanLine(0);
 		enterPhase(PHASE_FETCH_OAM);
 	}
+
 }
 

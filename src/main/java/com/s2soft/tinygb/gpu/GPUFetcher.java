@@ -90,4 +90,14 @@ public class GPUFetcher {
 			return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
 		}
 	}
+
+	public boolean hasSpriteSchedule() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void scheduleSprite(GPUSprite sprite) {
+		// TODO Auto-generated method stub
+		
+	}
 }

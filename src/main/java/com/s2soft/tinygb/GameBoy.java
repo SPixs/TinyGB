@@ -4,6 +4,7 @@ import com.s2soft.tinygb.control.IJoypad;
 import com.s2soft.tinygb.control.JoypadHandler;
 import com.s2soft.tinygb.cpu.GBCpu;
 import com.s2soft.tinygb.display.IDisplay;
+import com.s2soft.tinygb.dma.DMA;
 import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.tinygb.timer.Timers;
@@ -21,6 +22,7 @@ public class GameBoy {
 	private IDisplay m_display;
 	private JoypadHandler m_joypadHandler;
 	private Timers m_timers;
+	private DMA m_dma;
 
 	//	 =========================== Constructor =============================
 
@@ -29,6 +31,7 @@ public class GameBoy {
 		m_memory = new GBMemory(this);
 		m_gpu = new GBGPU(this);
 		m_cpu = new GBCpu(this);
+		m_dma = new DMA(this);
 		m_joypadHandler = new JoypadHandler(joypad);
 		m_timers = new Timers(this);
 		reset();
@@ -64,6 +67,11 @@ public class GameBoy {
 		return m_timers;
 	}
 
+
+	public DMA getDMA() {
+		return m_dma;
+	}
+
 	//	 ========================= Treatment methods =========================
 
 	public void setCartidge(Cartidge cartidge) {
@@ -97,6 +105,7 @@ public class GameBoy {
 			}
 			m_gpu.step();
 			m_timers.step();
+			m_dma.step();
 			
 			// Ensure emulation is synchronized with real time
 			if (m_clockCount % 1000 == 0) {

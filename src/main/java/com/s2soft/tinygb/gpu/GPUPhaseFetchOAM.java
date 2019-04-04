@@ -11,6 +11,8 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 
 	//	 =========================== Attributes ==============================
 
+	private final static int m_oamBaseAddress = 0xFE00;
+
 	//	 =========================== Constructor =============================
 
 	public GPUPhaseFetchOAM(String name) {
@@ -26,6 +28,7 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 		getGpu().setLineStartClock(getEnterClock());
 		getGpu().getPixelsFifo().clear();
 		getGpu().getFetcher().reset();
+		getGpu().clearVisibleSprites();
 	}
 
 	@Override
@@ -33,6 +36,17 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 		if (elapsedClockCount >= 80) {
 			setPhase(GBGPU.PHASE_READ_VRAM);
 			getGpu().step();
+		}
+		else {
+			if (getGpu().areSpritesEnabled() && elapsedClockCount % 2 == 0) {
+				// update sprite attributes from OAM
+				int sprintIndex = (int) (elapsedClockCount / 2);
+				final GPUSprite sprite = getGpu().getSprite(sprintIndex);
+				sprite.update();
+				if (sprite.isVisible(getGpu().getScanLine())) {
+					getGpu().addVisibleSprite(sprite);
+				}
+			}
 		}
 	}
 }

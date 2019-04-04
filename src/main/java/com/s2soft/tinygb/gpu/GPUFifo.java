@@ -15,6 +15,8 @@ public class GPUFifo {
 	private int m_usedSpace = 0;
 
 	private GBGPU m_gpu;
+
+	private boolean m_enabled;
 	
 	//	 =========================== Constructor =============================
 	
@@ -57,8 +59,8 @@ public class GPUFifo {
 			throw new IllegalStateException("Cannot put pixel fifo. Size must be <= 8 : " + m_usedSpace);
 		}
 		for (int i=7;i>=0;i--) {
-			byte pixelValue = (byte) (BitUtils.isSet(data2, i) ? 0b01 : 0b00) ;
-			pixelValue |= BitUtils.isSet(data1, i) ? 0b10 : 0b00;
+			byte pixelValue = (byte) (BitUtils.isSet(data1, i) ? 0b01 : 0b00) ;
+			pixelValue |= BitUtils.isSet(data2, i) ? 0b10 : 0b00;
 			m_queue[m_usedSpace++] = pixelValue;
 		}
 	}
@@ -74,5 +76,13 @@ public class GPUFifo {
 	public void clear() {
 		Arrays.fill(m_queue, (byte)0); // Not necessary
 		m_usedSpace = 0;
+	}
+
+	public void setEnabled(boolean b) {
+		m_enabled = b;
+	}
+	
+	public boolean isEnabled() {
+		return m_enabled;
 	}
 }

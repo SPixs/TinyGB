@@ -52,14 +52,14 @@ public class InstrOR extends Instruction {
 		cpu.setFlagHalfCarry(false);
 		cpu.setFlagCarry(false);
 		
-		if (opcode == (byte)0xA6) return 8;
-		if (opcode == (byte)0xE6) return 8;
+		if (opcode == (byte)0xB6) return 8;
+		if (opcode == (byte)0xF6) return 8;
 		return 4;
 	}
 
 	@Override
 	public int getLengthInBytes(byte opcode) {
-		if (opcode == (byte)0xE6) return 2;
+		if (opcode == (byte)0xF6) return 2;
 		return 1;
 	}
 }

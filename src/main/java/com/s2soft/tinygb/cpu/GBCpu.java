@@ -222,6 +222,8 @@ public class GBCpu {
 		m_extraInstructions.add(new InstrRL());
 		m_extraInstructions.add(new InstrRR());
 		m_extraInstructions.add(new InstrSRL());
+		m_extraInstructions.add(new InstrSLA());
+		m_extraInstructions.add(new InstrSRA());
 		m_extraInstructions.add(new InstrSWAP());
 		
 //		m_instructions.add(new InstrRET());
@@ -266,7 +268,7 @@ public class GBCpu {
 
 		processInterrupts();
 		
-		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x0393 && getPC() <= 0x03A0;
+//		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x0393 && getPC() <= 0x03A0;
 		
 		if (getPC() == 0x0028) {
 			System.out.println(">>> Tetris main loop");
@@ -489,5 +491,19 @@ public class GBCpu {
 	
 	public boolean getFlagCarry() {
 		return (m_f & 0x10) != 0;
+	}
+	
+	@Override
+	public String toString() {
+		String cpuStatus = "PC=" + Disassembler.shortToHex(getPC()) + " ";
+		for (Register8Bits reg8 : Register8Bits.values()) {
+			cpuStatus += " " + reg8.name()+"="+Instruction.toHexByte(reg8.getValue(this));
+		}
+		for (Register16Bits reg16 : Register16Bits.values()) {
+			cpuStatus += " " + reg16.name()+"="+Instruction.toHexShort(reg16.getValue(this));
+		}
+		cpuStatus += " Cycles=" + m_cyclesCount;
+		
+		return cpuStatus;
 	}
 }

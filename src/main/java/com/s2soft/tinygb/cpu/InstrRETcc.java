@@ -39,8 +39,11 @@ public class InstrRETcc extends Instruction {
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		int pulledValue = cpu.pullValue();
-		cpu.setPC(pulledValue);
+		FlagCondition flagCondition = getFlagCondition(opcode);
+		if (flagCondition.evaluate(cpu)) {
+			int pulledValue = cpu.pullValue();
+			cpu.setPC(pulledValue);
+		}
 
 		return 8;
 	}

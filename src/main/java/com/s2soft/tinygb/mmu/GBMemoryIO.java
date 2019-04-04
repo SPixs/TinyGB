@@ -51,7 +51,10 @@ public class GBMemoryIO implements IAddressable {
 		addRegister(0xFF42, "SCY", () -> BitUtils.toByte(m_gpu.getScrollY()) , (v) -> { m_gpu.setScrollY(BitUtils.toUInt(v)); } );
 		addRegister(0xFF43, "SCX", () -> BitUtils.toByte(m_gpu.getScrollX()) , (v) -> { m_gpu.setScrollX(BitUtils.toUInt(v)); } );
 		addRegister(0xFF44, "LY", () -> getLCDY() , (v) -> {} );
+		addRegister(0xFF46, "DMA", () -> m_gameBoy.getDMA().getStartPageNumber() , (v) -> {  m_gameBoy.getDMA().start(v); } );
 		addRegister(0xFF47, "BGP", () -> m_gpu.getBGPaletteData() , (v) -> { m_gpu.setBGPaletteData(v); });
+		addRegister(0xFF48, "OBP0", () -> m_gpu.getOMAPalette1Data() , (v) -> { m_gpu.setOMAPalette1Data(v); });
+		addRegister(0xFF49, "0BP1", () -> m_gpu.getOMAPalette2Data() , (v) -> { m_gpu.setOMAPalette2Data(v); });
 		addRegister(0xFF50, "BOOTRomLock", () -> m_bootROMLockRegister , (v) -> { setBootRommLockRegister(v); });
 	}
 

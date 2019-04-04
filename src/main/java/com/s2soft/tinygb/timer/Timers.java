@@ -1,10 +1,13 @@
 package com.s2soft.tinygb.timer;
 
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.cpu.Instruction;
 
 public class Timers {
 
-	//  ============================ Constants ==============================
+	//   ============================ Constants ==============================
+	
+	private final static boolean TRACE = true;
 	
 	//	 =========================== Attributes ==============================
 	
@@ -35,6 +38,9 @@ public class Timers {
 	//	 ========================== Access methods ===========================
 		
 	public void setTimerEnabled(boolean enabled) {
+		if (TRACE) {
+			System.out.println("Setting timer enabled : " + enabled);
+		}
 		m_timerEnabled = enabled;
 	}
 	
@@ -47,18 +53,30 @@ public class Timers {
 	}
 
 	public void setTimerModulo(byte timerModulo) {
+		if (TRACE) {
+			System.out.println("Setting timer modulo : " + timerModulo);
+		}
 		m_timerModulo = timerModulo;
 	}
 
 	public byte getTimerRegister() {
+		if (TRACE) {
+			System.out.println("Reading from timer : " + Instruction.toHexByte(m_timerRegister));
+		}
 		return m_timerRegister;
 	}
 
 	public void setTimerRegister(byte timerRegister) {
+		if (TRACE) {
+			System.out.println("Writing to timer : " + timerRegister);
+		}
 		m_timerRegister = timerRegister;
 	}
 
 	public byte getDividerRegister() {
+		if (TRACE) {
+			System.out.println("Reading divider register : " + Instruction.toHexByte(m_dividerRegister));
+		}
 		return m_dividerRegister;
 	}
 
@@ -93,6 +111,9 @@ public class Timers {
 	}
 
 	public void resetDividerRegister() {
+		if (TRACE) {
+			System.out.println("Reset divider register");
+		}
 		m_dividerRegister = 0;
 	}
 	
@@ -107,6 +128,9 @@ public class Timers {
 	 * @param clockSelect
 	 */
 	public void setInputClock(byte clockSelect) {
+		if (TRACE) {
+			System.out.println("Setting input clock : " + Instruction.toHexByte(clockSelect));
+		}
 		m_clockSelect = clockSelect;
 		resetTimerCounter();
 	}
