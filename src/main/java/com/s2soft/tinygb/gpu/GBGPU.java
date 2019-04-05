@@ -82,7 +82,7 @@ public class GBGPU {
 	}
 
 	public void setScrollY(int value) {
-		System.out.println("Set ScrollY="+value);
+//		System.out.println("Set ScrollY="+value);
 		m_scrollY = value;
 	}
 
@@ -91,7 +91,7 @@ public class GBGPU {
 	}
 
 	public void setScrollX(int value) {
-		System.out.println("Set ScrollX="+value);
+//		System.out.println("Set ScrollX="+value);
 		m_scrollX = value;
 	}
 
@@ -277,7 +277,7 @@ public class GBGPU {
 //		if (((m_gameBoy.getClockCount() - m_phase.getEnterClock()) % 2) == 0) {
 		if (elapsedClockCountInPhase % 2 == 0) {
 			if (pixelsCount > 0 && pixelsCount % 160 == 0) {
-				if (elapsedClockCountInPhase != 172) {
+				if (TRACE & elapsedClockCountInPhase != 172) {
 					System.out.println("Elapsed clock in ReadVRAM : " + elapsedClockCountInPhase);
 				}
 				pixelsCount = 0;
@@ -293,7 +293,7 @@ public class GBGPU {
 	 * @param sprite
 	 */
 	public void addVisibleSprite(GPUSprite sprite) {
-		System.out.println("Adding visible sprite " + sprite.getIndex());
+//		System.out.println("Adding visible sprite " + sprite.getIndex());
 		if (m_visibleSprites.size() < 10) {
 			m_visibleSprites.add(sprite);
 		}

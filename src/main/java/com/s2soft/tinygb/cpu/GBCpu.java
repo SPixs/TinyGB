@@ -269,6 +269,7 @@ public class GBCpu {
 		processInterrupts();
 		
 //		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x0393 && getPC() <= 0x03A0;
+//		startTrace = true;
 		
 		if (getPC() == 0x0028) {
 			System.out.println(">>> Tetris main loop");
