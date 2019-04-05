@@ -24,14 +24,17 @@ public class GameBoy {
 	private Timers m_timers;
 	private DMA m_dma;
 
+	private IConfiguration m_configuration;
+
 	//	 =========================== Constructor =============================
 
-	public GameBoy(IDisplay display, IJoypad joypad) {
+	public GameBoy(IConfiguration configuration, IDisplay display, IJoypad joypad) {
 		m_display = display;
 		m_memory = new GBMemory(this);
 		m_gpu = new GBGPU(this);
 		m_cpu = new GBCpu(this);
 		m_dma = new DMA(this);
+		m_configuration = configuration;
 		m_joypadHandler = new JoypadHandler(joypad);
 		m_timers = new Timers(this);
 		reset();
@@ -83,6 +86,13 @@ public class GameBoy {
 		m_clockCount = 0;
 		m_cpu.reset();
 		m_gpu.reset();
+		
+		if (!m_configuration.useBootRom()) {
+			m_memory.setBootROMLock(false);
+			m_cpu.setPc(0x0100);
+			m_gpu.setLCDEnable(true);
+			m_cpu.setSp(0xFFFE);
+		}
 	}
 
 

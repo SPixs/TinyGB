@@ -121,6 +121,12 @@ public class GBGPU {
 		}
 //		setLCDEnable(BitUtils.isSet(v, 7));
 //		}
+		if (areSpritesEnabled()) {
+			Thread.yield();
+		}
+		else {
+			Thread.yield();
+		}
 	}
 	
 	public GPUSprite getSprite(int index) {
@@ -238,7 +244,7 @@ public class GBGPU {
 
 		long elapsedClockCountInPhase = m_phase.getElapsedClockCountInPhase();
 		
-		if (areSpritesEnabled() && m_pixelsFifo.canPull()) {
+		if (areSpritesEnabled() && m_pixelsFifo.canOverlay()) {
 			GPUSprite visibleSprite = null;
 			for (GPUSprite sprite : m_visibleSprites) {
 				if (!m_fetcher.hasScheduledSprite() && sprite.getX() - 8 == pixelsCount) { // TODO : handle offscreen sprites with partial visibility

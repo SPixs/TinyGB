@@ -26,11 +26,12 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		LCDDisplay lcdDisplay = new LCDDisplay();
 		SwingJoypad joypad = new SwingJoypad();
-		GameBoy gameBoy = new GameBoy(lcdDisplay, joypad);
+		IConfiguration configuration = new DefaultConfiguration();
+		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, joypad);
 		
 		Cartidge cartidge = new Cartidge();
-		cartidge.read(Main.class.getResourceAsStream("/Tetris.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/Bomb Jack (U).gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/Tetris.gb"));
+		cartidge.read(Main.class.getResourceAsStream("/bpong.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/Tennis (W) [!].gb"));
 		gameBoy.setCartidge(cartidge);
 		

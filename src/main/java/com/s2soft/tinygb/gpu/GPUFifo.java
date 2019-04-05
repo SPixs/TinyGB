@@ -73,6 +73,10 @@ public class GPUFifo {
 		return m_usedSpace <= 8;
 	}
 
+	public boolean canOverlay() {
+		return getUsedSpace() >= 8;
+	}
+
 	public void clear() {
 		Arrays.fill(m_queue, (byte)0); // Not necessary
 		m_usedSpace = 0;
@@ -86,9 +90,18 @@ public class GPUFifo {
 		return m_enabled;
 	}
 
-	public void overlaySprite() {
-		for (int i=0;i<8;i++) {
-			m_queue[i] = (byte)(4*Math.random());
+	public void overlaySprite(GPUSprite scheduledSprite, byte spriteFirstBitplaneData, byte spriteSecondBitplaneData) {
+		if (m_usedSpace < 8) {
+			throw new IllegalStateException("Cannot overlay sprite with less than 8 pixels in pixel fifo");
+		}
+		for (int i=7;i>=0;i--) {
+//			byte bgPixel = m_queue[i];
+			int index = scheduledSprite.getXFlip() ? (7-i) : i;
+			byte spritePixel = (byte) (BitUtils.isSet(spriteFirstBitplaneData, index) ? 0b01 : 0b00) ;
+			spritePixel |= BitUtils.isSet(spriteSecondBitplaneData, index) ? 0b10 : 0b00;
+			if (spritePixel != 0) {
+				m_queue[i] = spritePixel;
+			}
 		}
 	}
 }

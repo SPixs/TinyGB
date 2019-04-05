@@ -35,7 +35,10 @@ public class GPUFetcher {
 	private byte m_firstBitplaneData;
 	private byte m_secondBitplaneData;
 
-	private Object m_scheduledSprite;
+	private byte m_spriteFirstBitplaneData;
+	private byte m_spriteSecondBitplaneData;
+
+	private GPUSprite m_scheduledSprite;
 
 
 	//	 =========================== Constructor =============================
@@ -44,10 +47,10 @@ public class GPUFetcher {
 		
 	public GPUFetcher(GBGPU gbgpu) {
 		m_gpu = gbgpu;
-		reset();
+		resetState();
 	}
 
-	public void reset() {
+	public void resetState() {
 		m_state = STATE.READ_TILE_ID;
 	}
 
@@ -77,26 +80,28 @@ public class GPUFetcher {
 				if (m_gpu.getPixelsFifo().canPut()) {
 					m_gpu.getPixelsFifo().putPixels(m_firstBitplaneData, m_secondBitplaneData);
 					m_tileAddress++;
-					reset();
+					resetState();
 					step();
 				}
 				break;
 		   case READ_SPRITE_TILE_ID:
-			   m_state = STATE.READ_SPRITE_FLAGS;
-			   break;
+			   	m_state = STATE.READ_SPRITE_FLAGS;
+			   	break;
 		   case READ_SPRITE_FLAGS:
-			   m_state = STATE.READ_SPRITE_DATA_1;
+			   	m_state = STATE.READ_SPRITE_DATA_1;
                 break;
            case READ_SPRITE_DATA_1:
-        	   m_state = STATE.READ_SPRITE_DATA_2;
+        	   	m_spriteFirstBitplaneData = readSpriteBitPlane(m_scheduledSprite, 0);
+        	   	m_state = STATE.READ_SPRITE_DATA_2;
                 break;
            case READ_SPRITE_DATA_2:
-        	   m_state = STATE.PUSH_SPRITE;
-	            break;
+        	   	m_spriteSecondBitplaneData = readSpriteBitPlane(m_scheduledSprite, 1);
+        	   	m_state = STATE.PUSH_SPRITE;
+        	   	break;
            case PUSH_SPRITE:
-        	   m_scheduledSprite = null;
-        	   m_gpu.getPixelsFifo().overlaySprite();
-               m_state = STATE.READ_TILE_ID;
+        	   	m_gpu.getPixelsFifo().overlaySprite(m_scheduledSprite, m_spriteFirstBitplaneData, m_spriteSecondBitplaneData);
+        	   	m_scheduledSprite = null;
+        	   	m_state = STATE.READ_TILE_ID;
 		}
 	}
 
@@ -111,6 +116,12 @@ public class GPUFetcher {
 			int tileOffsetInData = 16 * (int)(m_tileIndex & 0x0FF);
 			return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
 		}
+	}
+	
+	private byte readSpriteBitPlane(GPUSprite sprite, int bitPlaneIndex) {
+		int lineInTile = (m_gpu.getScanLine() - (sprite.getY() - 16)) % 8;
+		int tileOffsetInData = 16 * (sprite.getTileIndex() & 0x0FF);
+		return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
 	}
 
 	public boolean hasScheduledSprite() {

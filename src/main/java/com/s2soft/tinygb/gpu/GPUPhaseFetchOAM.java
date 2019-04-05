@@ -26,9 +26,9 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 	@Override
 	protected void enterImpl() {
 		getGpu().setLineStartClock(getEnterClock());
-		getGpu().getPixelsFifo().clear();
-		getGpu().getFetcher().reset();
 		getGpu().clearVisibleSprites();
+		getGpu().getPixelsFifo().clear();
+		getGpu().getFetcher().resetState();
 	}
 
 	@Override
