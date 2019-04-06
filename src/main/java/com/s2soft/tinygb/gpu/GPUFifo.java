@@ -100,7 +100,7 @@ public class GPUFifo {
 			byte spritePixel = (byte) (BitUtils.isSet(spriteFirstBitplaneData, index) ? 0b01 : 0b00) ;
 			spritePixel |= BitUtils.isSet(spriteSecondBitplaneData, index) ? 0b10 : 0b00;
 			if (spritePixel != 0) {
-				m_queue[i] = spritePixel;
+				m_queue[7-i] = spritePixel;
 			}
 		}
 	}
