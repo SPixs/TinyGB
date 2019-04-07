@@ -1,6 +1,7 @@
 package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
+import com.s2soft.utils.BitUtils;
 
 public class InstrSUB extends Instruction {
 
@@ -30,13 +31,14 @@ public class InstrSUB extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
 		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
-		byte result = (byte)(((cpu.getA() & 0x0FF) - value) & 0x0FF);
-		cpu.setA(result);
+		int a = cpu.getA() & 0xFF;
+		int result = a - value;
+		cpu.setA(BitUtils.toByte(result));
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(true);
-		cpu.setFlagHalfCarry((value & 0x0F) > (cpu.getA() & 0x0F));
-		cpu.setFlagCarry(value > (cpu.getA() & 0x0FF));
+		cpu.setFlagHalfCarry((value & 0x0F) > (a & 0x0F));
+		cpu.setFlagCarry(result < 0);
 		
 		switch ((int)opcode) {
 			case 0x96:

@@ -1,0 +1,14 @@
+Bug dans l'enregistrement HiScores de Tetris.
+La lettre ne clignote pas :
+
+l19fe:  ld      b,a             ; 19fe 47   G
+l19ff:  ldh     a,(41h)         ; 19ff f0 41   pA
+        and     3               ; 1a01 e6 03   f.
+        jr      nz,l19ff        ; 1a03 20 fa    z
+        ld      (hl),b          ; 1a05 70   p
+        ret                     ; 1a06 c9   I
+        
+        
+On devrait avoir dans b une alternance de $BF (tile vide) et de la tile d'une lettre....
+
+Compléter les bits de LCDSTAT ($FF41)...

@@ -30,9 +30,9 @@ public class Main {
 		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, joypad);
 		
 		Cartidge cartidge = new Cartidge();
-		cartidge.read(Main.class.getResourceAsStream("/rom/bgSprite0.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/Tetris.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/bpong.gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/bgSprite0.gb"));
+		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/bgbtest.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/Tennis (W) [!].gb"));
 		gameBoy.setCartidge(cartidge);
 		
@@ -59,7 +59,6 @@ public class Main {
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		
-		Thread.sleep(5000);
 		gameBoy.start();
 	}
 }

@@ -31,13 +31,14 @@ public class InstrADDAn extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
 		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
-		int result = BitUtils.toUInt(cpu.getA()) + value;
+		byte a = cpu.getA();
+		int result = BitUtils.toUInt(a) + value;
 
 		cpu.setA(BitUtils.toByte(result));
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry((value & 0x08) == 1 && (result & 0x08) == 0);
+		cpu.setFlagHalfCarry((value & 0x0F) + (a & 0x0F) > 0x0F);
 		cpu.setFlagCarry(result > 0x0FF);
 		
 		switch ((int)opcode) {

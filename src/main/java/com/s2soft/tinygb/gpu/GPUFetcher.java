@@ -119,7 +119,10 @@ public class GPUFetcher {
 	}
 	
 	private byte readSpriteBitPlane(GPUSprite sprite, int bitPlaneIndex) {
-		int lineInTile = (m_gpu.getScanLine() - (sprite.getY() - 16)) % 8;
+		int lineInTile = (m_gpu.getScanLine() - (sprite.getY() - 16)) % 16;
+		if (sprite.getYFlip()) {
+			lineInTile = sprite.getHeight() - lineInTile - 1;
+		}
 		int tileOffsetInData = 16 * (sprite.getTileIndex() & 0x0FF);
 		return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
 	}

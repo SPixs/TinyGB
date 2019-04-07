@@ -22,11 +22,21 @@ public class GBMemoryRAM implements IAddressable {
 
 	public void setByte(int address, byte b) {
 		m_memory[address] = b;
-		if (address == 0xFFE1) {
-			System.out.println(">>> Tetris set machine state : " + Instruction.toHexByte(b));
-		}
-		if (address == 0xFFA6) {
-			System.out.println(">>> Tetris writing to COUNTDOWN : " + Instruction.toHexByte(b));
+//		if (address == 0xFFE1) {
+//			System.out.println(">>> Tetris set machine state : " + Instruction.toHexByte(b));
+//		}
+//		if (address == 0xFFA6) {
+//			System.out.println(">>> Tetris writing to COUNTDOWN : " + Instruction.toHexByte(b));
+//		}
+//		if (address == 0xC000) {
+//			System.out.println(">>> Tetris writing to SPRITE1.Y : " + Instruction.toHexByte(b));
+//			Thread.yield();
+//		}
+//		if (address == 0xC001) {
+//			System.out.println(">>> Tetris writing to SPRITE1.X : " + Instruction.toHexByte(b));
+//		}
+		if (address == (0xC141)) {
+			Thread.yield();
 		}
 	}
 	

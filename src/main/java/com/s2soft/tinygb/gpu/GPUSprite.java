@@ -85,6 +85,14 @@ public class GPUSprite {
 	public boolean getPalette() {
 		return m_palette;
 	}
+	
+	/**
+	 * 
+	 * @return either 8 or 16 pixels
+	 */
+	public int getHeight() {
+		return m_height;
+	}
 
 	//	 ========================= Treatment methods =========================
 	

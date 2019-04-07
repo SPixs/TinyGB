@@ -57,6 +57,10 @@ public class GBCpu {
 	 * Delayed state of the master interrupt enable flag
 	 */
 	private boolean m_delayedInterruptState = false;
+	
+	private boolean m_halted;
+	
+	private boolean startTrace = false;
 
 	public GBCpu(GameBoy gameBoy) {
 		m_memory = gameBoy.getMemory();
@@ -166,6 +170,7 @@ public class GBCpu {
 		m_sp = 0; // fix me !
 		m_pc = 0;
 		m_ime = true;
+		m_halted = false;
 		resetCyclesCounter();
 	}
 
@@ -215,6 +220,7 @@ public class GBCpu {
 		m_instructions.add(new InstrRST());
 		m_instructions.add(new InstrJPHL());
 		m_instructions.add(new InstrJPCond());
+		m_instructions.add(new InstrHALT());
 		
 		m_extraInstructions.add(new InstrBIT());
 		m_extraInstructions.add(new InstrRES());
@@ -262,21 +268,29 @@ public class GBCpu {
 //		m_instructions.add(new InstrLDRegFromI());
 	}
 	
-	private boolean startTrace = false;
+	public void halt() {
+		m_halted = true;
+	}
 	
 	public int step() {
+		
+		if (m_halted & !getMemory().isInterruptRequested()) {
+			return 1;
+		}
 
+		m_halted = false;
+		
 		processInterrupts();
 		
-//		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x0393 && getPC() <= 0x03A0;
+		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x1A05 && getPC() <= 0x1A06;
 //		startTrace = true;
 		
-		if (getPC() == 0x0028) {
-			System.out.println(">>> Tetris main loop");
-		}
-		if (getPC() == 0x0033) {
-			System.out.println(">>> Tetris executing machine state at " + Instruction.toHexShort(Register16Bits.HL.getValue(this)));
-		}
+//		if (getPC() == 0x0028) {
+//			System.out.println(">>> Tetris main loop");
+//		}
+//		if (getPC() == 0x0033) {
+//			System.out.println(">>> Tetris executing machine state at " + Instruction.toHexShort(Register16Bits.HL.getValue(this)));
+//		}
 		
 		// Check for interrupt
 		if (isInterruptEnabled() && getMemory().isInterruptRequested()) {
@@ -284,15 +298,17 @@ public class GBCpu {
 			byte interruptsToHandle = (byte) (getMemory().getInterruptEnable() &  getMemory().getInterruptFlag());
 			
 			// For the moment, only handle VBL interrupts
-			if (BitUtils.isSet(interruptsToHandle, 0)) {
-				// Clear this interrupt flag
-				getMemory().setInterruptFlag(BitUtils.setBit(getMemory().getInterruptFlag(), 0, false));
-				
-				// Disable further interrupts
-	    	    setInterruptEnabled(false, false);
-	    	    pushShort(getPC());
-	    	    setPC(0x0040);
-	    	    return 12; // 12 cycles to process interrupt flag
+			for (int i=0;i<=4;i++) {
+				if (BitUtils.isSet(interruptsToHandle, i)) {
+					// Clear this interrupt flag
+					getMemory().setInterruptFlag(BitUtils.setBit(getMemory().getInterruptFlag(), i, false));
+					
+					// Disable further interrupts
+		    	    setInterruptEnabled(false, false);
+		    	    pushShort(getPC());
+		    	    setPC(0x0040+i*8);
+		    	    return 12; // 12 cycles to process interrupt flag
+				}
 			}
 		}
 		
@@ -321,6 +337,7 @@ public class GBCpu {
 		int previousPC = getPC();
 		
 		String disassembledLine = null;
+//		startTrace = getPc() == 0x0226;
 		if (TRACE || startTrace)  {
 			disassembledLine = ">$" + Disassembler.shortToHex(getPC()) + " " + instruction.disassemble(m_memory, getPC());
 			while (disassembledLine.length() < 24) disassembledLine += " ";
@@ -507,4 +524,5 @@ public class GBCpu {
 		
 		return cpuStatus;
 	}
+
 }

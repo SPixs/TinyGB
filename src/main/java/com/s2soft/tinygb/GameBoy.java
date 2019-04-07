@@ -18,7 +18,7 @@ public class GameBoy {
 	private GBMemory m_memory;
 	private GBCpu m_cpu;
 	private GBGPU m_gpu;
-	private int m_clockCount;
+	private long m_clockCount;
 	private IDisplay m_display;
 	private JoypadHandler m_joypadHandler;
 	private Timers m_timers;
@@ -100,11 +100,12 @@ public class GameBoy {
 		
 		// CPU is running at 4.194304Mhz (Clock cycles) or 1.048576Mhz (Machine cycles) 
 		// Cpu and instruction speed are described in machine cycles
-		double machineClock = 4.194304e6;
+		long machineClock = 4194304;
 		long runStartTimer = System.currentTimeMillis();
 		long cpuClockCount = 0;
 		
 		while (true) {
+			
 			
 //			System.out.println("GPU clock : " + m_clockCount + " CPU clock : " + cpuClockCount);
 			
@@ -118,7 +119,7 @@ public class GameBoy {
 			m_dma.step();
 			
 			// Ensure emulation is synchronized with real time
-			if (m_clockCount % 1000 == 0) {
+			if (m_clockCount % 10000 == 0) {
 				long elapsed = System.currentTimeMillis() - runStartTimer;
 				
 				// Clock speed on DMG GB is 4.19430Mhz

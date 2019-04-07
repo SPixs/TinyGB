@@ -23,6 +23,8 @@ public class GPUPhaseVBlank extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {
+		byte lcdStatus = getGpu().getLCDStatus();
+		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x01));
 		getGpu().getMemory().requestInterrupt(0); // VBlank interrupt request
 		getGpu().getDisplay().refresh();
 	}
@@ -36,6 +38,7 @@ public class GPUPhaseVBlank extends GPUPhase {
 		if (elapsedClockCount >= 4560) {
 			getGpu().setScanLine(0);
 			setPhase(GBGPU.PHASE_FETCH_OAM);
+			getGpu().step();
 		}
 	}
 }

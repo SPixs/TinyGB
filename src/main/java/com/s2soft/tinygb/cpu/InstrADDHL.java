@@ -25,12 +25,13 @@ public class InstrADDHL extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
 		int value = getAddressingMode(opcode).readWord(cpu);
-		int newValue = Register16Bits.HL.getValue(cpu) + value;
+		int hl = Register16Bits.HL.getValue(cpu);
+		int newValue = hl + value;
 		Register16Bits.HL.setValue(cpu, newValue);
 		
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry( (value & (1<<11)) == 1 && (newValue & (1<<11)) == 0);
-		cpu.setFlagCarry( (value & (1<<15)) == 1 && (newValue & (1<<15)) == 0);
+		cpu.setFlagHalfCarry((value & 0x0F) + (hl & 0x0F) > 0x0F);
+		cpu.setFlagCarry(newValue > 0xFFFF);
 		
 		return 8;
 	}

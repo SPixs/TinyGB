@@ -37,7 +37,7 @@ public class InstrADCAn extends Instruction {
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry((value & 0x08) == 1 && (result & 0x08) == 0);
+		cpu.setFlagHalfCarry((cpu.getA() & 0x0F) + (value & 0x0F) + (cpu.getFlagCarry() ? 1 : 0) > 0x0F);
 		cpu.setFlagCarry(result > 0x0FF);
 		
 		switch ((int)opcode) {

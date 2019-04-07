@@ -95,8 +95,6 @@ public class LCDDisplay extends JPanel implements IDisplay {
 	@Override
 	public void refresh() {
 		m_pixelIndex = 0;
-//		repaint();
-//		getParent().revalidate();
 		getParent().repaint();
 	}
 }

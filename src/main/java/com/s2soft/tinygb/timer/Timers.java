@@ -2,6 +2,7 @@ package com.s2soft.tinygb.timer;
 
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Instruction;
+import com.s2soft.tinygb.mmu.GBMemory;
 
 public class Timers {
 
@@ -29,10 +30,13 @@ public class Timers {
 	
 	private boolean m_timerEnabled = true;
 	private byte m_clockSelect;
+
+	private GBMemory m_memory;
 	
 	//	 =========================== Constructor =============================
 
 	public Timers(GameBoy gameBoy) {
+		m_memory = gameBoy.getMemory();
 	}
 
 	//	 ========================== Access methods ===========================
@@ -96,7 +100,7 @@ public class Timers {
 				resetTimerCounter();
 				m_timerRegister++;
 				if (m_timerRegister == 0) {
-					// @TODO generate an interrupt !
+					m_memory.requestInterrupt(2);
 					m_timerRegister = m_timerModulo;
 				}
 			}

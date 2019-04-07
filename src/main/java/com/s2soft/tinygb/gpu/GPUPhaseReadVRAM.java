@@ -23,6 +23,9 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {  
+		byte lcdStatus = getGpu().getLCDStatus();
+		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x03));
+
 		// compute base BG tile address for current line
 		int tilesBaseAddress = (getGpu().getBGMapIndex() == 0) ? 0x09800 : 0x09C00;
 		int currentLine = getGpu().getScanLine();

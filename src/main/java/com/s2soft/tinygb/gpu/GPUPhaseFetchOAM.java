@@ -25,6 +25,8 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 
 	@Override
 	protected void enterImpl() {
+		byte lcdStatus = getGpu().getLCDStatus();
+		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x02));
 		getGpu().setLineStartClock(getEnterClock());
 		getGpu().clearVisibleSprites();
 		getGpu().getPixelsFifo().clear();

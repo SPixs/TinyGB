@@ -23,8 +23,8 @@ public class GPUPhaseHBlank extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {
-		// TODO Auto-generated method stub
-		
+		byte lcdStatus = getGpu().getLCDStatus();
+		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x00));
 	}
 
 	@Override

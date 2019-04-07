@@ -29,14 +29,15 @@ public class InstrADD extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
-		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
-		byte result = (byte) (((cpu.getA() & 0x0FF) + value) & 0x0FF);
+		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0xFF;
+		int a = cpu.getA() & 0xFF;
+		byte result = (byte) ((a + value) & 0x0FF);
 		cpu.setA(result);
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry(((value & 0x08) == 1) && ((result & 0x08) == 0));
-		cpu.setFlagCarry(((value & 0x80) == 1) && ((result & 0x80) == 0));
+		cpu.setFlagHalfCarry((value & 0x0F) + (a & 0x0F) > 0x0F);
+		cpu.setFlagCarry(a + value > 0xFF);
 		
 		switch ((int)opcode) {
 			case 0x86:

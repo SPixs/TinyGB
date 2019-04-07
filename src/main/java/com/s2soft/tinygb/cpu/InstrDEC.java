@@ -34,7 +34,8 @@ public class InstrDEC extends Instruction {
 		
 		cpu.setFlagZero(newValue == 0);
 		cpu.setFlagSubtract(true);
-		cpu.setFlagHalfCarry((newValue & 0x10) == (value & 0x10));
+//		cpu.setFlagHalfCarry((newValue & 0x10) == (value & 0x10));
+		cpu.setFlagHalfCarry((value & 0x0F) == 0);
 
 		getAddressingMode(opcode).setByte(cpu, newValue, additionnalBytes);
 		
