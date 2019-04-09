@@ -119,14 +119,6 @@ public class GBGPU {
 				enterPhase(PHASE_FETCH_OAM);
 			}
 		}
-//		setLCDEnable(BitUtils.isSet(v, 7));
-//		}
-		if (areSpritesEnabled()) {
-			Thread.yield();
-		}
-		else {
-			Thread.yield();
-		}
 	}
 	
 	public GPUSprite getSprite(int index) {

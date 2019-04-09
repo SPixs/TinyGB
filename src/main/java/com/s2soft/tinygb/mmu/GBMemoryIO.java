@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.apu.GBAPU;
 import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.utils.BitUtils;
@@ -17,7 +18,7 @@ public class GBMemoryIO implements IAddressable {
 
 	//   ============================ Constants ==============================
 	
-	public final static boolean TRACE = false;
+	public final static boolean TRACE = true;
 
 	//	 =========================== Attributes ==============================
 	
@@ -33,8 +34,10 @@ public class GBMemoryIO implements IAddressable {
 	
 	private GBMemory m_gbMemory;
 	private GBGPU m_gpu;
+	private GBAPU m_apu;
 
 	private GameBoy m_gameBoy;
+
 
 	//	 =========================== Constructor =============================
 	
@@ -46,6 +49,13 @@ public class GBMemoryIO implements IAddressable {
 		addRegister(0xFF06, "TMA", () -> m_gameBoy.getTimers().getTimerModulo() , (v) -> { m_gameBoy.getTimers().setTimerModulo(v); } );
 		addRegister(0xFF07, "TAC", () -> getTimerControl() , (v) -> { setTimerControl(v); } );
 		addRegister(0xFF0F, "IF", () -> m_gbMemory.getInterruptFlag() , (v) -> { m_gbMemory.setInterruptFlag(v); } );
+		addRegister(0xFF11, "NR11", () -> m_apu.getNR11()  , (v) -> { m_apu.setNR11(v); } ); // NR11 - Channel 1 Sound length/Wave pattern duty (R/W)
+		addRegister(0xFF12, "NR12", () -> m_apu.getNR12()  , (v) -> { m_apu.setNR12(v); } ); // NR12 - Channel 1 Volume Envelope (R/W)
+		addRegister(0xFF13, "NR13", () -> m_apu.getNR13()  , (v) -> { m_apu.setNR13(v); } ); // NR13 - Channel 1 Frequency lo (Write Only)
+		addRegister(0xFF14, "NR14", () -> m_apu.getNR14()  , (v) -> { m_apu.setNR14(v); } ); // NR14 - Channel 1 Frequency hi (R/W)
+		addRegister(0xFF24, "NR50", () -> m_apu.getNR50()  , (v) -> { m_apu.setNR50(v); } ); // NR50 - Channel control / ON-OFF / Volume (R/W)
+		addRegister(0xFF25, "NR52", () -> m_apu.getNR51()  , (v) -> { m_apu.setNR51(v); } ); // NR51 - Selection of Sound output terminal (R/W)
+		addRegister(0xFF26, "NR52", () -> m_apu.getNR52()  , (v) -> { m_apu.setNR52(v); } ); // NR52 - Sound on/off
 		addRegister(0xFF40, "LCDC", () -> m_gpu.getLCDControl() , (v) -> { m_gpu.setLCDControl(v); } );
 		addRegister(0xFF41, "STAT", () -> m_gpu.getLCDStatus() , (v) -> { m_gpu.setLCDStatus(v); } );
 		addRegister(0xFF42, "SCY", () -> BitUtils.toByte(m_gpu.getScrollY()) , (v) -> { m_gpu.setScrollY(BitUtils.toUInt(v)); } );
@@ -56,6 +66,12 @@ public class GBMemoryIO implements IAddressable {
 		addRegister(0xFF48, "OBP0", () -> m_gpu.getOMAPalette1Data() , (v) -> { m_gpu.setOMAPalette1Data(v); });
 		addRegister(0xFF49, "0BP1", () -> m_gpu.getOMAPalette2Data() , (v) -> { m_gpu.setOMAPalette2Data(v); });
 		addRegister(0xFF50, "BOOTRomLock", () -> m_bootROMLockRegister , (v) -> { setBootRommLockRegister(v); });
+		
+		// 16 registers for sound WAV RAM
+		for (int i=0xFF30;i<0xFF40;i++) {
+			final int index = i-0xFF30;
+			addRegister(i, "WAVRAM", () -> m_apu.getWAVData(index) , (v) -> { m_apu.setWAVData(index, v); });
+		}
 	}
 
 	//	 ========================== Access methods ===========================
@@ -65,6 +81,7 @@ public class GBMemoryIO implements IAddressable {
 	public void reset() {
 		m_gbMemory = m_gameBoy.getMemory();
 		m_gpu = m_gameBoy.getGpu();
+		m_apu = m_gameBoy.getApu();
 		m_bootROMLockRegister = 0;
 		m_gbMemory.setBootROMLock(true); 
 	}
@@ -144,13 +161,13 @@ public class GBMemoryIO implements IAddressable {
 		IORegister ioRegister = m_registers.get(address);
 		if (ioRegister != null) {
 			if (TRACE) {
-				System.out.println("Writing to I/O register " + ioRegister.getName()+ ", value " + Instruction.toHexByte(value) + " at " + Instruction.toHexShort(address));
+//				System.out.println("Writing to I/O register " + ioRegister.getName()+ ", value " + Instruction.toHexByte(value) + " at " + Instruction.toHexShort(address));
 			}
 			ioRegister.setValue(value);
 		}
 		else {
 			if (TRACE) {
-				System.out.println("Writing to I/O Memory : " + Instruction.toHexByte(value) + " at " + Instruction.toHexShort(address));
+				System.out.println("Writing to unmapped IO register " + Instruction.toHexShort(address) + "=" + Instruction.toHexByte(value));
 			}
 		}
 	}
@@ -160,13 +177,13 @@ public class GBMemoryIO implements IAddressable {
 		IORegister ioRegister = m_registers.get(address);
 		if (ioRegister != null) {
 			if (TRACE) {
-				System.out.println("Reading from I/O register " + ioRegister.getName()+ ", at " + Instruction.toHexShort(address));
+//				System.out.println("Reading from I/O register " + ioRegister.getName()+ ", at " + Instruction.toHexShort(address));
 			}
 			return ioRegister.getValue();
 		}
 		else {
 			if (TRACE) {
-				System.out.println("Reading from I/O Memory at " + Instruction.toHexShort(address));
+				System.out.println("Reading from unmapped IO register " + Instruction.toHexShort(address));
 			}
 			return 0;
 		}

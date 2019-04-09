@@ -1,5 +1,7 @@
 package com.s2soft.tinygb;
 
+import com.s2soft.tinygb.apu.GBAPU;
+import com.s2soft.tinygb.audio.IAudioDevice;
 import com.s2soft.tinygb.control.IJoypad;
 import com.s2soft.tinygb.control.JoypadHandler;
 import com.s2soft.tinygb.cpu.GBCpu;
@@ -20,18 +22,22 @@ public class GameBoy {
 	private GBGPU m_gpu;
 	private long m_clockCount;
 	private IDisplay m_display;
+	private IAudioDevice m_audioDevice;
 	private JoypadHandler m_joypadHandler;
 	private Timers m_timers;
 	private DMA m_dma;
 
 	private IConfiguration m_configuration;
+	private GBAPU m_apu;
 
 	//	 =========================== Constructor =============================
 
-	public GameBoy(IConfiguration configuration, IDisplay display, IJoypad joypad) {
+	public GameBoy(IConfiguration configuration, IDisplay display, IAudioDevice audioDevice, IJoypad joypad) {
 		m_display = display;
+		m_audioDevice = audioDevice;
 		m_memory = new GBMemory(this);
 		m_gpu = new GBGPU(this);
+		m_apu = new GBAPU(this);
 		m_cpu = new GBCpu(this);
 		m_dma = new DMA(this);
 		m_configuration = configuration;
@@ -54,6 +60,10 @@ public class GameBoy {
 		return m_gpu;
 	}
 	
+	public GBAPU getApu() {
+		return m_apu;
+	}
+
 	public long getClockCount() {
 		return m_clockCount;
 	}
@@ -62,6 +72,10 @@ public class GameBoy {
 		return m_display;
 	}
 	
+	public IAudioDevice getAudioDevice() {
+		return m_audioDevice;
+	}
+
 	public JoypadHandler getJoypadHandler() {
 		return m_joypadHandler;
 	}
@@ -86,6 +100,7 @@ public class GameBoy {
 		m_clockCount = 0;
 		m_cpu.reset();
 		m_gpu.reset();
+		m_apu.reset();
 		
 		if (!m_configuration.useBootRom()) {
 			m_memory.setBootROMLock(false);
@@ -117,6 +132,7 @@ public class GameBoy {
 			m_gpu.step();
 			m_timers.step();
 			m_dma.step();
+			m_apu.step();
 			
 			// Ensure emulation is synchronized with real time
 			if (m_clockCount % 10000 == 0) {
