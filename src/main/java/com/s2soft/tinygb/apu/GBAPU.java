@@ -8,7 +8,7 @@ public class GBAPU {
 
 	//   ============================ Constants ==============================
 
-	public final static boolean TRACE = false;
+	public final static boolean TRACE = true;
 
 	//	 =========================== Attributes ==============================
 
@@ -24,7 +24,7 @@ public class GBAPU {
 	private Voice3 m_voice3 = new Voice3();
 	private Voice4 m_voice4 = new Voice4();
 	
-	private Voice[] m_voices = new  Voice[] { m_voice1, m_voice1, m_voice1, m_voice1 };
+	private Voice[] m_voices = new  Voice[] { m_voice1, m_voice2, m_voice3, m_voice4 };
 	
 	private boolean m_soundEnable = false;
 
@@ -57,7 +57,9 @@ public class GBAPU {
 			voice.step();
 		}
 		
-		m_gameBoy.getAudioDevice().putSample((byte)(getLeftChannelValue() & 0xFF), (byte)(getRightChannelValue() & 0xFF));
+		m_gameBoy.getAudioDevice().putSample(
+				(byte)(getLeftChannelValue() >> 3), 
+				(byte)(getRightChannelValue() >> 3));
 	}
 
 	
@@ -174,6 +176,48 @@ public class GBAPU {
 	}
 	
 	/**
+	 * I/O register NR10 at $FF10 
+	 * Channel 1 Sweep register (R/W)
+	 * Bit 6-4 - Sweep Time
+	 * Bit 3   - Sweep Increase/Decrease
+	 *            0: Addition    (frequency increases)
+	 *            1: Subtraction (frequency decreases)
+	 * Bit 2-0 - Number of sweep shift (n: 0-7)
+	 * Sweep Time:
+	 *   000: sweep off - no freq change
+	 *   001: 7.8 ms  (1/128Hz)
+	 *   010: 15.6 ms (2/128Hz)
+	 *   011: 23.4 ms (3/128Hz)
+	 *   100: 31.3 ms (4/128Hz)
+	 *   101: 39.1 ms (5/128Hz)
+	 *   110: 46.9 ms (6/128Hz)
+	 *   111: 54.7 ms (7/128Hz)
+	 *   
+	 *   The change of frequency (NR13,NR14) at each shift is calculated 
+	 *   by the following formula where X(0) is initial freq & X(t-1) is last freq:
+	 *   
+	 *     X(t) = X(t-1) +/- X(t-1)/2^n
+	 * 
+	 * @param v content of NR11 register 
+	 */
+	public void setNR10(byte v) {
+		byte sweepShift = (byte)(v & 0x03);
+		boolean increase = BitUtils.isSet(v, 3);
+		byte sweepTime = (byte)((v >> 4) & 0x03);
+		m_voice1.setSweepShift(sweepShift);
+		m_voice1.setSweepIncrease(increase);
+		m_voice1.setSweepTime(sweepTime);
+	}
+
+	public byte getNR10() {
+		byte result = (byte) 0b10000000;
+		result |= (m_voice1.getSweepShift() & 0x03);
+		result |= ((m_voice1.getSweepTime() & 0x03) << 4) ;
+		result = BitUtils.setBit(result, 3, m_voice1.isSweepIncrease());
+		return result;
+	}
+
+	/**
 	 * I/O register NR11 at $FF11 
 	 * Channel 1 Sound length/Wave pattern duty (R/W).
 	 * Bit 7-6 - Wave Pattern Duty (Read/Write)
@@ -189,16 +233,42 @@ public class GBAPU {
 	 * @param v content of NR11 register 
 	 */
 	public void setNR11(byte v) {
-		m_voice1.setRawLength(v & 0b00111111);
-		m_voice1.setRawDuty((v >> 6) & 0x03);
+		setNRX1(m_voice1, v);
 	}
 	
+	/**
+	 * I/O register NR11 at $FF16 
+	 * Same as NR11
+	 * The Length value is used only if Bit 6 in NR24 is set.
+	 * @param v
+	 */
+	public void setNR21(byte v) {
+		setNRX1(m_voice2, v);
+	}
+
+	private void setNRX1(PulseVoice voice, byte v) {
+		voice.setRawLength(v & 0b00111111);
+		voice.setRawDuty((v >> 6) & 0x03);
+	}
+
 	/**
 	 * @return content of NR11 APU register
 	 */
 	public byte getNR11() {
+		return getNRX1(m_voice1);
+	}
+	
+	/**
+	 * @return content of NR21 APU register
+	 */
+	public byte getNR21() {
+		return getNRX1(m_voice2);
+	}
+
+	private byte getNRX1(PulseVoice voice1) {
 		return (byte)(((m_voice1.getRawDuty() & 0x03) << 6) | (m_voice1.getRawLength() & 0b00111111));
 	}
+
 
 	/**
 	 * I/O register NR12 at $FF12 
@@ -213,6 +283,19 @@ public class GBAPU {
 	 * @param v content of NR12 register 
 	 */
 	public void setNR12(byte v) {
+		setNRX2(m_voice1, v);	
+	}
+	
+	/**
+	 * I/O register NR22 at $FF17 
+	 * 
+	 * @param v content of NR12 register 
+	 */
+	public void setNR22(byte v) {
+		setNRX2(m_voice2, v);	
+	}
+	
+	private void setNRX2(PulseVoice voice, byte v) {
 		int envelopeSweep = v & 0x03;
 		boolean increase = BitUtils.isSet(v, 3);
 		int initialEnvelopeVolume = (v >> 4) & 0x0F; // 0 = No sound
@@ -220,19 +303,31 @@ public class GBAPU {
 		// Note : 
 		// By Setting the envelope register only nothing will be reflected in the output.
 		// Always set the initial flag.
-		m_voice1.setEnvelopeIncrease(increase);
-		m_voice1.setEnvelopeSweep(envelopeSweep);
-		m_voice1.setInitialEnvelopeVolume(initialEnvelopeVolume);
+		voice.setEnvelopeIncrease(increase);
+		voice.setEnvelopeSweep(envelopeSweep);
+		voice.setInitialEnvelopeVolume(initialEnvelopeVolume);
 	}
 	
 	/**
 	 * @return content of NR12 APU register
 	 */
 	public byte getNR12() {
-		byte result = (byte) (m_voice1.getEnvelopeSweep() & 0x03);
-		result = BitUtils.setBit(result, 3, m_voice1.isEnvelopeIncrease());
-		result |= ((m_voice1.getInitialEnvelopeVolume() & 0x0F) << 4);
+		return getNRX2(m_voice1);
+	}
+	
+	/**
+	 * @return content of NR22 APU register
+	 */
+	public byte getNR22() {
+		return getNRX2(m_voice2);
+	}
+
+	private byte getNRX2(PulseVoice voice) {
+		byte result = (byte) (voice.getEnvelopeSweep() & 0x03);
+		result = BitUtils.setBit(result, 3, voice.isEnvelopeIncrease());
+		result |= ((voice.getInitialEnvelopeVolume() & 0x0F) << 4);
 		return result;
+
 	}
 
 	/**
@@ -244,16 +339,36 @@ public class GBAPU {
 	 * @param v content of NR13 register 
 	 */ 
 	public void setNR13(byte v) {
+		setNRX3(m_voice1, v);
+	}
+	
+	/**
+	 * I/O register NR23 at $FF18 
+	 * 
+	 * @param v content of NR23 register 
+	 */ 
+	public void setNR23(byte v) {
+		setNRX3(m_voice2, v);
+	}
+	
+	private void setNRX3(PulseVoice voice, byte v) {
 		// update 3 lower bits
-		int frequency = m_voice1.getRawFrequency() & 0x700;
+		int frequency = voice.getRawFrequency() & 0x700;
 		frequency |= (v & 0xFF);
-		m_voice1.setRawFrequency(frequency);
+		voice.setRawFrequency(frequency);
 	}
 	
 	/**
 	 * @return content of NR13 APU register (Write only, so $FF)
 	 */
 	public byte getNR13() {
+		return (byte) 0xFF;
+	}
+	
+	/**
+	 * @return content of NR23 APU register (Write only, so $FF)
+	 */
+	public byte getNR23() {
 		return (byte) 0xFF;
 	}
 	
@@ -270,26 +385,51 @@ public class GBAPU {
 	 * @param v content of NR14 register 
 	 */ 
 	public void setNR14(byte v) {
-		// update 3 upper bits
-		int frequency = m_voice1.getRawFrequency() & 0x0FF;
-		frequency |= (v & 0x07) << 8;
-		m_voice1.setRawFrequency(frequency);
-		m_voice1.setLengthEnabled(BitUtils.isSet(v, 6));
-		if (BitUtils.isSet(v, 7)) {
-			m_voice1.init();
-		}
+		setNRX4(m_voice1, v);
 	}
 	
+	/**
+	 * I/O register NR24 at $FF19 
+	 * 
+	 * @param v content of NR24 register 
+	 */ 
+	public void setNR24(byte v) {
+		setNRX4(m_voice2, v);
+	}
+	
+	private void setNRX4(PulseVoice voice, byte v) {
+		// update 3 upper bits
+		int frequency = voice.getRawFrequency() & 0x0FF;
+		frequency |= (v & 0x07) << 8;
+		voice.setRawFrequency(frequency);
+		voice.setLengthEnabled(BitUtils.isSet(v, 6));
+		if (BitUtils.isSet(v, 7)) {
+			voice.setEnabled(true);
+			voice.init();
+		}
+	}
+
 	/**
 	 * @return content of NR14 APU register
 	 */
 	public byte getNR14() {
-		// the only bit readable is 'length enable', bit 6
-		byte result = (byte) 0xFF;
-		result = BitUtils.setBit(result, 6, m_voice1.isLengthEnabled());
-		return result;
+		return getNRX4(m_voice1);
 	}
 
+	/**
+	 * @return content of NR24 APU register
+	 */
+	public byte getNR24() {
+		return getNRX4(m_voice2);
+	}
+
+	private byte getNRX4(PulseVoice voice) {
+		// the only bit readable is 'length enable', bit 6
+		byte result = (byte) 0xFF;
+		result = BitUtils.setBit(result, 6, voice.isLengthEnabled());
+		return result;
+	}
+	
 	/**
 	 * FF30-FF3F - Wave Pattern RAM
 	 * Contents - Waveform storage for arbitrary sound data

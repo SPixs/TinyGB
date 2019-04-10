@@ -17,5 +17,11 @@ public class Voice3 extends Voice {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void stepImpl() {
+		// TODO Auto-generated method stub
+		
+	}
 }
 

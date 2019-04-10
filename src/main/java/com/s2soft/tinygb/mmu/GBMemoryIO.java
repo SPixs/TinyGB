@@ -49,10 +49,15 @@ public class GBMemoryIO implements IAddressable {
 		addRegister(0xFF06, "TMA", () -> m_gameBoy.getTimers().getTimerModulo() , (v) -> { m_gameBoy.getTimers().setTimerModulo(v); } );
 		addRegister(0xFF07, "TAC", () -> getTimerControl() , (v) -> { setTimerControl(v); } );
 		addRegister(0xFF0F, "IF", () -> m_gbMemory.getInterruptFlag() , (v) -> { m_gbMemory.setInterruptFlag(v); } );
+		addRegister(0xFF10, "NR10", () -> m_apu.getNR10()  , (v) -> { m_apu.setNR10(v); } ); // NR10 - Channel 1 Sweep register (R/W)
 		addRegister(0xFF11, "NR11", () -> m_apu.getNR11()  , (v) -> { m_apu.setNR11(v); } ); // NR11 - Channel 1 Sound length/Wave pattern duty (R/W)
 		addRegister(0xFF12, "NR12", () -> m_apu.getNR12()  , (v) -> { m_apu.setNR12(v); } ); // NR12 - Channel 1 Volume Envelope (R/W)
 		addRegister(0xFF13, "NR13", () -> m_apu.getNR13()  , (v) -> { m_apu.setNR13(v); } ); // NR13 - Channel 1 Frequency lo (Write Only)
 		addRegister(0xFF14, "NR14", () -> m_apu.getNR14()  , (v) -> { m_apu.setNR14(v); } ); // NR14 - Channel 1 Frequency hi (R/W)
+		addRegister(0xFF16, "NR21", () -> m_apu.getNR21()  , (v) -> { m_apu.setNR21(v); } ); // NR21 - Channel 2 Sound length/Wave pattern duty (R/W)
+		addRegister(0xFF17, "NR22", () -> m_apu.getNR22()  , (v) -> { m_apu.setNR22(v); } ); // NR22 - Channel 2 Volume Envelope (R/W)
+		addRegister(0xFF18, "NR23", () -> m_apu.getNR23()  , (v) -> { m_apu.setNR23(v); } ); // NR23 - Channel 2 Frequency lo (Write Only)
+		addRegister(0xFF19, "NR24", () -> m_apu.getNR24()  , (v) -> { m_apu.setNR24(v); } ); // NR24 - Channel 2 Frequency hi (R/W)
 		addRegister(0xFF24, "NR50", () -> m_apu.getNR50()  , (v) -> { m_apu.setNR50(v); } ); // NR50 - Channel control / ON-OFF / Volume (R/W)
 		addRegister(0xFF25, "NR52", () -> m_apu.getNR51()  , (v) -> { m_apu.setNR51(v); } ); // NR51 - Selection of Sound output terminal (R/W)
 		addRegister(0xFF26, "NR52", () -> m_apu.getNR52()  , (v) -> { m_apu.setNR52(v); } ); // NR52 - Sound on/off

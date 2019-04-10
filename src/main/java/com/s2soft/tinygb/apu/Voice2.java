@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.apu;
 
-public class Voice2 extends Voice {
+public class Voice2 extends PulseVoice {
 
 	//   ============================ Constants ==============================
 
@@ -13,9 +13,8 @@ public class Voice2 extends Voice {
 	//	 ========================= Treatment methods =========================
 
 	@Override
-	public void step() {
-		// TODO Auto-generated method stub
-		
+	protected String getName() {
+		return "Voice 2";
 	}
 }
 

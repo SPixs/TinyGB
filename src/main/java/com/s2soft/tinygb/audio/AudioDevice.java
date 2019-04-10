@@ -1,10 +1,22 @@
 package com.s2soft.tinygb.audio;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.DataLine.Info;
+import javax.sound.sampled.Line;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
+import javax.sound.sampled.AudioFileFormat.Type;
 
 public class AudioDevice implements IAudioDevice {
 
@@ -22,10 +34,13 @@ public class AudioDevice implements IAudioDevice {
 
 	private SourceDataLine m_auline;
 
+	private ByteArrayOutputStream m_recordedOutputStream;
+
 	//	 =========================== Constructor =============================
 
 	public AudioDevice(int sampleRate) {
 		m_format = new AudioFormat(sampleRate, 8, 2, true, true);
+//		m_format = new AudioFormat(AudioFormat.Encoding.PCM_UNSIGNED, 44100, 8, 2, 2, 44100, false);
 	}
 
 	//	 ========================== Access methods ===========================
@@ -44,82 +59,44 @@ public class AudioDevice implements IAudioDevice {
 		m_auline.open(m_format);
 		m_auline.start();	
 		
-		m_bufferSamplesCount = 256;
+		m_bufferSamplesCount = 2;
 		m_buffer = new byte[m_format.getChannels() * m_bufferSamplesCount * m_format.getSampleSizeInBits() / 8];
 		m_bufferIndex = 0;
+		
+		m_recordedOutputStream = new ByteArrayOutputStream();
 	}
 
 	@Override
 	public void putSample(byte leftSample, byte rightSample) {
 		m_counter = m_counter % (int)(4194304 / m_format.getSampleRate());
 		if (m_counter == 0) {
+//			System.out.println(leftSample + " " + rightSample);
 			m_buffer[m_bufferIndex++] = leftSample;
 			m_buffer[m_bufferIndex++] = rightSample;
 			if (m_bufferIndex == m_buffer.length) {
 				m_auline.write(m_buffer, 0, m_buffer.length);
+				m_recordedOutputStream.write(m_buffer, 0, m_buffer.length);
 				m_bufferIndex = 0;
+				
+//				if (m_recordedOutputStream.size() == 256 * 1400) {
+//					System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
+//					try {
+//						byte[] byteArray = m_recordedOutputStream.toByteArray();
+//						AudioInputStream audioInputStream = new AudioInputStream(new ByteArrayInputStream(byteArray), m_format, byteArray.length / m_format.getFrameSize());
+//						OutputStream outputStream = new FileOutputStream("output.wav");
+//						AudioSystem.write(audioInputStream, Type.WAVE, outputStream);
+//						audioInputStream.close();
+//						outputStream.flush();
+//						outputStream.close();
+//					} 
+//					catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
 			}
 		}
 		m_counter++;
 	}
-	
-	
-	
-//		m_consumerThread = new Thread() {
-//			public void run() {
-//
-//				long samplesCount = 0;
-//				notifyTime(0);
-//				byte[] emptyBuffer = new byte[m_format.getSampleSizeInBits() / 8];
-//				m_shouldStop = false;
-//				
-//				// create a buffer that can hold 20ms of data
-//				final float sampleRate = m_format.getSampleRate();
-//				int bufferSamplesCount = 256;//(int) Math.round(sampleRate * 0.020 / 10.0d);
-////				int bufferSamplesCount = (int) Math.round(sampleRate * 0.01125);
-//				byte[] buffer = new byte[m_format.getChannels() * bufferSamplesCount * m_format.getSampleSizeInBits() / 8];
-//				int notificationsCount = 0;
-//				
-//				long startTime = System.currentTimeMillis();
-//				
-//				while (!m_shouldStop) {
-//					for (int i=0;i<bufferSamplesCount;i++) {
-//						double time = samplesCount / sampleRate;
-//						if (m_format.getChannels() == 2) {
-//							byte[] leftSample = (m_leftSampler == null) ? emptyBuffer : m_leftSampler.getSample(time);
-//							byte[] rightSample = (m_rightSampler == null) ? emptyBuffer : m_rightSampler.getSample(time);
-//							System.arraycopy(leftSample, 0, buffer, leftSample.length * i * 2, leftSample.length);
-//							System.arraycopy(rightSample, 0, buffer, rightSample.length * (i * 2 + 1), rightSample.length);
-//						}
-//						else {
-//							byte[] sample = (m_monoSampler == null) ? emptyBuffer : m_monoSampler.getSample(time);
-//							System.arraycopy(sample, 0, buffer, sample.length * i, sample.length);
-//						}
-//						samplesCount++;
-//						
-//						if (samplesCount >= ((notificationsCount + 1) * 0.020d) * sampleRate) {
-//							notificationsCount++;
-//							notifyTime(samplesCount / sampleRate);
-//						}
-//						
-//						long elapsed = System.currentTimeMillis() - startTime;
-//						long wait = (long) (((samplesCount * 1000)/ sampleRate) - elapsed);
-//						if (wait > 0) {
-//							try { Thread.sleep(wait); } 	
-//							catch (InterruptedException e) {}
-//						}
-//					}
-//					
-//					auline.write(buffer, 0, buffer.length);
-//				}
-//				
-//				auline.drain();
-//				auline.close();
-//			};
-//		};
-//		
-//		m_consumerThread.start();
-//	}
 }
 
 

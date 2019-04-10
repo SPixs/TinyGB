@@ -53,9 +53,11 @@ public class Mixer implements ISoundProvider {
 	public int getValue() {
 		int result = 0;
 		for (ISoundProvider provider : m_inputs) {
-			result += provider.getValue();
+			final int value = provider.getValue();
+			result += value;
 		}
-		return result * (m_volume + 1);
+		result *= (m_volume + 1);
+		return result;
 	}
 }
 
