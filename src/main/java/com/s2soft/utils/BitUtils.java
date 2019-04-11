@@ -16,6 +16,10 @@ public class BitUtils {
 		return ((value >> index) & 0x01) != 0;
 	}
 
+	public final static boolean isSet(int value, int index) {
+		return ((value >> index) & 0x01) != 0;
+	}
+
 	public final static byte toByte(int value) {
 		return (byte)(value & 0x0FF);
 	}
@@ -26,6 +30,13 @@ public class BitUtils {
 
 	public static byte setBit(byte status, int index, boolean value) {
 		byte mask = (byte) (1 << index);
+		status &= ~mask;
+		if (value) status |= mask;
+		return status;
+	}
+	
+	public static int setBit(int status, int index, boolean value) {
+		int mask = (1 << index);
 		status &= ~mask;
 		if (value) status |= mask;
 		return status;

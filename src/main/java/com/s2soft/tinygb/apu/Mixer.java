@@ -7,7 +7,7 @@ public class Mixer implements ISoundProvider {
 
 	//   ============================ Constants ==============================
 
-	private static final boolean TRACE = true;
+	private static final boolean TRACE = false;
 
 	//	 =========================== Attributes ==============================
 
@@ -30,7 +30,7 @@ public class Mixer implements ISoundProvider {
 	 */
 	public void setVolume(int volume) {
 		m_volume = volume;
-		if (TRACE) {
+		if (GBAPU.TRACE && TRACE) {
 			System.out.println("Setting volume in mixer " + m_name +" = " + volume);
 		}
 	}

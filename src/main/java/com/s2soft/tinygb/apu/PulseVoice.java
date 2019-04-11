@@ -2,16 +2,16 @@ package com.s2soft.tinygb.apu;
 
 import com.s2soft.utils.BitUtils;
 
-public abstract class PulseVoice extends Voice {
+public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice {
 
 	//   ============================ Constants ==============================
 
+	public final static boolean TRACE = false;
+	
 	//	 =========================== Attributes ==============================
 
 	private int m_rawDuty;
 	private float m_duty; // in pourcentage
-	
-	private int m_rawFrequency;
 	
 	private int m_counter; // Generate oscillator clocks by dividing machine clock
 	
@@ -25,12 +25,17 @@ public abstract class PulseVoice extends Voice {
 	};
 
 	private VolumeEnveloppe m_envelope;
-
+	
+	private LengthCounter m_lengthCounter;
+	
 	//	 =========================== Constructor =============================
 	
 	public PulseVoice() {
 		m_envelope = new VolumeEnveloppe();
 		getFrameSequencer().setVolumeEnvelope(m_envelope);
+		
+		m_lengthCounter = new LengthCounter(this, 64);
+		getFrameSequencer().setLengthCounter(m_lengthCounter);
 	}
 
 	//	 ========================== Access methods ===========================
@@ -61,25 +66,18 @@ public abstract class PulseVoice extends Voice {
 			case 0b10: m_duty = 0.50f; break;
 			case 0b11: m_duty = 0.75f; break;
 		}
-		if (GBAPU.TRACE) {
+		if (GBAPU.TRACE && TRACE) {
 			System.out.println("Voice 1. Duty = " + m_duty);
 		}
 	}
 
-	public int getRawFrequency() {
-		return m_rawFrequency;
-	}
-
-	public void setRawFrequency(int frequency) {
-		m_rawFrequency = frequency;
-	}
-
 	public void init() {
-		float frequency = 4194304.0f / (4 * 8 * (2048 - m_rawFrequency));
-		if (GBAPU.TRACE) {
+		m_lengthCounter.init();
+		float frequency = 4194304.0f / (4 * 8 * (2048 - getRawFrequency()));
+		if (GBAPU.TRACE && TRACE) {
 			System.out.println(getName()+". Init. Frequency = " + frequency);
 		}
-		m_counter = 0;
+		m_counter = 0; // the duty cycle starts immediately 
 		m_envelope.init();
 	}
 	
@@ -93,16 +91,14 @@ public abstract class PulseVoice extends Voice {
 
 		if (m_counter-- == 0) {
 			// A square channel's frequency timer period is set to (2048-frequency)*4. 
-			// Four duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through
-			m_counter = 4 * (2048 - m_rawFrequency) - 1;
+			// A full duty cycle period is 8 * 4 * (2048 - m_rawFrequency) machine cycles
+			// A duty cycle step is 4 * (2048 - m_rawFrequency) machine cycles (8 steps in a full cycle)
+			// Four kind of duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through
+			m_counter = 4 * (2048 - getRawFrequency()) - 1;
 			int oscillatorValue = BitUtils.isSet(m_dutyCycles[getRawDuty()], 7-m_dutyPosition) ? 1 : -1;
 			m_dutyPosition = (m_dutyPosition + 1) % 8; // progress into duty cycle
 			
-//			int oldValue = getValue();
 			setOutputValue(oscillatorValue * getEnvelopeValue());
-//			if (GBAPU.TRACE && getValue() != oldValue) {
-//				System.out.println(getName()+". Output value " + getValue());
-//			}
 		}
 	}
 	
@@ -111,14 +107,14 @@ public abstract class PulseVoice extends Voice {
 	}
 
 	public void setEnvelopeIncrease(boolean increase) {
-		if (GBAPU.TRACE) {
+		if (GBAPU.TRACE && TRACE) {
 			System.out.println("Voice 1. Set envelope increase " + increase);
 		}
 		m_envelope.setIncrease(increase);
 	}
 
 	public void setInitialEnvelopeVolume(int volume) {
-		if (GBAPU.TRACE) {
+		if (GBAPU.TRACE && TRACE) {
 			System.out.println("Voice 1. Set envelope volume " + volume);
 		}
 		m_envelope.setInitialVolume(volume);
@@ -137,12 +133,10 @@ public abstract class PulseVoice extends Voice {
 	}
 
 	public void setEnvelopeSweep(int envelopeSweep) {
-		if (GBAPU.TRACE) {
+		if (GBAPU.TRACE && TRACE) {
 			System.out.println("Voice 1. Set envelope sweep " + envelopeSweep);
 		}
 		m_envelope.setSweep(envelopeSweep);
 	}
-	
-	protected abstract String getName();
 }
 

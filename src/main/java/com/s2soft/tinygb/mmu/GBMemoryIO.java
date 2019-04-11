@@ -18,7 +18,7 @@ public class GBMemoryIO implements IAddressable {
 
 	//   ============================ Constants ==============================
 	
-	public final static boolean TRACE = true;
+	public final static boolean TRACE = false;
 
 	//	 =========================== Attributes ==============================
 	
@@ -58,8 +58,17 @@ public class GBMemoryIO implements IAddressable {
 		addRegister(0xFF17, "NR22", () -> m_apu.getNR22()  , (v) -> { m_apu.setNR22(v); } ); // NR22 - Channel 2 Volume Envelope (R/W)
 		addRegister(0xFF18, "NR23", () -> m_apu.getNR23()  , (v) -> { m_apu.setNR23(v); } ); // NR23 - Channel 2 Frequency lo (Write Only)
 		addRegister(0xFF19, "NR24", () -> m_apu.getNR24()  , (v) -> { m_apu.setNR24(v); } ); // NR24 - Channel 2 Frequency hi (R/W)
+		addRegister(0xFF1A, "NR30", () -> m_apu.getNR30()  , (v) -> { m_apu.setNR30(v); } ); // NR30 - Channel 3 Sound on/off (R/W)
+		addRegister(0xFF1B, "NR31", () -> m_apu.getNR31()  , (v) -> { m_apu.setNR31(v); } ); // NR31 - Channel 3 Sound Length
+		addRegister(0xFF1C, "NR32", () -> m_apu.getNR32()  , (v) -> { m_apu.setNR32(v); } ); // NR32 - Channel 3 Select output level (R/W)
+		addRegister(0xFF1D, "NR33", () -> m_apu.getNR33()  , (v) -> { m_apu.setNR33(v); } ); // NR33 - Channel 3 Frequency's lower data (W)
+		addRegister(0xFF1E, "NR34", () -> m_apu.getNR34()  , (v) -> { m_apu.setNR34(v); } ); // NR34 - Channel 3 Frequency's higher data (R/W)
+		addRegister(0xFF20, "NR30", () -> m_apu.getNR41()  , (v) -> { m_apu.setNR41(v); } ); // NR41 - Channel 4 Sound Length (R/W)
+		addRegister(0xFF21, "NR31", () -> m_apu.getNR42()  , (v) -> { m_apu.setNR42(v); } ); // NR42 - Channel 4 Volume Envelope (R/W)
+		addRegister(0xFF22, "NR32", () -> m_apu.getNR43()  , (v) -> { m_apu.setNR43(v); } ); // NR43 - Channel 4 Polynomial Counter (R/W)
+		addRegister(0xFF23, "NR33", () -> m_apu.getNR44()  , (v) -> { m_apu.setNR44(v); } ); // NR44 - Channel 4 Counter/consecutive; Inital (R/W)
 		addRegister(0xFF24, "NR50", () -> m_apu.getNR50()  , (v) -> { m_apu.setNR50(v); } ); // NR50 - Channel control / ON-OFF / Volume (R/W)
-		addRegister(0xFF25, "NR52", () -> m_apu.getNR51()  , (v) -> { m_apu.setNR51(v); } ); // NR51 - Selection of Sound output terminal (R/W)
+		addRegister(0xFF25, "NR51", () -> m_apu.getNR51()  , (v) -> { m_apu.setNR51(v); } ); // NR51 - Selection of Sound output terminal (R/W)
 		addRegister(0xFF26, "NR52", () -> m_apu.getNR52()  , (v) -> { m_apu.setNR52(v); } ); // NR52 - Sound on/off
 		addRegister(0xFF40, "LCDC", () -> m_gpu.getLCDControl() , (v) -> { m_gpu.setLCDControl(v); } );
 		addRegister(0xFF41, "STAT", () -> m_gpu.getLCDStatus() , (v) -> { m_gpu.setLCDStatus(v); } );

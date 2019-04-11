@@ -1,6 +1,7 @@
 package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
+import com.s2soft.utils.BitUtils;
 
 public class InstrRLA extends Instruction {
 
@@ -28,14 +29,14 @@ public class InstrRLA extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		byte valueToRotate = cpu.getA();
 		byte newValue = (byte) (valueToRotate << 1);
-		newValue |= (cpu.getFlagCarry() ? 1 : 0);
+		newValue = BitUtils.setBit(newValue, 0, cpu.getFlagCarry());
 		
 		cpu.setA(newValue);
 
 		cpu.setFlagZero(newValue == 0);
 		cpu.setFlagSubtract(false);
 		cpu.setFlagHalfCarry(false);
-		cpu.setFlagCarry(((valueToRotate >> 7) & 0x01) != 0);
+		cpu.setFlagCarry(BitUtils.isSet(valueToRotate, 7));
 		
 		return 4;
 	}

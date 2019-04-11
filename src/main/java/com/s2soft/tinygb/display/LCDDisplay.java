@@ -77,8 +77,6 @@ public class LCDDisplay extends JPanel implements IDisplay {
 	
 	@Override
 	public void setEnable(boolean enabled) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override

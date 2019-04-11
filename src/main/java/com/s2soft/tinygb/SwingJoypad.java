@@ -25,7 +25,12 @@ public class SwingJoypad implements IJoypad, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent event) {
-		JoypadButton button = getMappedButton(event);
+		keyPressed(event.getKeyCode());
+	}
+	
+	public void keyPressed(int key) {
+		System.out.println(">>>>" + key);
+		JoypadButton button = getMappedButton(key);
 		if (button != null) {
 			for (IJoypadButtonListener listener : m_listeners) {
 				listener.buttonPressed(button);
@@ -33,8 +38,7 @@ public class SwingJoypad implements IJoypad, KeyListener {
 		}
 	}
 
-	private JoypadButton getMappedButton(KeyEvent event) {
-		int keyCode = event.getKeyCode();
+	private JoypadButton getMappedButton(int keyCode) {
 		switch (keyCode) {
 			case KeyEvent.VK_UP: return JoypadButton.UP;
 			case KeyEvent.VK_DOWN: return JoypadButton.DOWN;
@@ -50,7 +54,11 @@ public class SwingJoypad implements IJoypad, KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent event) {
-		JoypadButton button = getMappedButton(event);
+		keyReleased(event.getKeyCode());
+	}
+	
+	public void keyReleased(int key) {
+		JoypadButton button = getMappedButton(key);
 		if (button != null) {
 			for (IJoypadButtonListener listener : m_listeners) {
 				listener.buttonReleased(button);

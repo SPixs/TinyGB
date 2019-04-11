@@ -8,7 +8,7 @@ public class GBAPU {
 
 	//   ============================ Constants ==============================
 
-	public final static boolean TRACE = true;
+	public final static boolean TRACE = false;
 
 	//	 =========================== Attributes ==============================
 
@@ -216,6 +216,24 @@ public class GBAPU {
 		result = BitUtils.setBit(result, 3, m_voice1.isSweepIncrease());
 		return result;
 	}
+	
+	/**
+	 * I/O register NR30 at $FF1A 
+	 * Channel 3 Sound on/off (R/W)
+	 * Bit 7 - Sound Channel 3 Off  (0=Stop, 1=Playback)  (Read/Write)
+	 * 
+	 * @param v content of NR11 register 
+	 */
+	public void setNR30(byte v) {
+		boolean playback = BitUtils.isSet(v, 7);
+		m_voice3.setPlayback(playback);
+	}
+	
+	public byte getNR30() {
+		byte result = (byte) 0xFF;
+		result = BitUtils.setBit(result, 7, m_voice3.isPlayback());
+		return result;
+	}
 
 	/**
 	 * I/O register NR11 at $FF11 
@@ -237,13 +255,38 @@ public class GBAPU {
 	}
 	
 	/**
-	 * I/O register NR11 at $FF16 
+	 * I/O register NR21 at $FF16 
 	 * Same as NR11
 	 * The Length value is used only if Bit 6 in NR24 is set.
 	 * @param v
 	 */
 	public void setNR21(byte v) {
 		setNRX1(m_voice2, v);
+	}
+	
+	/**
+	 * I/O register NR31 at $FF1B 
+	 * Channel 3 Sound Length
+	 * 
+	 * Sound Length = (256-t1)*(1/256) seconds.
+	 * This value is used only if Bit 6 in NR34 is set.
+	 * 
+	 * @param v
+	 */
+	public void setNR31(byte v) {
+		m_voice3.setRawLength(v);
+	}
+	
+	/**
+	 * I/O register NR41 at $FF20 
+	 * Channel 4 Sound Length (R/W)
+	 * Bit 5-0 - Sound length data (t1: 0-63)
+	 * Sound Length = (64-t1)*(1/256) seconds The Length value is used only if Bit 6 in NR44 is set.
+	 * 
+	 * @param v
+	 */
+	public void setNR41(byte v) {
+		m_voice4.setRawLength(v & 0b00111111);
 	}
 
 	private void setNRX1(PulseVoice voice, byte v) {
@@ -264,7 +307,23 @@ public class GBAPU {
 	public byte getNR21() {
 		return getNRX1(m_voice2);
 	}
+	
+	/**
+	 * @return content of NR31 APU register
+	 */
+	public byte getNR31() {
+		return (byte) (m_voice3.getRawLength() & 0xFF);
+	}
 
+	/**
+	 * @return content of NR41 APU register
+	 */
+	public byte getNR41() {
+		byte result = (byte) 0x11000000;
+		result |= (m_voice4.getRawLength() & 0b00111111);
+		return result;
+	}
+	
 	private byte getNRX1(PulseVoice voice1) {
 		return (byte)(((m_voice1.getRawDuty() & 0x03) << 6) | (m_voice1.getRawLength() & 0b00111111));
 	}
@@ -295,7 +354,34 @@ public class GBAPU {
 		setNRX2(m_voice2, v);	
 	}
 	
-	private void setNRX2(PulseVoice voice, byte v) {
+	/**
+	 * I/O register NR32 at $FF1C
+	 * Channel 3 Select output level (R/W)
+	 * Bit 6-5 - Select output level (Read/Write)
+	 * 
+	 * Possible Output levels are:
+	 *  0: Mute (No sound)
+	 *  1: 100% Volume (Produce Wave Pattern RAM Data as it is)
+	 *  2:  50% Volume (Produce Wave Pattern RAM data shifted once to the right)
+	 *  3:  25% Volume (Produce Wave Pattern RAM data shifted twice to the right)
+	 * 
+	 * @param v content of NR12 register 
+	 */
+	public void setNR32(byte v) {
+		m_voice3.setOutputLevel((v >> 5) & 0x03);
+	}
+	
+	/**
+	 * I/O register NR42 at $FF21
+	 * Channel 4 Volume Envelope (R/W) 
+	 * 
+	 * @param v content of NR12 register 
+	 */
+	public void setNR42(byte v) {
+		setNRX2(m_voice4, v);	
+	}
+	
+	private void setNRX2(IVolumeEnveloppeVoice voice, byte v) {
 		int envelopeSweep = v & 0x03;
 		boolean increase = BitUtils.isSet(v, 3);
 		int initialEnvelopeVolume = (v >> 4) & 0x0F; // 0 = No sound
@@ -321,8 +407,22 @@ public class GBAPU {
 	public byte getNR22() {
 		return getNRX2(m_voice2);
 	}
+	
+	/**
+	 * @return content of NR32 APU register
+	 */
+	public byte getNR32() {
+		return (byte) ((m_voice3.getOutputLevel() & 0x03) << 5);
+	}
 
-	private byte getNRX2(PulseVoice voice) {
+	/**
+	 * @return content of NR42 APU register
+	 */
+	public byte getNR42() {
+		return getNRX2(m_voice4);
+	}
+
+	private byte getNRX2(IVolumeEnveloppeVoice voice) {
 		byte result = (byte) (voice.getEnvelopeSweep() & 0x03);
 		result = BitUtils.setBit(result, 3, voice.isEnvelopeIncrease());
 		result |= ((voice.getInitialEnvelopeVolume() & 0x0F) << 4);
@@ -351,8 +451,44 @@ public class GBAPU {
 		setNRX3(m_voice2, v);
 	}
 	
-	private void setNRX3(PulseVoice voice, byte v) {
-		// update 3 lower bits
+	/**
+	 * I/O register NR33 at $FF33 
+	 * Channel 3 Frequency's lower data (W)
+	 * 
+	 * Lower 8 bits of an 11 bit frequency (x).
+	 * 
+	 * @param v content of NR23 register 
+	 */ 
+	public void setNR33(byte v) {
+		setNRX3(m_voice3, v);
+	}
+	
+	/**
+	 * I/O register NR43 at $FF22 
+	 * Channel 4 Polynomial Counter (R/W)
+	 * The amplitude is randomly switched between high and low at the given frequency. 
+	 * A higher frequency will make the noise to appear 'softer'. 
+	 * When Bit 3 is set, the output will become more regular, and some frequencies will sound more like Tone than Noise.
+	 * 
+	 * Bit 7-4 - Shift Clock Frequency (s)
+	 * Bit 3   - Counter Step/Width (0=15 bits, 1=7 bits)
+	 * Bit 2-0 - Dividing Ratio of Frequencies (r)
+	 * 
+	 * Frequency = 524288 Hz / r / 2^(s+1) ;For r=0 assume r=0.5 instead
+	 * 
+	 * @param v content of NR43 register 
+	 */ 
+	public void setNR43(byte v) {
+		byte dividingRatio = (byte) (v & 0x07);
+		boolean counterStepWidth = BitUtils.isSet(v, 3);
+		byte shiftClockFrequency = (byte) ((v >> 4) & 0x0F);
+		m_voice4.setDividingRatio(dividingRatio);
+		m_voice4.setCounterStepWidth(counterStepWidth);
+		m_voice4.setShiftClockFrequency(shiftClockFrequency);
+	}
+	
+	private void setNRX3(Voice voice, byte v) {
+		// update 8 lower bits
 		int frequency = voice.getRawFrequency() & 0x700;
 		frequency |= (v & 0xFF);
 		voice.setRawFrequency(frequency);
@@ -370,6 +506,30 @@ public class GBAPU {
 	 */
 	public byte getNR23() {
 		return (byte) 0xFF;
+	}
+	
+	/**
+	 * @return content of NR33 APU register (Write only, so $FF)
+	 */
+	public byte getNR33() {
+		return (byte) 0xFF;
+	}
+	
+	/**
+	 * @return content of NR34 APU register (Write only, so $FF)
+	 */
+	public byte getNR34() {
+		return (byte) 0xFF;
+	}
+
+	/**
+	 * @return content of NR43 APU register
+	 */
+	public byte getNR43() {
+		byte result = (byte) (m_voice4.getDividingRatio() & 0x07);
+		result |= (m_voice4.getShiftClockFrequency() & 0x0F) << 4;
+		result = BitUtils.setBit(result, 3, m_voice4.isCounterStepWidth());
+		return result;
 	}
 	
 	/**
@@ -397,7 +557,42 @@ public class GBAPU {
 		setNRX4(m_voice2, v);
 	}
 	
-	private void setNRX4(PulseVoice voice, byte v) {
+	/**
+	 * I/O register NR34 at $FF1E
+	 * Channel 3 Frequency's higher data (R/W)
+	 * 
+	 * Bit 7   - Initial (1=Restart Sound)     (Write Only)
+	 * Bit 6   - Counter/consecutive selection (Read/Write)
+	 *           (1=Stop output when length in NR31 expires)
+	 * Bit 2-0 - Frequency's higher 3 bits (x) (Write Only)
+	 * 
+	 * Frequency = 4194304/(64*(2048-x)) Hz = 65536/(2048-x) Hz
+	 * 
+	 * @param v content of NR34 register 
+	 */ 
+	public void setNR34(byte v) {
+		setNRX4(m_voice3, v);
+	}
+	
+	/**
+	 * I/O register NR44 at $FF23 
+	 * Channel 4 Counter/consecutive; Inital (R/W)
+	 * 
+	 * Bit 7   - Initial (1=Restart Sound)     (Write Only)
+	 * Bit 6   - Counter/consecutive selection (Read/Write)
+	 *           (1=Stop output when length in NR41 expires)
+	 * 
+	 * @param v content of NR44 register 
+	 */ 
+	public void setNR44(byte v) {
+		m_voice4.setLengthEnabled(BitUtils.isSet(v, 6));
+		if (BitUtils.isSet(v, 7)) {
+			m_voice4.setEnabled(true);
+			m_voice4.init();
+		}
+	}
+	
+	private void setNRX4(Voice voice, byte v) {
 		// update 3 upper bits
 		int frequency = voice.getRawFrequency() & 0x0FF;
 		frequency |= (v & 0x07) << 8;
@@ -422,8 +617,15 @@ public class GBAPU {
 	public byte getNR24() {
 		return getNRX4(m_voice2);
 	}
+	
+	/**
+	 * @return content of NR44 APU register
+	 */
+	public byte getNR44() {
+		return getNRX4(m_voice4);
+	}
 
-	private byte getNRX4(PulseVoice voice) {
+	private byte getNRX4(Voice voice) {
 		// the only bit readable is 'length enable', bit 6
 		byte result = (byte) 0xFF;
 		result = BitUtils.setBit(result, 6, voice.isLengthEnabled());
@@ -439,10 +641,11 @@ public class GBAPU {
 	 * @param v the pair of 4 bits samples
 	 */
 	public void setWAVData(int index, byte v) {
+		m_voice3.setWAVData(index, v);
 	}
 
 	public byte getWAVData(int index) {
-		return (byte) 0xFF;
+		return m_voice3.getWAVData(index);
 	}
 
 	public void reset() {

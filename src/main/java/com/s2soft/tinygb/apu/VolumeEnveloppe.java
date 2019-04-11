@@ -4,6 +4,8 @@ public class VolumeEnveloppe {
 
 	//   ============================ Constants ==============================
 
+	public final static boolean TRACE = false;
+	
 	//	 =========================== Attributes ==============================
 	
 	private int m_initialVolume = 0;
@@ -64,7 +66,9 @@ public class VolumeEnveloppe {
 			int newVolume = m_volume + (m_increase ? 1 : -1);
 			m_running = newVolume >= 0 && newVolume <= 0x0F;
 			if (m_running) { m_volume = newVolume; }
-			System.out.println("New envelope volume " + m_volume);
+			if (GBAPU.TRACE && TRACE) {
+				System.out.println("New envelope volume " + m_volume);
+			}
 		}
 		if (m_sweep < 0) { m_sweep = 0; }
 	}

@@ -1,5 +1,24 @@
 package com.s2soft.tinygb.apu;
 
+/**
+ * The frame sequencer generates low frequency clocks for the modulation units. It is clocked by a 512 Hz timer.
+ * 
+ * Step   Length Ctr  Vol Env     Sweep
+ * ---------------------------------------
+ * 0      Clock       -           -
+ * 1      -           -           -
+ * 2      Clock       -           Clock
+ * 3      -           -           -
+ * 4      Clock       -           -
+ * 5      -           -           -
+ * 6      Clock       -           Clock
+ * 7      -           Clock       -
+ * ---------------------------------------
+ * Rate   256 Hz      64 Hz       128 Hz
+ * 
+ * @author smametz
+ *
+ */
 public class FrameSequencer {
 
 
@@ -43,9 +62,9 @@ public class FrameSequencer {
 		
 		if (m_counter-- == 0) {
 			int sequenceStep = (m_sequenceStep++) % 8;
+			if (sequenceStep == 2 || sequenceStep == 6) { stepSweep(); }
 			if (sequenceStep % 2 == 0) { stepLength(); }
 			if (sequenceStep == 7) { stepVolume(); }
-			if (sequenceStep == 2 || sequenceStep == 6) { stepSweep(); }
 			reset();
 		}
 	}

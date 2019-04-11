@@ -4,6 +4,8 @@ public abstract class Voice implements ISoundProvider {
 
 	//   ============================ Constants ==============================
 
+	public final static boolean TRACE = false;
+	
 	//	 =========================== Attributes ==============================
 
 	private boolean m_enabled = false;
@@ -16,6 +18,8 @@ public abstract class Voice implements ISoundProvider {
 	private int m_value;
 	
 	private boolean m_lengthEnabled;
+
+	private int m_rawFrequency;
 	
 	//	 =========================== Constructor =============================
 
@@ -42,15 +46,15 @@ public abstract class Voice implements ISoundProvider {
 	public void setRawLength(int t1) {
 		m_rawLength = t1;
 		m_lengthInSeconds = (64 - (t1 & 0x001111)) / 256.0f;
-		if (GBAPU.TRACE) {
-			System.out.println("Voice 1. Length = " + m_lengthInSeconds + "s");
+		if (GBAPU.TRACE && TRACE) {
+			System.out.println(getName()+". Length = " + m_lengthInSeconds + "s");
 		}
 	}
 	
 	public void setLengthEnabled(boolean state) {
 		m_lengthEnabled = state;
-		if (GBAPU.TRACE) {
-			System.out.println("Voice 1. Length enabled = " + state);
+		if (GBAPU.TRACE && TRACE) {
+			System.out.println(getName()+". Length enabled = " + state);
 		}
 	}
 
@@ -58,8 +62,14 @@ public abstract class Voice implements ISoundProvider {
 		return m_lengthEnabled;
 	}
 
+	public int getRawFrequency() {
+		return m_rawFrequency;
+	}
 
-	
+	public void setRawFrequency(int frequency) {
+		m_rawFrequency = frequency;
+	}
+
 	//	 ========================= Treatment methods =========================
 
 	public boolean isEnabled() {
@@ -88,11 +98,21 @@ public abstract class Voice implements ISoundProvider {
 	}
 
 	public void step() {
+		if (!m_enabled) {
+			return;
+		}
+		
 		m_frameSequencer.step();
 		
 		stepImpl();
 	}
 	
 	public abstract void stepImpl();
+
+	protected abstract String getName();
+
+	public abstract void init();
+	
+	
 }
 

@@ -1,6 +1,7 @@
 package com.s2soft.tinygb;
 
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -10,6 +11,7 @@ import javax.swing.JFrame;
 import com.s2soft.tinygb.audio.AudioDevice;
 import com.s2soft.tinygb.cpu.Disassembler;
 import com.s2soft.tinygb.cpu.Instruction;
+import com.s2soft.tinygb.display.BufferedLCDDisplay;
 import com.s2soft.tinygb.display.LCDDisplay;
 
 public class Main {
@@ -25,28 +27,17 @@ public class Main {
 	//	 ========================= Treatment methods =========================
 
 	public static void main(String[] args) throws Exception {
-		LCDDisplay lcdDisplay = new LCDDisplay();
+//		LCDDisplay lcdDisplay = new LCDDisplay();
+		BufferedLCDDisplay lcdDisplay = new BufferedLCDDisplay();
 		AudioDevice audioDevice = new AudioDevice(44100);
 		SwingJoypad joypad = new SwingJoypad();
 		IConfiguration configuration = new DefaultConfiguration();
 		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, audioDevice, joypad);
 		
 		Cartidge cartidge = new Cartidge();
-//		cartidge.read(Main.class.getResourceAsStream("/rom/bgSprite0.gb"));
 		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/rom/bgbtest.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/Tennis (W) [!].gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/01-registers.gb"));
 		gameBoy.setCartidge(cartidge);
-		
-//		gameBoy.getMemory().setBootROMLock(false);
-//		new Disassembler(gameBoy).disassemble((short)0x2820, (short)(0x2820+0x0ff));
-//		System.exit(0);
-		
-//		for (int i=0x0104;i<0x0104+(0x00D8-0x00A8);i++) {
-//			System.out.println("CART LOGO " + i + "\t" + Instruction.toHexByte(cartidge.getROMByte(i)) );
-//		}
-//		
-//		System.exit(0);
 		
 		JFrame mainFrame = new JFrame("TinyGB");
 		mainFrame.setIconImages(Arrays.asList(new BufferedImage[] {
@@ -54,8 +45,11 @@ public class Main {
 				ImageIO.read(Main.class.getResourceAsStream("/icon_32.png"))
 		}));
 		mainFrame.addKeyListener(joypad);
-		GameboyEnclosurePanel panel = new GameboyEnclosurePanel(lcdDisplay);
-		mainFrame.getContentPane().add(panel);
+		mainFrame.setFocusable(true);
+		mainFrame.setFocusTraversalKeysEnabled(false);
+		mainFrame.requestFocus();
+		lcdDisplay.setFocusable(false);
+		mainFrame.getContentPane().add(lcdDisplay);
 		mainFrame.pack();
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setLocationRelativeTo(null);

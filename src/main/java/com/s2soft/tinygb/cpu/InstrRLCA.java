@@ -28,8 +28,8 @@ public class InstrRLCA extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		byte valueToRotate = cpu.getA();
-		byte newValue = (byte) (valueToRotate << 1);
-		newValue |= BitUtils.isSet(valueToRotate, 7) ? 1 : 0;
+		byte newValue = (byte) ((valueToRotate << 1) & 0xFF);
+		newValue = BitUtils.setBit(newValue, 0, BitUtils.isSet(valueToRotate, 7));
 
 		cpu.setA(newValue);
 

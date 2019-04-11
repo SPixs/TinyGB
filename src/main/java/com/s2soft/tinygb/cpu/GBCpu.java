@@ -195,6 +195,7 @@ public class GBCpu {
 		m_instructions.add(new InstrLDHnA());
 		m_instructions.add(new InstrLDHAn());
 		m_instructions.add(new InstrCALL());
+		m_instructions.add(new InstrCALLcc());
 		m_instructions.add(new InstrPUSH());
 		m_instructions.add(new InstrPOP());
 		m_instructions.add(new InstrRET());
@@ -206,6 +207,8 @@ public class GBCpu {
 		m_instructions.add(new InstrADDAn());
 		m_instructions.add(new InstrRLA());
 		m_instructions.add(new InstrRLCA());
+		m_instructions.add(new InstrRRA());
+		m_instructions.add(new InstrRRCA());
 		m_instructions.add(new InstrNOP());
 		m_instructions.add(new InstrAND());
 		m_instructions.add(new InstrOR());
@@ -282,7 +285,7 @@ public class GBCpu {
 		
 		processInterrupts();
 		
-		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x1A05 && getPC() <= 0x1A06;
+//		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x1A05 && getPC() <= 0x1A06;
 //		startTrace = true;
 		
 //		if (getPC() == 0x0028) {

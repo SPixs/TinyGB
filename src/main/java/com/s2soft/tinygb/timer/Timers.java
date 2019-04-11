@@ -8,7 +8,7 @@ public class Timers {
 
 	//   ============================ Constants ==============================
 	
-	private final static boolean TRACE = true;
+	private final static boolean TRACE = false;
 	
 	//	 =========================== Attributes ==============================
 	
