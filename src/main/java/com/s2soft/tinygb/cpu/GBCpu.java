@@ -285,7 +285,8 @@ public class GBCpu {
 		
 		processInterrupts();
 		
-//		startTrace = !m_memory.isBootROMLock() && getPC() >= 0x1A05 && getPC() <= 0x1A06;
+		startTrace = !m_memory.isBootROMLock() && ((getPC() >= 0xC276 && getPC() < 0xC288) ||
+				(getPC() >= 0xC2CD && getPC() < 0xC2CD + 20));
 //		startTrace = true;
 		
 //		if (getPC() == 0x0028) {

@@ -31,8 +31,8 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 		int currentLine = getGpu().getScanLine();
 		int scrollX = getGpu().getScrollX();
 		int scrollY = getGpu().getScrollY();
-		int tileX = scrollX / 8;
-		int tileY = (currentLine + scrollY) / 8;
+		int tileX = (scrollX / 8) % 32;
+		int tileY = ((currentLine + scrollY) / 8) % 32;
 		getGpu().getFetcher().setTileAddress(tilesBaseAddress + tileX + tileY * 32);
 	}
 

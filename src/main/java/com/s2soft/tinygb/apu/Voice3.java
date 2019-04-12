@@ -51,6 +51,11 @@ public class Voice3 extends Voice {
 	public byte getWAVData(int index) {
 		return m_samples[index];
 	}
+	
+	@Override
+	public boolean isPlaying() {
+		return isEnabled() && isPlayback();
+	}
 
 	//	 ========================= Treatment methods =========================
 

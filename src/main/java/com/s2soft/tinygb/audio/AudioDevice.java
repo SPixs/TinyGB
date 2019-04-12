@@ -65,6 +65,12 @@ public class AudioDevice implements IAudioDevice {
 		
 		m_recordedOutputStream = new ByteArrayOutputStream();
 	}
+	
+	@Override
+	public void stop() {
+		m_auline.drain();
+		m_auline.close();
+	}
 
 	@Override
 	public void putSample(byte leftSample, byte rightSample) {
@@ -78,21 +84,21 @@ public class AudioDevice implements IAudioDevice {
 				m_recordedOutputStream.write(m_buffer, 0, m_buffer.length);
 				m_bufferIndex = 0;
 				
-				if (m_recordedOutputStream.size() == 256 * 8000) {
-					System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
-					try {
-						byte[] byteArray = m_recordedOutputStream.toByteArray();
-						AudioInputStream audioInputStream = new AudioInputStream(new ByteArrayInputStream(byteArray), m_format, byteArray.length / m_format.getFrameSize());
-						OutputStream outputStream = new FileOutputStream("output.wav");
-						AudioSystem.write(audioInputStream, Type.WAVE, outputStream);
-						audioInputStream.close();
-						outputStream.flush();
-						outputStream.close();
-					} 
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+//				if (m_recordedOutputStream.size() == 256 * 8000) {
+//					System.out.println("!!!!!!!!!!!!!!!!!!!!!!");
+//					try {
+//						byte[] byteArray = m_recordedOutputStream.toByteArray();
+//						AudioInputStream audioInputStream = new AudioInputStream(new ByteArrayInputStream(byteArray), m_format, byteArray.length / m_format.getFrameSize());
+//						OutputStream outputStream = new FileOutputStream("output.wav");
+//						AudioSystem.write(audioInputStream, Type.WAVE, outputStream);
+//						audioInputStream.close();
+//						outputStream.flush();
+//						outputStream.close();
+//					} 
+//					catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
 			}
 		}
 		m_counter++;

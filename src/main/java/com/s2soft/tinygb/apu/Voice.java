@@ -89,9 +89,7 @@ public abstract class Voice implements ISoundProvider {
 		return m_enabled ? m_value : 0;
 	}
 	
-	public boolean isPlaying() {
-		return false;
-	}
+	public abstract boolean isPlaying();
 
 	public float getLengthInSeconds() {
 		return m_lengthInSeconds;

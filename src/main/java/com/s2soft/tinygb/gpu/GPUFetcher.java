@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.gpu;
 
+import com.s2soft.tinygb.cpu.Instruction;
+
 public class GPUFetcher {
 
 	//   ============================ Constants ==============================

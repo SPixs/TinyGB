@@ -199,7 +199,7 @@ public class GBMemoryIO implements IAddressable {
 			if (TRACE) {
 				System.out.println("Reading from unmapped IO register " + Instruction.toHexShort(address));
 			}
-			return 0;
+			return (byte) 0xFF;
 		}
 	}
 }
