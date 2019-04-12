@@ -42,7 +42,7 @@ public class InstrCALLcc extends Instruction {
 		FlagCondition flagCondition = getFlagCondition(opcode);
 		int callAddress = ((additionalBytes[0] & 0x0ff) | ((additionalBytes[1] << 8) & 0xFF00));
 		if (flagCondition.evaluate(cpu)) {
-			cpu.pushShort(cpu.getPc());
+			cpu.pushShort(cpu.getPC());
 			cpu.setPC(callAddress);
 		}
 

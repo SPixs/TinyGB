@@ -26,11 +26,12 @@ public class LengthCounter {
 	
 	public void init() {
 		m_enabled = true;
-		m_counter = 64 - m_voice.getRawLength();
+		m_counter = m_maxLength - m_voice.getRawLength();
 	}
 
 	public void step() {
-		if (m_enabled && m_counter-- == 0) {
+//		System.out.println(m_voice.getName() + " Length Step, LENGTH="+m_counter);
+		if (m_enabled && --m_counter == 0) {
 			if (!m_voice.isLengthEnabled()) {
 				m_counter = m_maxLength - m_voice.getRawLength();
 			}

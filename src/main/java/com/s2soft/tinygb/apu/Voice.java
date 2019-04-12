@@ -4,7 +4,7 @@ public abstract class Voice implements ISoundProvider {
 
 	//   ============================ Constants ==============================
 
-	public final static boolean TRACE = false;
+	public final static boolean TRACE = true;
 	
 	//	 =========================== Attributes ==============================
 
@@ -45,9 +45,12 @@ public abstract class Voice implements ISoundProvider {
 	 */
 	public void setRawLength(int t1) {
 		m_rawLength = t1;
-		m_lengthInSeconds = (64 - (t1 & 0x001111)) / 256.0f;
+		m_lengthInSeconds = (64 - (t1 & 0x00111111)) / 256.0f;
+		if (m_rawLength == 60) {
+			Thread.yield();
+		}
 		if (GBAPU.TRACE && TRACE) {
-			System.out.println(getName()+". Length = " + m_lengthInSeconds + "s");
+			System.out.println(getName()+". Set length = " + m_rawLength +", " + m_lengthInSeconds + "s");
 		}
 	}
 	

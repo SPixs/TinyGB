@@ -59,13 +59,13 @@ public class FrameSequencer {
 	//	 ========================= Treatment methods =========================
 
 	public void step() {
-		
 		if (m_counter-- == 0) {
+			
 			int sequenceStep = (m_sequenceStep++) % 8;
 			if (sequenceStep == 2 || sequenceStep == 6) { stepSweep(); }
 			if (sequenceStep % 2 == 0) { stepLength(); }
 			if (sequenceStep == 7) { stepVolume(); }
-			reset();
+			m_counter = (4194304 / 512) - 1; // Frame sequencer is clocked by a 512 Hz timer.
 		}
 	}
 	
@@ -87,10 +87,15 @@ public class FrameSequencer {
 		}
 	}
 
-	public void reset() {
-		m_counter = (4194304 / 512) - 1; // Frame sequencer is clocked by a 512 Hz timer.
+	public void init() {
+		m_counter = 0;
+		m_lengthCounter.init();
+		if (m_volumeEnvelope != null) {
+			m_volumeEnvelope.init();
+		}
+		if (m_frequencySweep != null) {
+			m_frequencySweep.init();
+		}
 	}
-
-
 }
 

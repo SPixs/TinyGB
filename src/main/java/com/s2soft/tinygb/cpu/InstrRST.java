@@ -50,7 +50,7 @@ public class InstrRST extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		int callAddress = getJumpAddress(opcode);
-		cpu.pushShort(cpu.getPc());
+		cpu.pushShort(cpu.getPC());
 		cpu.setPC(callAddress);
 
 		return 16;

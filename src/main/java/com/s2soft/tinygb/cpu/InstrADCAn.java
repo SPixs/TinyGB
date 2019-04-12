@@ -31,13 +31,15 @@ public class InstrADCAn extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
 		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
-		int result = BitUtils.toUInt(cpu.getA()) + value + (cpu.getFlagCarry() ? 1 : 0);
+		int regA = BitUtils.toUInt(cpu.getA());
+		int carry = cpu.getFlagCarry() ? 1 : 0;
+		int result = regA + value + carry;
 
 		cpu.setA(BitUtils.toByte(result));
 		
-		cpu.setFlagZero(result == 0);
+		cpu.setFlagZero((result & 0xFF) == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry((cpu.getA() & 0x0F) + (value & 0x0F) + (cpu.getFlagCarry() ? 1 : 0) > 0x0F);
+		cpu.setFlagHalfCarry((regA & 0x0F) + (value & 0x0F) + carry > 0x0F);
 		cpu.setFlagCarry(result > 0x0FF);
 		
 		switch ((int)opcode) {

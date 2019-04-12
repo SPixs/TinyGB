@@ -43,7 +43,7 @@ public class InstrJRCond extends Instruction {
 		FlagCondition flagCondition = getFlagCondition(opcode);
 		byte offset = additionalBytes[0];
 		if (flagCondition.evaluate(cpu)) {
-			cpu.setPC(cpu.getPc() + offset);
+			cpu.setPC(cpu.getPC() + offset);
 		}
 		return 8;
 	}

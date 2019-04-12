@@ -15,6 +15,7 @@ import java.awt.image.IndexColorModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
@@ -44,6 +45,8 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 	private BufferedImage m_gameboyPocketLCD;
 
 	private BufferedImage m_gameboyPocketEnclosure;
+
+	private boolean m_enabled;
 	
 	//	 =========================== Constructor =============================
 	
@@ -72,6 +75,8 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 		m_gameboyPocketLCD = ImageIO.read(getClass().getResourceAsStream("/pocket_lcd_alpha.png"));
 		
 		setPreferredSize(new Dimension(m_gameboyPocketEnclosure.getWidth(), m_gameboyPocketEnclosure.getHeight()));
+		
+		m_enabled = false;
 	}
 
 	//	 ========================== Access methods ===========================
@@ -80,10 +85,20 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 
 	@Override
 	public void setEnable(boolean enabled) {
+		System.out.println("LCD DISPLAY : " + enabled);
+		m_enabled = enabled;
+		if (!enabled) {
+			m_pixelIndex = 0;
+			Arrays.fill(m_videoMemory, (byte)0);
+			refresh();
+		}
 	}
 
 	@Override
 	public void putPixel(byte pixel) {
+		if (!m_enabled) {
+			throw new IllegalStateException();
+		}
 		byte pixels = m_videoMemory[m_pixelIndex / 4];
 		pixel = (byte) (pixel << ((3-(m_pixelIndex % 4)) * 2));
 		byte mask = (byte) (0x03 << ((3-(m_pixelIndex % 4)) * 2));
@@ -95,7 +110,6 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 
 	@Override
 	public void refresh() {
-		
 		if (m_strategy == null) {
 			createBufferStrategy(2);
 			m_strategy = getBufferStrategy();

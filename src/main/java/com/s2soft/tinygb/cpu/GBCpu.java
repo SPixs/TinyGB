@@ -134,13 +134,13 @@ public class GBCpu {
 		m_f = f;
 	}
 
-	public int getPc() {
-		return m_pc;
-	}
+//	public int getPc() {
+//		return m_pc;
+//	}
 
-	public void setPc(int pc) {
-		m_pc = pc;
-	}
+//	public void setPc(int pc) {
+//		m_pc = pc;
+//	}
 
 	public int getSp() {
 		return m_sp & 0x0FFFF;
@@ -285,8 +285,9 @@ public class GBCpu {
 		
 		processInterrupts();
 		
-		startTrace = !m_memory.isBootROMLock() && ((getPC() >= 0xC276 && getPC() < 0xC288) ||
-				(getPC() >= 0xC2CD && getPC() < 0xC2CD + 20));
+//		startTrace = !m_memory.isBootROMLock() && ((getPC() >= 0xC226 && getPC() <= 0xC263) ||
+//				(getPC() >= 0xC203 && getPC() <= 0xC225) ||
+//				(getPC() >= 0xC210 && getPC() <= 0xC21B));
 //		startTrace = true;
 		
 //		if (getPC() == 0x0028) {
@@ -294,6 +295,11 @@ public class GBCpu {
 //		}
 //		if (getPC() == 0x0033) {
 //			System.out.println(">>> Tetris executing machine state at " + Instruction.toHexShort(Register16Bits.HL.getValue(this)));
+//		}
+		
+//		if (getPC() == 0xC79B || getPC() == 0xC78C) {
+//			Thread.yield();
+//			startTrace = true;
 //		}
 		
 		// Check for interrupt
@@ -374,10 +380,11 @@ public class GBCpu {
 			}
 		}
 		catch (Exception ex) {
+			ex.printStackTrace();
 			System.out.println("------------------------");
 			System.out.println("----- FATAL ERROR ------");
 			System.out.println("- Last cpu instruction -");
-			new Disassembler(this, m_memory).disassemble((short)previousPC, (short)previousPC);
+			new Disassembler(this, m_memory).disassemble(previousPC & 0xFFFF, previousPC & 0xFFFF);
 			System.out.println("------------------------");
 			throw ex;
 		}

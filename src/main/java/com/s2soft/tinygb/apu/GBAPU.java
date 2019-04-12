@@ -1,6 +1,7 @@
 package com.s2soft.tinygb.apu;
 
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.utils.BitUtils;
 
@@ -8,7 +9,7 @@ public class GBAPU {
 
 	//   ============================ Constants ==============================
 
-	public final static boolean TRACE = false;
+	public final static boolean TRACE = true;
 
 	//	 =========================== Attributes ==============================
 
@@ -187,6 +188,7 @@ public class GBAPU {
 		for (int i=0;i<4;i++) {
 			result = BitUtils.setBit(result, i, m_voices[i].isPlaying());
 		}
+//		System.out.println("READ NR52 " + Instruction.toHexByte(result));
 		return result;
 	}
 	

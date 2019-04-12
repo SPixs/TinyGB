@@ -29,7 +29,7 @@ public class InstrJR extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		byte offset = additionalBytes[0];
-		cpu.setPC(cpu.getPc() + offset);
+		cpu.setPC(cpu.getPC() + offset);
 
 		return 8;
 	}

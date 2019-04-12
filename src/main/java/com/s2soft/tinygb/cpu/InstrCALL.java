@@ -28,7 +28,7 @@ public class InstrCALL extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		int callAddress = ((additionalBytes[0] & 0x0ff) | ((additionalBytes[1] << 8) & 0xFF00));
-		cpu.pushShort(cpu.getPc());
+		cpu.pushShort(cpu.getPC());
 		cpu.setPC(callAddress);
 
 		return 12;

@@ -11,7 +11,7 @@ public enum Register16Bits {
 		void setValue(GBCpu cpu, int value) { cpu.setSp(value); }
 	},
 	PC(null, null) {
-		int getValue(GBCpu cpu) { return cpu.getPc(); }
+		int getValue(GBCpu cpu) { return cpu.getPC(); }
 		void setValue(GBCpu cpu, int value) { cpu.setPC(value); }
 	};
 	

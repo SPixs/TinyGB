@@ -18,7 +18,7 @@ public class Disassembler {
 		m_memory = memory;
 	}
 
-	public void disassemble(short startAddress, short endAddress) {
+	public void disassemble(int startAddress, int endAddress) {
 		while (startAddress <= endAddress) {
 			byte opcode = m_memory.getByte(startAddress);
 			

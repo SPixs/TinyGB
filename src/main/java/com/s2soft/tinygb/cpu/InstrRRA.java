@@ -28,7 +28,7 @@ public class InstrRRA extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		byte valueToRotate = cpu.getA();
-		byte newValue = (byte) (valueToRotate << 1);
+		byte newValue = (byte) (valueToRotate >> 1);
 		newValue = BitUtils.setBit(newValue, 7, cpu.getFlagCarry());
 		
 		cpu.setA(newValue);

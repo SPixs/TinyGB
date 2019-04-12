@@ -106,7 +106,7 @@ public class GBGPU {
 					"Window["+(BitUtils.isSet(v, 5) ? "ON" : "OFF")+"], " +
 					"WindowTileMap["+(BitUtils.isSet(v, 6) ? "$9C00-$9FFF" : "$9800-$9BFF")+"], " +
 					"LCD["+(BitUtils.isSet(v, 7) ? "ON" : "OFF")+"]");
-			new Disassembler(m_gameBoy).disassemble((short)m_gameBoy.getCpu().getPc(), (short)m_gameBoy.getCpu().getPc());
+			new Disassembler(m_gameBoy).disassemble((short)m_gameBoy.getCpu().getPC(), (short)m_gameBoy.getCpu().getPC());
 		}
 		
 		byte oldControl = m_lcdControl;
@@ -114,9 +114,11 @@ public class GBGPU {
 		if (BitUtils.isSet(oldControl, 7) != BitUtils.isSet(m_lcdControl, 7)) {
 			if (!BitUtils.isSet(m_lcdControl, 7)) {
 				setScanLine(0);
+				getDisplay().setEnable(false);
 			}
 			else {
 				enterPhase(PHASE_FETCH_OAM);
+				getDisplay().setEnable(true);
 			}
 		}
 	}

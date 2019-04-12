@@ -35,8 +35,10 @@ public class Main {
 		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, audioDevice, joypad);
 		
 		Cartidge cartidge = new Cartidge();
-//		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
-		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/01-registers.gb"));
+		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/01-special.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/01-registers.gb")); // OK
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/02-len ctr.gb"));
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/03-trigger.gb"));
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/04-sweep.gb"));

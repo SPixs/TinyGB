@@ -104,7 +104,7 @@ public class GameBoy {
 		
 		if (!m_configuration.useBootRom()) {
 			m_memory.setBootROMLock(false);
-			m_cpu.setPc(0x0100);
+			m_cpu.setPC(0x0100);
 			m_gpu.setLCDEnable(true);
 			m_cpu.setSp(0xFFFE);
 		}
