@@ -33,7 +33,7 @@ public class InstrRRCA extends Instruction {
 
 		cpu.setA(newValue);
 
-		cpu.setFlagZero(newValue == 0);
+		cpu.setFlagZero(false); // Always reset (contrary to what GBCPUMAN says...)
 		cpu.setFlagSubtract(false);
 		cpu.setFlagHalfCarry(false);
 		cpu.setFlagCarry(BitUtils.isSet(valueToRotate, 0));

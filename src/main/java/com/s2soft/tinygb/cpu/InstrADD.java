@@ -12,7 +12,7 @@ public class InstrADD extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x97: return new RegisterAddressingMode(Register8Bits.A);
+			case 0x87: return new RegisterAddressingMode(Register8Bits.A);
 			case 0x80: return new RegisterAddressingMode(Register8Bits.B);
 			case 0x81: return new RegisterAddressingMode(Register8Bits.C);
 			case 0x82: return new RegisterAddressingMode(Register8Bits.D);
@@ -39,9 +39,9 @@ public class InstrADD extends Instruction {
 		cpu.setFlagHalfCarry((value & 0x0F) + (a & 0x0F) > 0x0F);
 		cpu.setFlagCarry(a + value > 0xFF);
 		
-		switch ((int)opcode) {
-			case 0x86:
-			case 0xC6: return 8;
+		switch (opcode) {
+			case (byte)0x86:
+			case (byte)0xC6: return 8;
 			default : return 4;
 		}
 	}

@@ -126,30 +126,34 @@ public class GameBoy {
 			
 			// CPU is running at 4.194304Mhz but instructions take a multiple of 4 to be executed.
 			// Hence, the CPU behaves as clocked at 1.048576Mhz
-			while(m_clockCount >= cpuClockCount) {
-				cpuClockCount += m_cpu.step();
-			}
-			m_gpu.step();
-			m_timers.step();
-			m_dma.step();
-			m_apu.step();
-			
-			// Ensure emulation is synchronized with real time
-			if (m_clockCount % 10000 == 0) {
-				long elapsed = System.currentTimeMillis() - runStartTimer;
+			cpuClockCount += m_cpu.step();
+
+			while(m_clockCount < cpuClockCount) {
+				m_gpu.step();
+				m_timers.step();
+				m_dma.step();
+				m_apu.step();
 				
-				// Clock speed on DMG GB is 4.19430Mhz
-				long wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
-				if (wait > 0) {
-					try { Thread.sleep(wait); } 	
-					catch (InterruptedException e) {}
+				// Ensure emulation is synchronized with real time
+				if (m_clockCount % 10000 == 0) {
+					long elapsed = System.currentTimeMillis() - runStartTimer;
+					
+					// Clock speed on DMG GB is 4.19430Mhz
+					long wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
+					if (wait < -1) {
+//						System.out.println("Warning : emulation too SLOW " + wait + "ms");
+					}
+					if (wait > 0) {
+						try { Thread.sleep(wait); } 	
+						catch (InterruptedException e) {}
+					}
+					
+	//				System.out.println("CPU freq : " + (1000.0 * cpuClockCount / elapsed));
+	//				System.out.println("GPU freq : " + (1000.0 * m_clockCount / elapsed));
 				}
 				
-//				System.out.println("CPU freq : " + (1000.0 * cpuClockCount / elapsed));
-//				System.out.println("GPU freq : " + (1000.0 * m_clockCount / elapsed));
+				m_clockCount++;
 			}
-			
-			m_clockCount++;
 		}
 	}
 }

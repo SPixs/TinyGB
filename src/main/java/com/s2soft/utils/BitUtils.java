@@ -21,7 +21,7 @@ public class BitUtils {
 	}
 
 	public final static byte toByte(int value) {
-		return (byte)(value & 0x0FF);
+		return (byte)(value & 0xFF);
 	}
 
 	public static int toUInt(byte v) {

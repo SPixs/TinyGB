@@ -41,9 +41,9 @@ public class GBMemoryRAM implements IAddressable {
 	}
 	
 	public byte getByte(int address) {
-		if (address == 0xFFA6 && m_memory[address] == 0) {
-			System.out.println(">>> Tetris reading COUNTDOWN : " + Instruction.toHexByte(m_memory[address]));
-		}
+//		if (address == 0xFFA6 && m_memory[address] == 0) {
+//			System.out.println(">>> Tetris reading COUNTDOWN : " + Instruction.toHexByte(m_memory[address]));
+//		}
 		return m_memory[address];
 	}
 }

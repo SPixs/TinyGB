@@ -1,9 +1,8 @@
 package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
-import com.s2soft.utils.BitUtils;
 
-public class InstrRLA extends Instruction {
+public class InstrLDnnSP extends Instruction {
 
 	//   ============================ Constants ==============================
 
@@ -17,33 +16,28 @@ public class InstrRLA extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {
-		return opcode == (byte)0x17;
+		return opcode == 0x08;
 	}
 	
 	@Override
 	public String disassemble(GBMemory memory, int address) {
-		return "RLA";
+		int immediateValue = (memory.getByte(address+1) & 0x00FF) | memory.getByte(address+2) << 8;
+		return "LD (" + Instruction.toHexShort(immediateValue) + "),SP";
 	}
 
 	@Override
-	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
-		byte valueToRotate = cpu.getA();
-		byte newValue = (byte) (valueToRotate << 1);
-		newValue = BitUtils.setBit(newValue, 0, cpu.getFlagCarry());
+	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
+		// read the immediate 16 bits value
+		int immediate = (additionalBytes[0] & 0x0FF) |  ((additionalBytes[1] & 0x0FF) << 8);
+		cpu.getMemory().setByte(immediate, (byte) (cpu.getSp() & 0xFF));
+		cpu.getMemory().setByte(immediate+1, (byte) ((cpu.getSp() >> 8) & 0xFF));
 		
-		cpu.setA(newValue);
-
-		cpu.setFlagZero(false); // Always reset (contrary to what GBCPUMAN says...)
-		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry(false);
-		cpu.setFlagCarry(BitUtils.isSet(valueToRotate, 7));
-		
-		return 4;
+		return 20;
 	}
 
 	@Override
 	public int getLengthInBytes(byte opcode) {
-		return 1;
+		return 3;
 	}
 }
 

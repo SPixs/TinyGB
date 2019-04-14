@@ -9,7 +9,7 @@ public class GBAPU {
 
 	//   ============================ Constants ==============================
 
-	public final static boolean TRACE = true;
+	public final static boolean TRACE = false;
 
 	//	 =========================== Attributes ==============================
 

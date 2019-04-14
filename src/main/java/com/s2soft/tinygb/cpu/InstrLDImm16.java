@@ -23,7 +23,7 @@ public class InstrLDImm16 extends Instruction {
 	
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
-		// read the immediate 8 bits value
+		// read the immediate 16 bits value
 		int immediate = (additionnalBytes[0] & 0x0FF) |  ((additionnalBytes[1] & 0x0FF) << 8);
 		
 		Register16Bits register = getRegister(opcode);

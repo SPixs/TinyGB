@@ -244,13 +244,13 @@ At the start of the scanline:
 
 In step 1, the address we latch is calculated like this:
 
-yscroll is the yscroll register on the GB CPU
-xscroll is the xscroll register on the GB CPU
+yroll register on the GB CPU
 ycounter is the current scanline we are rendering (0-143)
 whichnt is bit 3 of the LCD control reg on the GB CPU
 
 ybase = (yscroll + ycounter)   // calculates the effective vis. scanline
-
+scroll is the yscroll register on the GB CPU
+xscroll is the xsc
 charaddr = (0x9800 | (whichnt << 10) | ((ybase & 0xf8) << 2) |
 		   ((xscroll & 0xf8) >> 3)
 

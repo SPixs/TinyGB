@@ -40,12 +40,14 @@ public class InstrRETcc extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		FlagCondition flagCondition = getFlagCondition(opcode);
+		byte cycles = 8;
 		if (flagCondition.evaluate(cpu)) {
 			int pulledValue = cpu.pullValue();
 			cpu.setPC(pulledValue);
+			cycles += 12;
 		}
 
-		return 8;
+		return cycles;
 	}
 
 	@Override

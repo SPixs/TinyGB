@@ -2,17 +2,14 @@ package com.s2soft.tinygb;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.s2soft.tinygb.audio.AudioDevice;
-import com.s2soft.tinygb.cpu.Disassembler;
-import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.display.BufferedLCDDisplay;
-import com.s2soft.tinygb.display.LCDDisplay;
 
 public class Main {
 
@@ -35,10 +32,31 @@ public class Main {
 		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, audioDevice, joypad);
 		
 		Cartidge cartidge = new Cartidge();
-		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
-//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb"));
-//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/01-special.gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
+
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/01-registers.gb")); // OK
+		
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/01-special.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/02-interrupts.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/03-op sp,hl.gb")); // OK !!!
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/04-op r,imm.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/05-op rp.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/06-ld r,r.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/07-jr,jp,call,ret,rst.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/08-misc instrs.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/09-op r,r.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/10-bit ops.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/11-op a,(hl).gb")); // OK
+//
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb")); // OK
+		cartidge.read(new FileInputStream("testROM/Blargg/instr_timing/instr_timing.gb")); // OK
+
+		
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/04-op r,imm.gb")); // OK
+		
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb"));²
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/01-special.gb"));
+//		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/09-op r,r.gb"));
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/02-len ctr.gb"));
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/03-trigger.gb"));
 //		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/04-sweep.gb"));

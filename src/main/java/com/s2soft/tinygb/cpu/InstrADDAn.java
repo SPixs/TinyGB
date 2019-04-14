@@ -41,9 +41,9 @@ public class InstrADDAn extends Instruction {
 		cpu.setFlagHalfCarry((value & 0x0F) + (a & 0x0F) > 0x0F);
 		cpu.setFlagCarry(result > 0x0FF);
 		
-		switch ((int)opcode) {
-			case 0x86:
-			case 0xC6: return 8;
+		switch (opcode) {
+			case (byte)0x86:
+			case (byte)0xC6: return 8;
 			default : return 4;
 		}
 	}

@@ -28,15 +28,15 @@ public class InstrINC extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
-		byte value = getAddressingMode(opcode).readByte(cpu, additionnalBytes);
-		byte newValue = value;
+		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes);
+		int newValue = value;
 		newValue++;
 		
-		cpu.setFlagZero(newValue == 0);
+		cpu.setFlagZero((newValue & 0xFF) == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry(((newValue & 0x10) != 0) && ((value & 0x10) == 0));
+		cpu.setFlagHalfCarry((value & 0x0F) + 1 > 0x0F);
 
-		getAddressingMode(opcode).setByte(cpu, newValue, additionnalBytes);
+		getAddressingMode(opcode).setByte(cpu, (byte) (newValue & 0xFF), additionnalBytes);
 		
 		switch ((int)opcode) {
 			case 0x34: return 12;

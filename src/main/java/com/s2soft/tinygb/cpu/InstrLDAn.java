@@ -35,12 +35,12 @@ public class InstrLDAn extends Instruction {
 		byte value = getAddressingMode(opcode).readByte(cpu, additionnalBytes);
 		cpu.setA(value);
 		
-		switch ((int)opcode) {
-			case 0x0A:
-			case 0x1A:
-			case 0x7E:
-			case 0x3E: return 8;
-			case 0xFA: return 16;
+		switch (opcode) {
+			case (byte)0x0A:
+			case (byte)0x1A:
+			case (byte)0x7E:
+			case (byte)0x3E: return 8;
+			case (byte)0xFA: return 16;
 			default : return 4;
 		}
 	}

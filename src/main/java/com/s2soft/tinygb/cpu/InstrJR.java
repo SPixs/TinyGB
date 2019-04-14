@@ -31,7 +31,7 @@ public class InstrJR extends Instruction {
 		byte offset = additionalBytes[0];
 		cpu.setPC(cpu.getPC() + offset);
 
-		return 8;
+		return 12;
 	}
 
 	@Override

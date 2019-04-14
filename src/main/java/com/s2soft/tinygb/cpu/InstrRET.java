@@ -29,7 +29,7 @@ public class InstrRET extends Instruction {
 		int pulledValue = cpu.pullValue();
 		cpu.setPC(pulledValue);
 
-		return 8;
+		return 16;
 	}
 
 	@Override

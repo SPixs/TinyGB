@@ -31,7 +31,7 @@ public class InstrCALL extends Instruction {
 		cpu.pushShort(cpu.getPC());
 		cpu.setPC(callAddress);
 
-		return 12;
+		return 24;
 	}
 
 	@Override

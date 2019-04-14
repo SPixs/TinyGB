@@ -48,7 +48,7 @@ public class InstrSWAP extends Instruction {
 		
 		cpu.setFlagZero(result == 0);
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry(true);
+		cpu.setFlagHalfCarry(false);
 		cpu.setFlagCarry(false);
 		
 		if (opcode == 0x36) return 16;

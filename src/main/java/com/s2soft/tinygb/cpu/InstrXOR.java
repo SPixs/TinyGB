@@ -50,12 +50,12 @@ public class InstrXOR extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		final byte value = (byte)((cpu.getA() ^ getAddressingMode(opcode).readByte(cpu, additionalBytes) & 0x0FF));
 		cpu.setA(value);
-		if ((opcode & 0xFF) == 0xEE) return 8;
-		if ((opcode & 0xFF) == 0xAE) return 8;
 		cpu.setFlagZero(value == 0);
 		cpu.setFlagSubtract(false);
 		cpu.setFlagHalfCarry(false);
 		cpu.setFlagCarry(false);
+		if ((opcode & 0xFF) == 0xEE) return 8;
+		if ((opcode & 0xFF) == 0xAE) return 8;
 		return 4;
 	}
 

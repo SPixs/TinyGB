@@ -42,10 +42,12 @@ public class InstrJRCond extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		FlagCondition flagCondition = getFlagCondition(opcode);
 		byte offset = additionalBytes[0];
+		byte cycles = 8;
 		if (flagCondition.evaluate(cpu)) {
 			cpu.setPC(cpu.getPC() + offset);
+			cycles += 4;
 		}
-		return 8;
+		return cycles;
 	}
 
 	@Override

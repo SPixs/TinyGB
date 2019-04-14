@@ -1,5 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import com.s2soft.tinygb.Cartidge;
@@ -60,6 +61,7 @@ public class GBMemory {
 		m_bootRom = new GBRom(0, 256);
 		try {
 			m_bootRom.read(getClass().getResourceAsStream("/DMG_ROM.bin"));
+//			m_bootRom.read(new FileInputStream("EMPTY_DMG_ROM.bin"));
 		}
 		catch (Exception ex) {
 		}
@@ -92,10 +94,12 @@ public class GBMemory {
     }
 	
 	public byte getInterruptFlag() {
+//		System.out.println("Read interrupt flag " + Instruction.toHexByte(m_interruptFlag));
 		return m_interruptFlag;
 	}
 
 	public void setInterruptFlag(byte flags) {
+//		System.out.println("Write interrupt flag " + Instruction.toHexByte(flags));
 		m_interruptFlag = flags;
 	}
 	
@@ -123,9 +127,9 @@ public class GBMemory {
 	}
 
 	private IAddressable getAddressable(int address) {
-//		if (address == 0x0FFFE) {
-//			Thread.yield();
-//		}
+		if (address > 0xFFFF) {
+			throw new IllegalStateException("Address out of range : $" + Integer.toHexString(address));
+		}
 		if ((address & 0xFF80) == 0xFF00) {
 			return m_ioMemory;
 		}
@@ -182,6 +186,7 @@ public class GBMemory {
 	}
 	
 	public void requestInterrupt(int index) {
+//		System.out.println("Request interrupt : " + index);
 		m_interruptFlag = BitUtils.setBit(m_interruptFlag, index, true);
 	}
 

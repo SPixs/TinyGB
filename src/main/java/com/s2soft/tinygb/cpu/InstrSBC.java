@@ -30,20 +30,21 @@ public class InstrSBC extends Instruction {
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
 		// read the 8 bits value
-		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0x0FF;
+		int value = getAddressingMode(opcode).readByte(cpu, additionnalBytes) & 0xFF;
 		int carry = cpu.getFlagCarry() ? 1 : 0;
-		int a = cpu.getA() & 0x0FF;
+		int a = cpu.getA() & 0xFF;
+		
 		int result = a - value - carry;
 		cpu.setA(BitUtils.toByte(result));
 		
-		cpu.setFlagZero(result == 0);
+		cpu.setFlagZero((result & 0xFF) == 0);
 		cpu.setFlagSubtract(true);
-		cpu.setFlagHalfCarry(((value & 0x0F) + carry) > (cpu.getA() & 0x0F));
+		cpu.setFlagHalfCarry((a & 0x0F) - (value & 0x0F) - carry < 0);
 		cpu.setFlagCarry(result < 0);
 		
-		switch ((int)opcode) {
-			case 0x9E:
-			case 0xDE: return 8;
+		switch (opcode) {
+			case (byte)0x9E:
+			case (byte)0xDE: return 8;
 			default : return 4;
 		}
 	}

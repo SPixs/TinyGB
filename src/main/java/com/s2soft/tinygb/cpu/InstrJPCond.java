@@ -53,10 +53,12 @@ public class InstrJPCond extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		FlagCondition flagCondition = getFlagCondition(opcode);
 		int jumpAddress = BitUtils.toUShort(additionalBytes[0], additionalBytes[1]);
+		byte cycles = 12;
 		if (flagCondition.evaluate(cpu)) {
 			cpu.setPC(jumpAddress);
+			cycles += 4;
 		}
-		return 12;
+		return cycles;
 	}
 
 	@Override

@@ -27,11 +27,11 @@ public class InstrADDHL extends Instruction {
 		int value = getAddressingMode(opcode).readWord(cpu);
 		int hl = Register16Bits.HL.getValue(cpu);
 		int newValue = hl + value;
-		Register16Bits.HL.setValue(cpu, newValue);
+		Register16Bits.HL.setValue(cpu, newValue & 0xFFFF);
 		
 		cpu.setFlagSubtract(false);
-		cpu.setFlagHalfCarry((value & 0x0F) + (hl & 0x0F) > 0x0F);
-		cpu.setFlagCarry(newValue > 0xFFFF);
+		cpu.setFlagHalfCarry((value & 0x0FFF) + (hl & 0x0FFF) > 0x0FFF);
+		cpu.setFlagCarry((value & 0xFFFF) + (hl & 0xFFFF) > 0xFFFF);
 		
 		return 8;
 	}

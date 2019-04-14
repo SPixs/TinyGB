@@ -40,9 +40,9 @@ public class InstrSUB extends Instruction {
 		cpu.setFlagHalfCarry((value & 0x0F) > (a & 0x0F));
 		cpu.setFlagCarry(result < 0);
 		
-		switch ((int)opcode) {
-			case 0x96:
-			case 0xD6: return 8;
+		switch (opcode) {
+			case (byte)0x96:
+			case (byte)0xD6: return 8;
 			default : return 4;
 		}
 	}

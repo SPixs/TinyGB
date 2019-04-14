@@ -2,7 +2,7 @@ package com.s2soft.tinygb.cpu;
 
 import com.s2soft.tinygb.mmu.GBMemory;
 
-public class InstrLDNA extends Instruction {
+public class InstrLDnA extends Instruction {
 
 	@Override
 	public boolean matchOpcode(byte opcode) {
@@ -34,11 +34,11 @@ public class InstrLDNA extends Instruction {
 		byte value = cpu.getA();
 		getAddressingMode(opcode).setByte(cpu, value, additionnalBytes);
 		
-		switch ((int)opcode) {
-			case 0x02:
-			case 0x12:
-			case 0x77: return 8;
-			case 0xEA: return 16;
+		switch (opcode) {
+			case (byte)0x02:
+			case (byte)0x12:
+			case (byte)0x77: return 8;
+			case (byte)0xEA: return 16;
 			default : return 4;
 		}
 	}

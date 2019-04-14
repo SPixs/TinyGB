@@ -63,7 +63,7 @@ public class InstrBIT extends Instruction {
 		cpu.setFlagHalfCarry(true);
 		
 		int lowerNibble = (opcode & 0x0F);
-		if ((lowerNibble & 0x0F) == 0x06) return 16;
+		if ((lowerNibble & 0x07) == 0x06) return 12; // Lots of documents tell 16 cycles here. But 12 seems to be the right value
 		return 8;
 	}
 

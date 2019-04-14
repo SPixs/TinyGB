@@ -31,7 +31,7 @@ public class InstrJPImm extends Instruction {
 		int address = BitUtils.toUShort(additionalBytes[0], additionalBytes[1]);
 		cpu.setPC(address);
 
-		return 12;
+		return 16;
 	}
 
 	@Override

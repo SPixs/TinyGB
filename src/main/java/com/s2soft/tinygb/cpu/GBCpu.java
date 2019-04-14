@@ -127,11 +127,11 @@ public class GBCpu {
 	}
 
 	public byte getF() {
-		return m_f;
+		return (byte) (m_f & 0xF0);
 	}
 
 	public void setF(byte f) {
-		m_f = f;
+		m_f = (byte) (f & 0xF0);
 	}
 
 //	public int getPc() {
@@ -150,6 +150,10 @@ public class GBCpu {
 		m_sp = sp & 0x0FFFF;
 	}
 	
+	public long getCyclesCount() {
+		return m_cyclesCount;
+	}
+
 	public boolean isInterruptEnabled() {
 		return m_ime;
 	}
@@ -161,14 +165,23 @@ public class GBCpu {
 		}
 		else {
 			m_ime = enabled;
+			System.out.println("IME="+m_ime);
 		}
 	}
 
 	// ============================== threatment methods ================================
 	
 	public void reset() {
-		m_sp = 0; // fix me !
+		m_sp = 0; // fix me !?
 		m_pc = 0;
+		setA((byte)0);
+		setF((byte)0);
+		setB((byte)0);
+		setC((byte)0);
+		setD((byte)0);
+		setE((byte)0);
+		setH((byte)0);
+		setL((byte)0);
 		m_ime = true;
 		m_halted = false;
 		resetCyclesCounter();
@@ -185,7 +198,7 @@ public class GBCpu {
 		m_instructions.add(new InstrJPImm());
 		m_instructions.add(new InstrLDrr());
 		m_instructions.add(new InstrLDAn());
-		m_instructions.add(new InstrLDNA());
+		m_instructions.add(new InstrLDnA());
 		m_instructions.add(new InstrLDAC());
 		m_instructions.add(new InstrLDCA());
 		m_instructions.add(new InstrINC());
@@ -224,51 +237,24 @@ public class GBCpu {
 		m_instructions.add(new InstrJPHL());
 		m_instructions.add(new InstrJPCond());
 		m_instructions.add(new InstrHALT());
+		m_instructions.add(new InstrLDnnSP());
+		m_instructions.add(new InstrLDSPHL());
+		m_instructions.add(new InstrLDHLSPn());
+		m_instructions.add(new InstrADDSPn());
+		m_instructions.add(new InstrSCF());
+		m_instructions.add(new InstrCCF());
 		
 		m_extraInstructions.add(new InstrBIT());
 		m_extraInstructions.add(new InstrRES());
 		m_extraInstructions.add(new InstrSET());
 		m_extraInstructions.add(new InstrRL());
+		m_extraInstructions.add(new InstrRLC());
 		m_extraInstructions.add(new InstrRR());
+		m_extraInstructions.add(new InstrRRC());
 		m_extraInstructions.add(new InstrSRL());
 		m_extraInstructions.add(new InstrSLA());
 		m_extraInstructions.add(new InstrSRA());
 		m_extraInstructions.add(new InstrSWAP());
-		
-//		m_instructions.add(new InstrRET());
-//		m_instructions.add(new InstrSYS());
-//		m_instructions.add(new InstrJP());
-//		m_instructions.add(new InstrCall());
-//		m_instructions.add(new InstrSEImm());
-//		m_instructions.add(new InstrSNEImm());
-//		m_instructions.add(new InstrSEReg());
-//		m_instructions.add(new InstrLDImm());
-//		m_instructions.add(new InstrADDImm());
-//		m_instructions.add(new InstrLDReg());
-//		m_instructions.add(new InstrORReg());
-//		m_instructions.add(new InstrAndReg());
-//		m_instructions.add(new InstrXORReg());
-//		m_instructions.add(new InstrADDReg());
-//		m_instructions.add(new InstrSUBReg());
-//		m_instructions.add(new InstrSHR());
-//		m_instructions.add(new InstrSUBNReg());
-//		m_instructions.add(new InstrSHL());
-//		m_instructions.add(new InstrSNEReg());
-//		m_instructions.add(new InstrLDI());
-//		m_instructions.add(new InstrJPIndexed());
-//		m_instructions.add(new InstrRND());
-//		m_instructions.add(new InstrDRW());
-//		m_instructions.add(new InstrSKP());
-//		m_instructions.add(new InstrSKNP());
-//		m_instructions.add(new InstrLDFromTimer());
-//		m_instructions.add(new InstrLDKey());
-//		m_instructions.add(new InstrLDToTimer());
-//		m_instructions.add(new InstrLDToSound());
-//		m_instructions.add(new InstrADDI());
-//		m_instructions.add(new InstrLDISprite());
-//		m_instructions.add(new InstrLDBcd());
-//		m_instructions.add(new InstrLDIFromReg());
-//		m_instructions.add(new InstrLDRegFromI());
 	}
 	
 	public void halt() {
@@ -285,9 +271,12 @@ public class GBCpu {
 		
 		processInterrupts();
 		
-//		startTrace = !m_memory.isBootROMLock() && ((getPC() >= 0xC226 && getPC() <= 0xC263) ||
-//				(getPC() >= 0xC203 && getPC() <= 0xC225) ||
-//				(getPC() >= 0xC210 && getPC() <= 0xC21B));
+//		startTrace = /*!m_memory.isBootROMLock() &&*/ (
+//				(getPC() <= 0x000A) ||
+//				(getPC() >= 0xC317 && getPC() <= 0xC321) ||
+//				(getPC() == 0xC32F) ||
+//				(getPC() >= 0xC33D && getPC() <= 0xC33F) ||
+//				(getPC() >= 0xC34E && getPC() <= 0xC352));
 //		startTrace = true;
 		
 //		if (getPC() == 0x0028) {
@@ -297,10 +286,27 @@ public class GBCpu {
 //			System.out.println(">>> Tetris executing machine state at " + Instruction.toHexShort(Register16Bits.HL.getValue(this)));
 //		}
 		
-//		if (getPC() == 0xC79B || getPC() == 0xC78C) {
+//		if (getPC() == 0xC05A) {
+//			for (int i=0;i<4;i++) {
+//				System.out.print(Instruction.toHexByte(getMemory().getByte(0xFF80+i)));
+//			}
+//			System.out.println();
 //			Thread.yield();
 //			startTrace = true;
 //		}
+		
+//		if (getPC() == 0xDEF8) {
+//			new Disassembler(this, m_memory).disassemble(0xDEF8, 0xDEF8 + 128); // $C62E
+//			System.exit(0);
+//		}
+		
+//		if (getPC() == 0x000A) {
+//			byte div = getMemory().getByte(0xFF04);
+//			System.out.println("DIV="+Instruction.toHexByte(div));
+//			Thread.yield();
+//		}
+		
+//		startTrace = (getPC() == 0xDEFA /*|| getPC() == 0xDEF8*/) && (getMemory().getByte(0xDEF8) == (byte)0xDE);
 		
 		// Check for interrupt
 		if (isInterruptEnabled() && getMemory().isInterruptRequested()) {

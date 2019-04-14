@@ -41,12 +41,14 @@ public class InstrCALLcc extends Instruction {
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
 		FlagCondition flagCondition = getFlagCondition(opcode);
 		int callAddress = ((additionalBytes[0] & 0x0ff) | ((additionalBytes[1] << 8) & 0xFF00));
+		byte cycles = 12;
 		if (flagCondition.evaluate(cpu)) {
 			cpu.pushShort(cpu.getPC());
 			cpu.setPC(callAddress);
+			cycles += 12;
 		}
-
-		return 12;
+		
+		return cycles;
 	}
 
 	@Override

@@ -8,19 +8,19 @@ public class Timers {
 
 	//   ============================ Constants ==============================
 	
-	private final static boolean TRACE = false;
+	private final static boolean TRACE = true;
 	
 	//	 =========================== Attributes ==============================
 	
-	private byte m_dividerRegister = 0;
-	private byte m_timerRegister = 0;
-	private byte m_timerModulo = 0;
+	private int m_dividerRegister = 0;
+	private int m_timerRegister = 0;
+	private int m_timerModulo = 0;
 	
 	/**
 	 * The divider register is incremented at rate of 16384Hz.
-	 * To achieve this, we divide the T-clock by 1024.
+	 * To achieve this, we divide the T-clock by 256.
 	 */
-	private int m_timerCounter = 0x3FF; // 1023
+	private int m_timerCounter = 0x00; 
 	
 	/**
 	 * The divider register is incremented at rate of 16384Hz.
@@ -28,7 +28,7 @@ public class Timers {
 	 */
 	private int m_dividerCounter = 0xFF;
 	
-	private boolean m_timerEnabled = true;
+	private boolean m_timerEnabled;
 	private byte m_clockSelect;
 
 	private GBMemory m_memory;
@@ -37,6 +37,7 @@ public class Timers {
 
 	public Timers(GameBoy gameBoy) {
 		m_memory = gameBoy.getMemory();
+		reset();
 	}
 
 	//	 ========================== Access methods ===========================
@@ -53,7 +54,7 @@ public class Timers {
 	}
 
 	public byte getTimerModulo() {
-		return m_timerModulo;
+		return (byte)(m_timerModulo & 0xFF);
 	}
 
 	public void setTimerModulo(byte timerModulo) {
@@ -65,9 +66,9 @@ public class Timers {
 
 	public byte getTimerRegister() {
 		if (TRACE) {
-			System.out.println("Reading from timer : " + Instruction.toHexByte(m_timerRegister));
+			System.out.println("Reading from timer : " + Instruction.toHexByte((byte) (m_timerRegister & 0xFF)));
 		}
-		return m_timerRegister;
+		return (byte) (m_timerRegister & 0xFF);
 	}
 
 	public void setTimerRegister(byte timerRegister) {
@@ -79,9 +80,9 @@ public class Timers {
 
 	public byte getDividerRegister() {
 		if (TRACE) {
-			System.out.println("Reading divider register : " + Instruction.toHexByte(m_dividerRegister));
+			System.out.println("Reading divider register : " + Instruction.toHexByte((byte) (m_dividerRegister & 0xFF)));
 		}
-		return m_dividerRegister;
+		return (byte) (m_dividerRegister & 0xFF);
 	}
 
 	//	 ========================= Treatment methods =========================
@@ -90,16 +91,18 @@ public class Timers {
 	 * Called at T-clock frequency ((4.194304Mhz)
 	 */
 	public void step() {
+		
 		if (m_dividerCounter-- == 0) {
 			m_dividerCounter = 255;
-			m_dividerRegister++;
+			m_dividerRegister = (m_dividerRegister + 1) & 0xFF;
+//			System.out.println(m_dividerRegister);
 		}
 		
 		if (m_timerEnabled) {
 			if (m_timerCounter-- == 0) {
 				resetTimerCounter();
 				m_timerRegister++;
-				if (m_timerRegister == 0) {
+				if ((m_timerRegister & 0xFF) == 0) {
 					m_memory.requestInterrupt(2);
 					m_timerRegister = m_timerModulo;
 				}
@@ -108,10 +111,11 @@ public class Timers {
 	}
 	
 	public void reset() {
+		m_timerEnabled = false;
 		m_clockSelect = 0;
 		resetTimerCounter();
-		m_timerCounter = 1024;
 		m_dividerCounter = 255;
+		m_timerModulo = 0;
 	}
 
 	public void resetDividerRegister() {

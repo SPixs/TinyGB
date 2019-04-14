@@ -42,9 +42,9 @@ public class InstrADCAn extends Instruction {
 		cpu.setFlagHalfCarry((regA & 0x0F) + (value & 0x0F) + carry > 0x0F);
 		cpu.setFlagCarry(result > 0x0FF);
 		
-		switch ((int)opcode) {
-			case 0x8D:
-			case 0xCE: return 8;
+		switch (opcode) {
+			case (byte)0xCE:
+			case (byte)0x8E: return 8;
 			default : return 4;
 		}
 	}

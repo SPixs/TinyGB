@@ -37,9 +37,9 @@ public class InstrCP extends Instruction {
 		cpu.setFlagHalfCarry((value & 0x0F) > (cpu.getA() & 0x0F));
 		cpu.setFlagCarry(value > (cpu.getA() & 0x0FF));
 		
-		switch ((int)opcode) {
-			case 0xBE:
-			case 0xFE: return 8;
+		switch (opcode) {
+			case (byte)0xBE:
+			case (byte)0xFE: return 8;
 			default : return 4;
 		}
 	}

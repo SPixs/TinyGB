@@ -61,7 +61,7 @@ public class InstrRES extends Instruction {
 		getAddressingMode(opcode).setByte(cpu, valueToReset, additionnalBytes);
 		
 		int lowerNibble = (opcode & 0x0F);
-		if ((lowerNibble & 0x0F) == 0x06) return 16;
+		if ((lowerNibble & 0x07) == 0x06) return 16; // Lots of documents tell 16 cycles here
 		return 8;
 	}
 

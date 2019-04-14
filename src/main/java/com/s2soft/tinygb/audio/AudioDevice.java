@@ -59,7 +59,7 @@ public class AudioDevice implements IAudioDevice {
 		m_auline.open(m_format);
 		m_auline.start();	
 		
-		m_bufferSamplesCount = 2;
+		m_bufferSamplesCount = 256;
 		m_buffer = new byte[m_format.getChannels() * m_bufferSamplesCount * m_format.getSampleSizeInBits() / 8];
 		m_bufferIndex = 0;
 		
@@ -74,9 +74,9 @@ public class AudioDevice implements IAudioDevice {
 
 	@Override
 	public void putSample(byte leftSample, byte rightSample) {
+//		if (1==1) return;
 		m_counter = m_counter % (int)(4194304 / m_format.getSampleRate());
 		if (m_counter == 0) {
-//			System.out.println(leftSample + " " + rightSample);
 			m_buffer[m_bufferIndex++] = leftSample;
 			m_buffer[m_bufferIndex++] = rightSample;
 			if (m_bufferIndex == m_buffer.length) {

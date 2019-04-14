@@ -30,7 +30,7 @@ public class InstrRETI extends Instruction {
 		cpu.setPC(pulledValue);
 		cpu.setInterruptEnabled(true, false);
 
-		return 8;
+		return 16;
 	}
 
 	@Override

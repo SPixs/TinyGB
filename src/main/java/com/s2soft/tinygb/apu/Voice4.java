@@ -93,7 +93,6 @@ public class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 		getFrameSequencer().init();
 		m_lfsr = 0x7FFF;
 		m_counter = 0;
-		System.out.println("Voice4. init");
 	}
 	
 	public void setDividingRatio(byte dividingRatio) {

@@ -26,20 +26,31 @@ public class InstrDAA extends Instruction {
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
-		int value = cpu.getA();
+		int value = cpu.getA() & 0xFF;
 		
-		if (cpu.getFlagHalfCarry() || (value & 0x0F) > 0x09) {
-			value += 0x06;
+		if (cpu.getFlagSubtract()) {
+			if (cpu.getFlagHalfCarry()) {
+				value = (value - 0x06) & 0xFF;
+			}
+			if (cpu.getFlagCarry()) {
+				value = (value - 0x60) & 0xFF;
+			}
 		}
-		if (cpu.getFlagCarry() || (value & 0xF0) > 0x90) {
-			value += 0x60;
+		else {
+			if (cpu.getFlagHalfCarry() || (value & 0x0F) > 0x09) {
+				value += 0x06;
+			}
+			if (cpu.getFlagCarry() || value > 0x9F) {
+				value += 0x60;
+			}
 		}
 		
-		cpu.setA((byte)(value &  0x0FF));
-		
-		cpu.setFlagZero(value == 0);
 		cpu.setFlagHalfCarry(false);
-		cpu.setFlagCarry(value > 99);
+		if (value > 0xFF) {
+			cpu.setFlagCarry(true);
+		}
+		cpu.setFlagZero((value & 0xFF) == 0);
+		cpu.setA((byte)(value & 0xFF));
 		
 		return 4;
 	}
