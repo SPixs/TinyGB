@@ -29,7 +29,6 @@ public class SwingJoypad implements IJoypad, KeyListener {
 	}
 	
 	public void keyPressed(int key) {
-		System.out.println(">>>>" + key);
 		JoypadButton button = getMappedButton(key);
 		if (button != null) {
 			for (IJoypadButtonListener listener : m_listeners) {

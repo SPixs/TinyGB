@@ -165,7 +165,7 @@ public class GBCpu {
 		}
 		else {
 			m_ime = enabled;
-			System.out.println("IME="+m_ime);
+//			System.out.println("IME="+m_ime);
 		}
 	}
 

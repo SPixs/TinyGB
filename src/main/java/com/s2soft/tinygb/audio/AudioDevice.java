@@ -59,7 +59,7 @@ public class AudioDevice implements IAudioDevice {
 		m_auline.open(m_format);
 		m_auline.start();	
 		
-		m_bufferSamplesCount = 256;
+		m_bufferSamplesCount = 32;
 		m_buffer = new byte[m_format.getChannels() * m_bufferSamplesCount * m_format.getSampleSizeInBits() / 8];
 		m_bufferIndex = 0;
 		

@@ -141,7 +141,7 @@ public class GameBoy {
 					// Clock speed on DMG GB is 4.19430Mhz
 					long wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
 					if (wait < -1) {
-//						System.out.println("Warning : emulation too SLOW " + wait + "ms");
+						System.out.println("Warning : emulation too SLOW " + wait + "ms");
 					}
 					if (wait > 0) {
 						try { Thread.sleep(wait); } 	
