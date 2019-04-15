@@ -99,9 +99,11 @@ public class GBAPU {
 //			voice.step();
 //		}
 		
-		m_gameBoy.getAudioDevice().putSample(
-				(byte)(getLeftChannelValue() >> 3), 
-				(byte)(getRightChannelValue() >> 3));
+		if (m_gameBoy.getEmulationSyncShift() > -5) {
+			m_gameBoy.getAudioDevice().putSample(
+					(byte)(getLeftChannelValue() >> 3), 
+					(byte)(getRightChannelValue() >> 3));
+		}
 	}
 
 	

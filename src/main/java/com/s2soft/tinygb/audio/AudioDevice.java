@@ -68,18 +68,20 @@ public class AudioDevice implements IAudioDevice {
 	
 	@Override
 	public void stop() {
-		m_auline.drain();
+		m_auline.flush();
 		m_auline.close();
 	}
 
 	@Override
 	public void putSample(byte leftSample, byte rightSample) {
-//		if (1==1) return;
 		m_counter = m_counter % (int)(4194304 / m_format.getSampleRate());
 		if (m_counter == 0) {
 			m_buffer[m_bufferIndex++] = leftSample;
 			m_buffer[m_bufferIndex++] = rightSample;
 			if (m_bufferIndex == m_buffer.length) {
+				if (m_auline.available() < m_buffer.length) {
+					System.out.println("Warning : missing " + (m_buffer.length - (m_auline.available()) + " in input audio line"));
+				}
 				m_auline.write(m_buffer, 0, m_buffer.length);
 				m_recordedOutputStream.write(m_buffer, 0, m_buffer.length);
 				m_bufferIndex = 0;

@@ -29,6 +29,7 @@ public class GameBoy {
 
 	private IConfiguration m_configuration;
 	private GBAPU m_apu;
+	private long m_emulationSyncShift;
 
 	//	 =========================== Constructor =============================
 
@@ -88,6 +89,17 @@ public class GameBoy {
 	public DMA getDMA() {
 		return m_dma;
 	}
+	
+	private void setEmulationSyncShift(long shift) {
+		if (shift < 0 && shift != m_emulationSyncShift) {
+			System.out.println("Warning : emulation too SLOW " + shift + "ms");
+		}
+		m_emulationSyncShift = shift;
+	}
+
+	public long getEmulationSyncShift() {
+		return m_emulationSyncShift;
+	}
 
 	//	 ========================= Treatment methods =========================
 
@@ -135,14 +147,12 @@ public class GameBoy {
 				m_apu.step();
 				
 				// Ensure emulation is synchronized with real time
-				if (m_clockCount % 10000 == 0) {
+				if (m_clockCount % 500 == 0 || m_emulationSyncShift < 0) {
 					long elapsed = System.currentTimeMillis() - runStartTimer;
 					
 					// Clock speed on DMG GB is 4.19430Mhz
 					long wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
-					if (wait < -1) {
-						System.out.println("Warning : emulation too SLOW " + wait + "ms");
-					}
+					setEmulationSyncShift(wait);
 					if (wait > 0) {
 						try { Thread.sleep(wait); } 	
 						catch (InterruptedException e) {}
