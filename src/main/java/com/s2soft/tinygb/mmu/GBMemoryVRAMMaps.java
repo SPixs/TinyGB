@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.s2soft.tinygb.cpu.Instruction;
 
-public class GBMemoryVRAMMaps implements IAddressable {
+public final class GBMemoryVRAMMaps implements IAddressable {
 
 	//   ============================ Constants ==============================
 

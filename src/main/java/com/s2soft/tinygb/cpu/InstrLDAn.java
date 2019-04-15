@@ -12,18 +12,18 @@ public class InstrLDAn extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x7F: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x78: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x79: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x7A: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x7B: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x7C: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x7D: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x0A: return new IndirectAddressMode(Register16Bits.BC);
-			case 0x1A: return new IndirectAddressMode(Register16Bits.DE);
-			case 0x7E: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xFA: return new AbsoluteAddressingMode();
-			case 0x3E: return new ImmediateAddressMode();
+			case 0x7F: return RegisterAddressingMode.A;
+			case 0x78: return RegisterAddressingMode.B;
+			case 0x79: return RegisterAddressingMode.C;
+			case 0x7A: return RegisterAddressingMode.D;
+			case 0x7B: return RegisterAddressingMode.E;
+			case 0x7C: return RegisterAddressingMode.H;
+			case 0x7D: return RegisterAddressingMode.L;
+			case 0x0A: return IndirectAddressMode.BC;
+			case 0x1A: return IndirectAddressMode.DE;
+			case 0x7E: return IndirectAddressMode.HL;
+			case 0xFA: return AbsoluteAddressingMode.INSTANCE;
+			case 0x3E: return ImmediateAddressMode.INSTANCE;
 		}
 		
 		return null;

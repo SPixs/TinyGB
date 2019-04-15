@@ -12,14 +12,14 @@ public class InstrINC extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x3C: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x04: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x0C: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x14: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x1C: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x24: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x2C: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x34: return new IndirectAddressMode(Register16Bits.HL);
+			case 0x3C: return RegisterAddressingMode.A;
+			case 0x04: return RegisterAddressingMode.B;
+			case 0x0C: return RegisterAddressingMode.C;
+			case 0x14: return RegisterAddressingMode.D;
+			case 0x1C: return RegisterAddressingMode.E;
+			case 0x24: return RegisterAddressingMode.H;
+			case 0x2C: return RegisterAddressingMode.L;
+			case 0x34: return IndirectAddressMode.HL;
 		}
 		
 		return null;
@@ -53,10 +53,6 @@ public class InstrINC extends Instruction {
 
 	@Override
 	public int getLengthInBytes(byte opcode) {
-		switch (opcode) {
-			case (byte)0x3E: return 2;
-			case (byte)0xFA: return 3;
-			default : return 1;
-		}
+		return 1;
 	}
 }

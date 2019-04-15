@@ -13,15 +13,15 @@ public class InstrSUB extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x97: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x90: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x91: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x92: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x93: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x94: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x95: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x96: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xD6: return new ImmediateAddressMode();
+			case 0x97: return RegisterAddressingMode.A;
+			case 0x90: return RegisterAddressingMode.B;
+			case 0x91: return RegisterAddressingMode.C;
+			case 0x92: return RegisterAddressingMode.D;
+			case 0x93: return RegisterAddressingMode.E;
+			case 0x94: return RegisterAddressingMode.H;
+			case 0x95: return RegisterAddressingMode.L;
+			case 0x96: return IndirectAddressMode.HL;
+			case 0xD6: return ImmediateAddressMode.INSTANCE;
 		}
 		
 		return null;

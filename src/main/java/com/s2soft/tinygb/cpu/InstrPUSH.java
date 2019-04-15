@@ -22,10 +22,10 @@ public class InstrPUSH extends Instruction {
 	private Register16AddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0xF5: return new Register16AddressingMode(Register16Bits.AF);
-			case 0xC5: return new Register16AddressingMode(Register16Bits.BC);
-			case 0xD5: return new Register16AddressingMode(Register16Bits.DE);
-			case 0xE5: return new Register16AddressingMode(Register16Bits.HL);
+			case 0xF5: return Register16AddressingMode.AF;
+			case 0xC5: return Register16AddressingMode.BC;
+			case 0xD5: return Register16AddressingMode.DE;
+			case 0xE5: return Register16AddressingMode.HL;
 		}
 		
 		return null;

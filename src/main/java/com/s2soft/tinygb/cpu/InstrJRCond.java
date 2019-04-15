@@ -22,10 +22,10 @@ public class InstrJRCond extends Instruction {
 	
 	private FlagCondition getFlagCondition(byte opcode) {
 		switch (opcode) {
-			case 0x020: return new FlagCondition(FlagField.Z, false);
-			case 0x028: return new FlagCondition(FlagField.Z, true);
-			case 0x030: return new FlagCondition(FlagField.C, false);
-			case 0x038: return new FlagCondition(FlagField.C, true);
+			case 0x020: return FlagCondition.NZ;
+			case 0x028: return FlagCondition.Z;
+			case 0x030: return FlagCondition.NC;
+			case 0x038: return FlagCondition.C;
 		}
 		return null;
 	}

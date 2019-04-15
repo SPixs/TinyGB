@@ -33,14 +33,14 @@ public class InstrRES extends Instruction {
 	
 	private IAddressingMode getAddressingMode(byte opcode) {
 		IAddressingMode[] allModes = new IAddressingMode[] {
-				new RegisterAddressingMode(Register8Bits.B),
-				new RegisterAddressingMode(Register8Bits.C),
-				new RegisterAddressingMode(Register8Bits.D),
-				new RegisterAddressingMode(Register8Bits.E),
-				new RegisterAddressingMode(Register8Bits.H),
-				new RegisterAddressingMode(Register8Bits.L),
-				new IndirectAddressMode(Register16Bits.HL),
-				new RegisterAddressingMode(Register8Bits.A)
+				RegisterAddressingMode.B,
+				RegisterAddressingMode.C,
+				RegisterAddressingMode.D,
+				RegisterAddressingMode.E,
+				RegisterAddressingMode.H,
+				RegisterAddressingMode.L,
+				IndirectAddressMode.HL,
+				RegisterAddressingMode.A
 		};
 		
 		int lowerNibble = (opcode & 0x0F);

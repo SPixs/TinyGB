@@ -12,15 +12,15 @@ public class InstrADD extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x87: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x80: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x81: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x82: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x83: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x84: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x85: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x86: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xC6: return new ImmediateAddressMode();
+			case 0x87: return RegisterAddressingMode.A;
+			case 0x80: return RegisterAddressingMode.B;
+			case 0x81: return RegisterAddressingMode.C;
+			case 0x82: return RegisterAddressingMode.D;
+			case 0x83: return RegisterAddressingMode.E;
+			case 0x84: return RegisterAddressingMode.H;
+			case 0x85: return RegisterAddressingMode.L;
+			case 0x86: return IndirectAddressMode.HL;
+			case 0xC6: return ImmediateAddressMode.INSTANCE;
 		}
 		
 		return null;

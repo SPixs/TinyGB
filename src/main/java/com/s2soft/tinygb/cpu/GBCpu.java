@@ -1,5 +1,6 @@
 package com.s2soft.tinygb.cpu;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.mmu.GBMemory;
@@ -62,6 +63,10 @@ public class GBCpu {
 	
 	private boolean startTrace = false;
 
+	private Instruction[] m_instructionsArray;
+	private Instruction[] m_extraInstructionsArray;
+	private final byte[][] m_additionalBytes = new byte[3][];
+	
 	public GBCpu(GameBoy gameBoy) {
 		m_memory = gameBoy.getMemory();
 		initInstructions();
@@ -255,6 +260,29 @@ public class GBCpu {
 		m_extraInstructions.add(new InstrSLA());
 		m_extraInstructions.add(new InstrSRA());
 		m_extraInstructions.add(new InstrSWAP());
+		
+		m_instructionsArray = new Instruction[0x100];
+		m_extraInstructionsArray = new Instruction[0x100];
+		for (int i=0;i<0x100;i++) {
+			Iterator<Instruction> iterator = m_instructions.iterator();
+			while (m_instructionsArray[i] == null && iterator.hasNext()) {
+				Instruction instruction = iterator.next();
+				if (instruction.matchOpcode((byte)i)) {
+					m_instructionsArray[i] = instruction;
+				}
+			}
+			iterator = m_extraInstructions.iterator();
+			while (m_extraInstructionsArray[i] == null && iterator.hasNext()) {
+				Instruction instruction = iterator.next();
+				if (instruction.matchOpcode((byte)i)) {
+					m_extraInstructionsArray[i] = instruction;
+				}
+			}
+		}
+		
+		for (int i=0;i<m_additionalBytes.length;i++) {
+			m_additionalBytes[i] = new byte[i];
+		}
 	}
 	
 	public void halt() {
@@ -370,7 +398,7 @@ public class GBCpu {
 		
 		setPC(getPC() + 1);
 		int lengthInBytes = instruction.getLengthInBytes(opcode);
-		byte[] additionalBytes = new byte[lengthInBytes - 1];
+		byte[] additionalBytes = m_additionalBytes[lengthInBytes - 1];
 		for (int i=0;i<lengthInBytes-1;i++) {
 			additionalBytes[i] = getMemory().getByte(getPC());
 			setPC(getPC() + 1);
@@ -427,21 +455,11 @@ public class GBCpu {
 	}
 	
 	public Instruction getIntruction(byte opcode) {
-		for (Instruction instruction : m_instructions) {
-			if (instruction.matchOpcode(opcode)) {
-				return instruction;
-			}
-		}
-		return null;
+		return m_instructionsArray[opcode & 0xFF];
 	}
 	
 	public Instruction getExtraIntruction(byte opcode) {
-		for (Instruction instruction : m_extraInstructions) {
-			if (instruction.matchOpcode(opcode)) {
-				return instruction;
-			}
-		}
-		return null;
+		return m_extraInstructionsArray[opcode & 0xFF];
 	}
 	
 	/**

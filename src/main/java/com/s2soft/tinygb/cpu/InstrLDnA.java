@@ -12,17 +12,17 @@ public class InstrLDnA extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x7F: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x47: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x4F: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x57: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x5F: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x67: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x6F: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x02: return new IndirectAddressMode(Register16Bits.BC);
-			case 0x12: return new IndirectAddressMode(Register16Bits.DE);
-			case 0x77: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xEA: return new AbsoluteAddressingMode();
+			case 0x7F: return RegisterAddressingMode.A;
+			case 0x47: return RegisterAddressingMode.B;
+			case 0x4F: return RegisterAddressingMode.C;
+			case 0x57: return RegisterAddressingMode.D;
+			case 0x5F: return RegisterAddressingMode.E;
+			case 0x67: return RegisterAddressingMode.H;
+			case 0x6F: return RegisterAddressingMode.L;
+			case 0x02: return IndirectAddressMode.BC;
+			case 0x12: return IndirectAddressMode.DE;
+			case 0x77: return IndirectAddressMode.HL;
+			case 0xEA: return AbsoluteAddressingMode.INSTANCE;
 		}
 		
 		return null;

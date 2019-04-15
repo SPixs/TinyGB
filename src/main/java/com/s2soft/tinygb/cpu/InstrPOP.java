@@ -22,10 +22,10 @@ public class InstrPOP extends Instruction {
 	private Register16AddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0xF1: return new Register16AddressingMode(Register16Bits.AF);
-			case 0xC1: return new Register16AddressingMode(Register16Bits.BC);
-			case 0xD1: return new Register16AddressingMode(Register16Bits.DE);
-			case 0xE1: return new Register16AddressingMode(Register16Bits.HL);
+			case 0xF1: return Register16AddressingMode.AF;
+			case 0xC1: return Register16AddressingMode.BC;
+			case 0xD1: return Register16AddressingMode.DE;
+			case 0xE1: return Register16AddressingMode.HL;
 		}
 		
 		return null;

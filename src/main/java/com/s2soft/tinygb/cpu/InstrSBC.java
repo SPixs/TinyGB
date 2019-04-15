@@ -13,15 +13,15 @@ public class InstrSBC extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x9F: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x98: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x99: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x9A: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x9B: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x9C: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x9D: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x9E: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xDE: return new ImmediateAddressMode();
+			case 0x9F: return RegisterAddressingMode.A;
+			case 0x98: return RegisterAddressingMode.B;
+			case 0x99: return RegisterAddressingMode.C;
+			case 0x9A: return RegisterAddressingMode.D;
+			case 0x9B: return RegisterAddressingMode.E;
+			case 0x9C: return RegisterAddressingMode.H;
+			case 0x9D: return RegisterAddressingMode.L;
+			case 0x9E: return IndirectAddressMode.HL;
+			case 0xDE: return ImmediateAddressMode.INSTANCE;
 		}
 		
 		return null;

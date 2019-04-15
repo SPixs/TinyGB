@@ -21,14 +21,14 @@ public class InstrSRA extends Instruction {
 	
 	private IAddressingMode getAddressingMode(byte opcode) {
 		switch (opcode) {
-			case (byte)0x2F: return new RegisterAddressingMode(Register8Bits.A);
-			case (byte)0x28: return new RegisterAddressingMode(Register8Bits.B);
-			case (byte)0x29: return new RegisterAddressingMode(Register8Bits.C);
-			case (byte)0x2A: return new RegisterAddressingMode(Register8Bits.D);
-			case (byte)0x2B: return new RegisterAddressingMode(Register8Bits.E);
-			case (byte)0x2C: return new RegisterAddressingMode(Register8Bits.H);
-			case (byte)0x2D: return new RegisterAddressingMode(Register8Bits.L);
-			case (byte)0x2E: return new IndirectAddressMode(Register16Bits.HL);
+			case (byte)0x2F: return RegisterAddressingMode.A;
+			case (byte)0x28: return RegisterAddressingMode.B;
+			case (byte)0x29: return RegisterAddressingMode.C;
+			case (byte)0x2A: return RegisterAddressingMode.D;
+			case (byte)0x2B: return RegisterAddressingMode.E;
+			case (byte)0x2C: return RegisterAddressingMode.H;
+			case (byte)0x2D: return RegisterAddressingMode.L;
+			case (byte)0x2E: return IndirectAddressMode.HL;
 		}
 		return null;
 	}

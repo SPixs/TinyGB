@@ -1,9 +1,18 @@
 package com.s2soft.tinygb.cpu;
 
-public class RegisterAddressingMode implements IAddressingMode {
+public final class RegisterAddressingMode implements IAddressingMode {
 
 	//   ============================ Constants ==============================
 
+	public final static RegisterAddressingMode A = new RegisterAddressingMode(Register8Bits.A);
+	public final static RegisterAddressingMode B = new RegisterAddressingMode(Register8Bits.B);
+	public final static RegisterAddressingMode C = new RegisterAddressingMode(Register8Bits.C);
+	public final static RegisterAddressingMode D = new RegisterAddressingMode(Register8Bits.D);
+	public final static RegisterAddressingMode E = new RegisterAddressingMode(Register8Bits.E);
+	public final static RegisterAddressingMode H = new RegisterAddressingMode(Register8Bits.H);
+	public final static RegisterAddressingMode L = new RegisterAddressingMode(Register8Bits.L);
+	public final static RegisterAddressingMode F = new RegisterAddressingMode(Register8Bits.F);
+	
 	//	 =========================== Attributes ==============================
 
 	private Register8Bits m_register;

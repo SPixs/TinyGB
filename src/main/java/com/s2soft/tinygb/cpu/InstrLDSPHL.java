@@ -11,8 +11,8 @@ public class InstrLDSPHL extends Instruction {
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionnalBytes) {
-		Register16AddressingMode readAddressingMode = new Register16AddressingMode(Register16Bits.HL);
-		Register16AddressingMode writeAddressingMode = new Register16AddressingMode(Register16Bits.SP);
+		Register16AddressingMode readAddressingMode = Register16AddressingMode.HL;
+		Register16AddressingMode writeAddressingMode = Register16AddressingMode.SP;
 		writeAddressingMode.setWord(cpu, readAddressingMode.readWord(cpu));
 
 		return 8; 

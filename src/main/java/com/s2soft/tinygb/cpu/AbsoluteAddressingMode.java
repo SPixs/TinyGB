@@ -1,14 +1,16 @@
 package com.s2soft.tinygb.cpu;
 
-public class AbsoluteAddressingMode implements IAddressingMode {
+public final class AbsoluteAddressingMode implements IAddressingMode {
 
 	//   ============================ Constants ==============================
+	
+	public final static AbsoluteAddressingMode INSTANCE = new AbsoluteAddressingMode();
 
 	//	 =========================== Attributes ==============================
 
 	//	 =========================== Constructor =============================
 	
-	public AbsoluteAddressingMode() {
+	private AbsoluteAddressingMode() {
 	}
 
 	//	 ========================== Access methods ===========================

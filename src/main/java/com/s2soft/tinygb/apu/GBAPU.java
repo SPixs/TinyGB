@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.apu;
 
+import java.util.ArrayList;
+
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.mmu.GBMemory;
@@ -55,14 +57,47 @@ public class GBAPU {
 
 	//	 ========================= Treatment methods =========================
 
+	public static void main(String[] args) {
+		for (int j=0;j<10;j++) {
+			Voice voice = new Voice1();
+			voice.setEnabled(true);
+			long start = System.currentTimeMillis();
+			for (long i=0;i<500000000;i++) {
+				voice.step();
+			}
+			long d1 = System.currentTimeMillis()-start;
+			System.out.println(d1);
+
+			for (int k=0;k<5;k++) {
+	//			ArrayList<Voice> voices = new ArrayList<Voice>();
+				Voice tmpVoice = new Voice1();
+				tmpVoice.setEnabled(true);
+	//			voices.add(tmpVoice);
+	//			voices.get(0).setEnabled(true);
+	//			Voice1 myVoice = (Voice1) voices.get(0);
+				long start2 = System.currentTimeMillis();
+				for (long i=0;i<500000000;i++) {
+					tmpVoice.step();
+				}
+				long d2 = System.currentTimeMillis()-start2;
+				System.out.println(d2);
+				System.out.println("+"+Math.round((d2-d1)*100.0d/d1)+"%");
+			}
+		}
+	}
+	
 	public void step() {
 		if (!m_soundEnable) {
 			return;
 		}
 		
-		for (Voice voice : m_voices) {
-			voice.step();
-		}
+		m_voice1.step();
+		m_voice2.step();
+		m_voice3.step();
+		m_voice4.step();
+//		for (Voice voice : m_voices) {
+//			voice.step();
+//		}
 		
 		m_gameBoy.getAudioDevice().putSample(
 				(byte)(getLeftChannelValue() >> 3), 

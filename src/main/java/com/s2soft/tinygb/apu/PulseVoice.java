@@ -86,7 +86,7 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 	}
 
 	@Override
-	public void stepImpl() {
+	public final void stepImpl() {
 
 		if (m_counter-- == 0) {
 			// A square channel's frequency timer period is set to (2048-frequency)*4. 

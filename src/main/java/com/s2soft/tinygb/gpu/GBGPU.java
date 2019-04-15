@@ -240,7 +240,8 @@ public class GBGPU {
 		
 		if (areSpritesEnabled() && m_pixelsFifo.canOverlay()) {
 			GPUSprite visibleSprite = null;
-			for (GPUSprite sprite : m_visibleSprites) {
+			for (int i=0;i<m_visibleSprites.size();i++) {
+				GPUSprite sprite = m_visibleSprites.get(i);
 				if (!m_fetcher.hasScheduledSprite() && sprite.getX() - 8 == pixelsCount) { // TODO : handle offscreen sprites with partial visibility
 					m_fetcher.scheduleSprite(sprite);
 					visibleSprite = sprite;

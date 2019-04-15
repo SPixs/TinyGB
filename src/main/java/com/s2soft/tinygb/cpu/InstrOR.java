@@ -21,15 +21,15 @@ public class InstrOR extends Instruction {
 	
 	private IAddressingMode getAddressingMode(byte opcode) {
 		switch (opcode) {
-			case (byte)0xB7: return new RegisterAddressingMode(Register8Bits.A);
-			case (byte)0xB0: return new RegisterAddressingMode(Register8Bits.B);
-			case (byte)0xB1: return new RegisterAddressingMode(Register8Bits.C);
-			case (byte)0xB2: return new RegisterAddressingMode(Register8Bits.D);
-			case (byte)0xB3: return new RegisterAddressingMode(Register8Bits.E);
-			case (byte)0xB4: return new RegisterAddressingMode(Register8Bits.H);
-			case (byte)0xB5: return new RegisterAddressingMode(Register8Bits.L);
-			case (byte)0xB6: return new IndirectAddressMode(Register16Bits.HL);
-			case (byte)0xF6: return new ImmediateAddressMode();
+			case (byte)0xB7: return RegisterAddressingMode.A;
+			case (byte)0xB0: return RegisterAddressingMode.B;
+			case (byte)0xB1: return RegisterAddressingMode.C;
+			case (byte)0xB2: return RegisterAddressingMode.D;
+			case (byte)0xB3: return RegisterAddressingMode.E;
+			case (byte)0xB4: return RegisterAddressingMode.H;
+			case (byte)0xB5: return RegisterAddressingMode.L;
+			case (byte)0xB6: return IndirectAddressMode.HL;
+			case (byte)0xF6: return ImmediateAddressMode.INSTANCE;
 		}
 		return null;
 	}

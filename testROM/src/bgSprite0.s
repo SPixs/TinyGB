@@ -47,9 +47,9 @@ start:
   ; wait for VBL before initializing VRAM and OAM
   call waitVBL
 
-  ; ase we are modifying VRAM, turn LCD off
- ; ld a,$00
- ; ldh ($40),a
+  ; as we are modifying VRAM, turn LCD off
+;  ld a,$00
+;  ldh ($40),a
 
   ; clear OAM
   ld hl,$FE00
@@ -62,6 +62,21 @@ start:
   call clearMEM
   call waitVBL
   
+;  ld hl,$FE40
+;  ld b,$20
+;  call clearMEM
+;  call waitVBL
+
+;  ld hl,$FE60
+;  ld b,$20
+;  call clearMEM
+;  call waitVBL
+  
+;  ld hl,$FE80
+;  ld b,$20
+;  call clearMEM
+;  call waitVBL
+
   ; copy a single tile to VRAM $8010 (tile 25)
   ld b,16
   ld hl,tiles
@@ -93,6 +108,9 @@ copyTile:
   ld a,$93            ; BG on, tiles at $8000
   ldh ($40),a
 
+  ld b,%11100100 ; palette for sprites
+  ld c,$04 ; palette rotation counter
+
 loop:
   ld a,(SPRITE_X)
   inc a
@@ -102,7 +120,17 @@ loop:
 noOffscreenX:
   ld (SPRITE_X),a
   call waitVBL
-  ld a,(SPRITE_X)
+  dec c
+  jr nz,+
+  ld a,b  ; reload sprite palette
+  rlca     ; rotate palette
+  rlca     ; rotate palette
+  ld hl,$FF48
+  ld (hl+),a ; load sprite palette 0
+  ld (hl+),a ; load sprite palette 1
+  ld b,a
+  ld c,$04  ; reset palette counter
++ ld a,(SPRITE_X)
   ld ($FE01),a
   jp loop     
 
@@ -124,8 +152,8 @@ waitLY144:
 clearMEM:
   xor a
   ld (hl),a
-  dec b
   inc l
+  dec b
   jr nz,clearMEM
   ret
 

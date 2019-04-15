@@ -12,10 +12,10 @@ public class InstrDECnn extends Instruction {
 	private Register16AddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x0B: return new Register16AddressingMode(Register16Bits.BC);
-			case 0x1B: return new Register16AddressingMode(Register16Bits.DE);
-			case 0x2B: return new Register16AddressingMode(Register16Bits.HL);
-			case 0x3B: return new Register16AddressingMode(Register16Bits.SP);
+			case 0x0B: return Register16AddressingMode.BC;
+			case 0x1B: return Register16AddressingMode.DE;
+			case 0x2B: return Register16AddressingMode.HL;
+			case 0x3B: return Register16AddressingMode.SP;
 		}
 		
 		return null;

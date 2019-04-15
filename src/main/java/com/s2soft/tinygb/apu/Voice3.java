@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.apu;
 
-public class Voice3 extends Voice {
+public final class Voice3 extends Voice {
 
 	//   ============================ Constants ==============================
 
@@ -60,7 +60,7 @@ public class Voice3 extends Voice {
 	//	 ========================= Treatment methods =========================
 
 	@Override
-	public void stepImpl() {
+	public final void stepImpl() {
 		if (m_playback && m_counter-- == 0) {
 			// The frequency timer period is set to (2048-frequency)*2.
 			// When the timer generates a clock, the position counter is advanced one sample in the wave table,

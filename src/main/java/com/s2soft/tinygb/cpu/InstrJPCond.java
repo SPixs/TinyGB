@@ -33,10 +33,10 @@ public class InstrJPCond extends Instruction {
 	
 	private FlagCondition getFlagCondition(byte opcode) {
 		switch (opcode) {
-			case (byte)0xC2: return new FlagCondition(FlagField.Z, false);
-			case (byte)0xCA: return new FlagCondition(FlagField.Z, true);
-			case (byte)0xD2: return new FlagCondition(FlagField.C, false);
-			case (byte)0xDA: return new FlagCondition(FlagField.C, true);
+			case (byte)0xC2: return FlagCondition.NZ;
+			case (byte)0xCA: return FlagCondition.Z;
+			case (byte)0xD2: return FlagCondition.NC;
+			case (byte)0xDA: return FlagCondition.C;
 		}
 		return null;
 	}

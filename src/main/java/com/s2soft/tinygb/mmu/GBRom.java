@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 import com.s2soft.tinygb.cpu.Instruction;
 
-public class GBRom implements IAddressable {
+public final class GBRom implements IAddressable {
 
 	//   ============================ Constants ==============================
 

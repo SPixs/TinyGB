@@ -14,7 +14,7 @@ import com.s2soft.utils.BitUtils;
  * 
  * @author smametz
  */
-public class GBMemoryIO implements IAddressable {
+public final class GBMemoryIO implements IAddressable {
 
 	//   ============================ Constants ==============================
 	
@@ -22,7 +22,9 @@ public class GBMemoryIO implements IAddressable {
 
 	//	 =========================== Attributes ==============================
 	
-	private Map<Integer, IORegister> m_registers = new HashMap<Integer, IORegister>();
+//	private Map<Integer, IORegister> m_registers = new HashMap<Integer, IORegister>();
+	
+	private IORegister[] m_registers = new IORegister[0x100];
 	
 	/**
 	 * If 0x01, then the first 256 bytes in memory are the Gameboy boot ROM.
@@ -123,7 +125,7 @@ public class GBMemoryIO implements IAddressable {
 	}
 
 	private void addRegister(int address, String registerName, IByteGetter getter, IByteSetter setter) {
-		m_registers.put(address, new IORegister(registerName, address, setter, getter));
+		m_registers[address - 0xFF00] = new IORegister(registerName, address, setter, getter);
 	}
 
 	/**
@@ -172,7 +174,7 @@ public class GBMemoryIO implements IAddressable {
 
 	@Override
 	public void setByte(int address, byte value) {
-		IORegister ioRegister = m_registers.get(address);
+		IORegister ioRegister = m_registers[address - 0xFF00];
 		if (ioRegister != null) {
 			if (TRACE) {
 //				System.out.println("Writing to I/O register " + ioRegister.getName()+ ", value " + Instruction.toHexByte(value) + " at " + Instruction.toHexShort(address));
@@ -188,7 +190,7 @@ public class GBMemoryIO implements IAddressable {
 
 	@Override
 	public byte getByte(int address) {
-		IORegister ioRegister = m_registers.get(address);
+		IORegister ioRegister = m_registers[address - 0xFF00];
 		if (ioRegister != null) {
 			if (TRACE) {
 //				System.out.println("Reading from I/O register " + ioRegister.getName()+ ", at " + Instruction.toHexShort(address));

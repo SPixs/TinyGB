@@ -22,7 +22,7 @@ import com.s2soft.utils.BitUtils;
  * @author smametz
  *
  */
-public class Voice4 extends Voice implements IVolumeEnveloppeVoice {
+public final class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 
 	//   ============================ Constants ==============================
 
@@ -67,7 +67,7 @@ public class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 	//	 ========================= Treatment methods =========================
 
 	@Override
-	public void stepImpl() {
+	public final void stepImpl() {
 		if (m_counter-- == 0) {
 			m_counter = PRESCALER_VALUES[getDividingRatio()] * (1 << getShiftClockFrequency()) - 1; // reset value of polynomial counter's clock
 			byte value = (byte) (clockLFSR() ? 1 : -1);

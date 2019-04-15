@@ -27,8 +27,8 @@ public class InstrLDI extends Instruction {
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		IndirectAddressMode addressingModeIndirect = new IndirectAddressMode(Register16Bits.HL);
-		RegisterAddressingMode addressingModeA = new RegisterAddressingMode(Register8Bits.A);
+		IndirectAddressMode addressingModeIndirect = IndirectAddressMode.HL;
+		RegisterAddressingMode addressingModeA = RegisterAddressingMode.A;
 		IAddressingMode src = (opcode == (byte)(0x22)) ? addressingModeA : addressingModeIndirect;
 		IAddressingMode dest = (opcode == (byte)(0x22)) ? addressingModeIndirect: addressingModeA;
 		dest.setByte(cpu, src.readByte(cpu, additionalBytes), additionalBytes);

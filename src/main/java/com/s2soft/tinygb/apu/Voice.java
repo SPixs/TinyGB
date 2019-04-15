@@ -88,7 +88,7 @@ public abstract class Voice implements ISoundProvider {
 	}
 
 	@Override
-	public int getValue() {
+	public final int getValue() {
 		return m_enabled ? m_value : 0;
 	}
 	

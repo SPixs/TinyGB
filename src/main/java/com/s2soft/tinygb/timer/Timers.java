@@ -10,6 +10,8 @@ public class Timers {
 	
 	private final static boolean TRACE = true;
 	
+	final static int[] COUNTER_RESET_VALUES = new int[] { 0x3FF, 0x0F, 0x3F, 0xFF };
+
 	//	 =========================== Attributes ==============================
 	
 	private int m_dividerRegister = 0;
@@ -148,8 +150,7 @@ public class Timers {
 	}
 
 	private void resetTimerCounter() {
-		final int[] counter = new int[] { 0x3FF, 0x0F, 0x3F, 0xFF };
-		m_timerCounter = counter[m_clockSelect];
+		m_timerCounter = COUNTER_RESET_VALUES[m_clockSelect];
 	}
 }
 

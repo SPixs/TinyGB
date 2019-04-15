@@ -22,14 +22,14 @@ public class InstrRRC extends Instruction {
 	
 	private IAddressingMode getAddressingMode(byte opcode) {
 		switch (opcode) {
-			case (byte)0x0F: return new RegisterAddressingMode(Register8Bits.A);
-			case (byte)0x08: return new RegisterAddressingMode(Register8Bits.B);
-			case (byte)0x09: return new RegisterAddressingMode(Register8Bits.C);
-			case (byte)0x0A: return new RegisterAddressingMode(Register8Bits.D);
-			case (byte)0x0B: return new RegisterAddressingMode(Register8Bits.E);
-			case (byte)0x0C: return new RegisterAddressingMode(Register8Bits.H);
-			case (byte)0x0D: return new RegisterAddressingMode(Register8Bits.L);
-			case (byte)0x0E: return new IndirectAddressMode(Register16Bits.HL);
+			case (byte)0x0F: return RegisterAddressingMode.A;
+			case (byte)0x08: return RegisterAddressingMode.B;
+			case (byte)0x09: return RegisterAddressingMode.C;
+			case (byte)0x0A: return RegisterAddressingMode.D;
+			case (byte)0x0B: return RegisterAddressingMode.E;
+			case (byte)0x0C: return RegisterAddressingMode.H;
+			case (byte)0x0D: return RegisterAddressingMode.L;
+			case (byte)0x0E: return IndirectAddressMode.HL;
 		}
 		return null;
 	}

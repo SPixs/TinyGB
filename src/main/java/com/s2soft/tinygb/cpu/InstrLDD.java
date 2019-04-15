@@ -27,10 +27,8 @@ public class InstrLDD extends Instruction {
 
 	@Override
 	public int execute(byte opcode, GBCpu cpu, byte[] additionalBytes) {
-		IndirectAddressMode addressingModeIndirect = new IndirectAddressMode(Register16Bits.HL);
-		RegisterAddressingMode addressingModeA = new RegisterAddressingMode(Register8Bits.A);
-		IAddressingMode src = (opcode == (byte)(0x32)) ? addressingModeA : addressingModeIndirect;
-		IAddressingMode dest = (opcode == (byte)(0x32)) ? addressingModeIndirect: addressingModeA;
+		IAddressingMode src = (opcode == (byte)(0x32)) ? RegisterAddressingMode.A : IndirectAddressMode.HL;
+		IAddressingMode dest = (opcode == (byte)(0x32)) ? IndirectAddressMode.HL: RegisterAddressingMode.A;
 		dest.setByte(cpu, src.readByte(cpu, additionalBytes), additionalBytes);
 		Register16Bits.HL.setValue(cpu, Register16Bits.HL.getValue(cpu) - 1);
 		return 8;

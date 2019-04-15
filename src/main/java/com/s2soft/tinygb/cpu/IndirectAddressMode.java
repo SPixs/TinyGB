@@ -1,9 +1,13 @@
 package com.s2soft.tinygb.cpu;
 
-public class IndirectAddressMode implements IAddressingMode {
+public final class IndirectAddressMode implements IAddressingMode {
 
 	//   ============================ Constants ==============================
 
+	public final static IndirectAddressMode HL = new IndirectAddressMode(Register16Bits.HL);
+	public final static IndirectAddressMode BC = new IndirectAddressMode(Register16Bits.BC);
+	public final static IndirectAddressMode DE = new IndirectAddressMode(Register16Bits.DE);
+	
 	//	 =========================== Attributes ==============================
 
 	private Register16Bits m_register;

@@ -12,15 +12,15 @@ public class InstrCP extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0xBF: return new RegisterAddressingMode(Register8Bits.A);
-			case 0xB8: return new RegisterAddressingMode(Register8Bits.B);
-			case 0xB9: return new RegisterAddressingMode(Register8Bits.C);
-			case 0xBA: return new RegisterAddressingMode(Register8Bits.D);
-			case 0xBB: return new RegisterAddressingMode(Register8Bits.E);
-			case 0xBC: return new RegisterAddressingMode(Register8Bits.H);
-			case 0xBD: return new RegisterAddressingMode(Register8Bits.L);
-			case 0xBE: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xFE: return new ImmediateAddressMode();
+			case 0xBF: return RegisterAddressingMode.A;
+			case 0xB8: return RegisterAddressingMode.B;
+			case 0xB9: return RegisterAddressingMode.C;
+			case 0xBA: return RegisterAddressingMode.D;
+			case 0xBB: return RegisterAddressingMode.E;
+			case 0xBC: return RegisterAddressingMode.H;
+			case 0xBD: return RegisterAddressingMode.L;
+			case 0xBE: return IndirectAddressMode.HL;
+			case 0xFE: return ImmediateAddressMode.INSTANCE;
 		}
 		
 		return null;

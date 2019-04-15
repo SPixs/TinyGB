@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.apu;
 
-public class Voice2 extends PulseVoice {
+public final class Voice2 extends PulseVoice {
 
 	//   ============================ Constants ==============================
 

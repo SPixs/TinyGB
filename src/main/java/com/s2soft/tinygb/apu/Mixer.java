@@ -11,7 +11,8 @@ public class Mixer implements ISoundProvider {
 
 	//	 =========================== Attributes ==============================
 
-	private List<ISoundProvider> m_inputs = new ArrayList<ISoundProvider>();
+//	private List<ISoundProvider> m_inputs = new ArrayList<ISoundProvider>();
+	private ArrayList<Switch> m_inputs = new ArrayList<Switch>();
 
 	private String m_name;
 
@@ -41,10 +42,14 @@ public class Mixer implements ISoundProvider {
 
 	//	 ========================= Treatment methods =========================
 	
-	public void addInput(ISoundProvider provider) {
-		m_inputs.add(provider);
-	}
+//	public void addInput(ISoundProvider provider) {
+//		m_inputs.add(provider);
+//	}
 	
+	public void addInput(Switch switchInput) {
+		m_inputs.add(switchInput);
+	}
+
 	public void removeAllInput() {
 		m_inputs.clear();
 	}
@@ -52,9 +57,8 @@ public class Mixer implements ISoundProvider {
 	@Override
 	public int getValue() {
 		int result = 0;
-		for (ISoundProvider provider : m_inputs) {
-			final int value = provider.getValue();
-			result += value;
+		for (int i=0;i<m_inputs.size();i++) {
+			result += m_inputs.get(i).getValue();
 		}
 		result *= (m_volume + 1);
 		return result;

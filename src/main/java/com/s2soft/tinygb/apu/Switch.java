@@ -11,7 +11,8 @@ public class Switch implements ISoundProvider {
 	private String m_name;
 
 	private boolean m_enabled = false;
-	private ISoundProvider m_input;
+//	private ISoundProvider m_input;
+	private Voice m_input;
 
 	//	 =========================== Constructor =============================
 
@@ -21,11 +22,19 @@ public class Switch implements ISoundProvider {
 
 	//	 ========================== Access methods ===========================
 
-	public ISoundProvider getInput() {
+//	public ISoundProvider getInput() {
+//		return m_input;
+//	}
+
+//	public void setInput(ISoundProvider input) {
+//		m_input = (Voice)input;
+//	}
+
+	public Voice getInput() {
 		return m_input;
 	}
-
-	public void setInput(ISoundProvider input) {
+	
+	public void setInput(Voice input) {
 		m_input = input;
 	}
 

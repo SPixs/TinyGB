@@ -22,10 +22,10 @@ public class InstrRETcc extends Instruction {
 	
 	private FlagCondition getFlagCondition(byte opcode) {
 		switch (opcode) {
-			case (byte)0xC0: return new FlagCondition(FlagField.Z, false);
-			case (byte)0xC8: return new FlagCondition(FlagField.Z, true);
-			case (byte)0xD0: return new FlagCondition(FlagField.C, false);
-			case (byte)0xD8: return new FlagCondition(FlagField.C, true);
+			case (byte)0xC0: return FlagCondition.NZ;
+			case (byte)0xC8: return FlagCondition.Z;
+			case (byte)0xD0: return FlagCondition.NC;
+			case (byte)0xD8: return FlagCondition.C;
 		}
 		return null;
 	}

@@ -13,15 +13,15 @@ public class InstrADCAn extends Instruction {
 	private IAddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x8F: return new RegisterAddressingMode(Register8Bits.A);
-			case 0x88: return new RegisterAddressingMode(Register8Bits.B);
-			case 0x89: return new RegisterAddressingMode(Register8Bits.C);
-			case 0x8A: return new RegisterAddressingMode(Register8Bits.D);
-			case 0x8B: return new RegisterAddressingMode(Register8Bits.E);
-			case 0x8C: return new RegisterAddressingMode(Register8Bits.H);
-			case 0x8D: return new RegisterAddressingMode(Register8Bits.L);
-			case 0x8E: return new IndirectAddressMode(Register16Bits.HL);
-			case 0xCE: return new ImmediateAddressMode();
+			case 0x8F: return RegisterAddressingMode.A;
+			case 0x88: return RegisterAddressingMode.B;
+			case 0x89: return RegisterAddressingMode.C;
+			case 0x8A: return RegisterAddressingMode.D;
+			case 0x8B: return RegisterAddressingMode.E;
+			case 0x8C: return RegisterAddressingMode.H;
+			case 0x8D: return RegisterAddressingMode.L;
+			case 0x8E: return IndirectAddressMode.HL;
+			case 0xCE: return ImmediateAddressMode.INSTANCE;
 		}
 		
 		return null;

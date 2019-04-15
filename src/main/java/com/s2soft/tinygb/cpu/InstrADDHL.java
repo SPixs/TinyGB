@@ -12,10 +12,10 @@ public class InstrADDHL extends Instruction {
 	private Register16AddressingMode getAddressingMode(byte opcode) {
 
 		switch (opcode & 0xFF) {
-			case 0x09: return new Register16AddressingMode(Register16Bits.BC);
-			case 0x19: return new Register16AddressingMode(Register16Bits.DE);
-			case 0x29: return new Register16AddressingMode(Register16Bits.HL);
-			case 0x39: return new Register16AddressingMode(Register16Bits.SP);
+			case 0x09: return Register16AddressingMode.BC;
+			case 0x19: return Register16AddressingMode.DE;
+			case 0x29: return Register16AddressingMode.HL;
+			case 0x39: return Register16AddressingMode.SP;
 		}
 		
 		return null;

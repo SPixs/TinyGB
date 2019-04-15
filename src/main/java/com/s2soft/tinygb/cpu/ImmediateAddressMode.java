@@ -1,8 +1,10 @@
 package com.s2soft.tinygb.cpu;
 
-public class ImmediateAddressMode implements IAddressingMode {
+public final class ImmediateAddressMode implements IAddressingMode {
 
 	//   ============================ Constants ==============================
+	
+	public final static ImmediateAddressMode INSTANCE = new ImmediateAddressMode();
 
 	//	 =========================== Attributes ==============================
 

@@ -1,8 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-import com.s2soft.tinygb.cpu.Instruction;
-
-public class GBMemoryRAM implements IAddressable {
+public final class GBMemoryRAM implements IAddressable {
 
 	//   ============================ Constants ==============================
 

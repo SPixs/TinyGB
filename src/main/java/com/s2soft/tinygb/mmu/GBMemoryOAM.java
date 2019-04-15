@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-public class GBMemoryOAM implements IAddressable {
+public final class GBMemoryOAM implements IAddressable {
 
 	//   ============================ Constants ==============================
 

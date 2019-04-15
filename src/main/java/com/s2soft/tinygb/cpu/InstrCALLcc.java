@@ -22,10 +22,10 @@ public class InstrCALLcc extends Instruction {
 	
 	private FlagCondition getFlagCondition(byte opcode) {
 		switch (opcode) {
-			case (byte)0xC4: return new FlagCondition(FlagField.Z, false);
-			case (byte)0xCC: return new FlagCondition(FlagField.Z, true);
-			case (byte)0xD4: return new FlagCondition(FlagField.C, false);
-			case (byte)0xDC: return new FlagCondition(FlagField.C, true);
+			case (byte)0xC4: return FlagCondition.NZ;
+			case (byte)0xCC: return FlagCondition.Z;
+			case (byte)0xD4: return FlagCondition.NC;
+			case (byte)0xDC: return FlagCondition.C;
 		}
 		return null;
 	}
