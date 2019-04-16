@@ -88,7 +88,7 @@ public class FrameSequencer {
 	}
 
 	public void init() {
-		m_counter = 0;
+		m_counter = (4194304 / 512) - 1;//0;
 		m_lengthCounter.init();
 		if (m_volumeEnvelope != null) {
 			m_volumeEnvelope.init();

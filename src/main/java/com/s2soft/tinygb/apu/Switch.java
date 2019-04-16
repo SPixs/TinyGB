@@ -12,7 +12,7 @@ public class Switch implements ISoundProvider {
 
 	private boolean m_enabled = false;
 //	private ISoundProvider m_input;
-	private Voice m_input;
+	private DAC m_input;
 
 	//	 =========================== Constructor =============================
 
@@ -30,11 +30,11 @@ public class Switch implements ISoundProvider {
 //		m_input = (Voice)input;
 //	}
 
-	public Voice getInput() {
+	public DAC getInput() {
 		return m_input;
 	}
 	
-	public void setInput(Voice input) {
+	public void setInput(DAC input) {
 		m_input = input;
 	}
 
@@ -49,12 +49,14 @@ public class Switch implements ISoundProvider {
 
 	//	 ========================= Treatment methods =========================
 
-	private int readInput() {
-		return m_input == null ? 0 : m_input.getValue();
+	private double readInput() {
+		double result = m_input == null ? 0 : m_input.getValue();
+//		if (result < -1 || result > 1) throw new IllegalStateException();
+		return result;
 	}
 
 	@Override
-	public int getValue() {
+	public double getValue() {
 		return m_enabled ? readInput() : 0;
 	}
 

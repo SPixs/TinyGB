@@ -4,7 +4,7 @@ public interface IAudioDevice {
 
 	void start() throws Exception;
 	void stop();
-	void putSample(byte leftSample, byte rightSample);
+	void putSample(double leftChannel, double rightChannel);
 	
 }
 

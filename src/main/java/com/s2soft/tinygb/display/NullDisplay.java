@@ -1,6 +1,6 @@
-package com.s2soft.tinygb;
+package com.s2soft.tinygb.display;
 
-public class DefaultConfiguration implements IConfiguration {
+public class NullDisplay implements IDisplay {
 
 	//   ============================ Constants ==============================
 
@@ -13,8 +13,15 @@ public class DefaultConfiguration implements IConfiguration {
 	//	 ========================= Treatment methods =========================
 
 	@Override
-	public boolean useBootRom() {
-		return false;
+	public void setEnable(boolean enabled) {
+	}
+
+	@Override
+	public void putPixel(byte pixel) {
+	}
+
+	@Override
+	public void refresh() {
 	}
 }
 

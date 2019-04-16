@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.apu;
 
-public abstract class Voice implements ISoundProvider {
+public abstract class Voice implements IVoice {
 
 	//   ============================ Constants ==============================
 
@@ -12,8 +12,8 @@ public abstract class Voice implements ISoundProvider {
 	
 	private FrameSequencer m_frameSequencer;
 
-	private int m_rawLength;
-	private float m_lengthInSeconds;
+//	private int m_rawLength;
+//	private float m_lengthInSeconds;
 	
 	private int m_value;
 	
@@ -21,21 +21,34 @@ public abstract class Voice implements ISoundProvider {
 
 	private int m_rawFrequency;
 	
+	protected LengthCounter m_lengthCounter;
+
+	private DAC m_dac;
+	
 	//	 =========================== Constructor =============================
 
 	public Voice() {
 		m_frameSequencer = new FrameSequencer(this);
+		
+		m_lengthCounter = new LengthCounter(this, 64);
+		getFrameSequencer().setLengthCounter(m_lengthCounter);
+		
+		m_dac = new DAC(this);
 	}
 	
 	//	 ========================== Access methods ===========================
 
+	public DAC getDAC() {
+		return m_dac;
+	}
+	
 	protected FrameSequencer getFrameSequencer() {
 		return m_frameSequencer;
 	}
 
-	public int getRawLength() {
-		return m_rawLength;
-	}
+//	public int getRawLength() {
+//		return m_rawLength;
+//	}
 
 	/**
 	 * Sound Length = (64-t1)*(1/256) seconds
@@ -44,14 +57,10 @@ public abstract class Voice implements ISoundProvider {
 	 * @param i
 	 */
 	public void setRawLength(int t1) {
-		m_rawLength = t1;
-		m_lengthInSeconds = (64 - (t1 & 0x00111111)) / 256.0f;
-		if (m_rawLength == 60) {
-			Thread.yield();
-		}
-		if (GBAPU.TRACE && TRACE) {
-			System.out.println(getName()+". Set length = " + m_rawLength +", " + m_lengthInSeconds + "s");
-		}
+		m_lengthCounter.setValue(t1);
+//		m_rawLength = t1;
+//		m_lengthInSeconds = (64 - (t1 & 0x00111111)) / 256.0f;
+//		m_lengthCounter.reload();
 	}
 	
 	public void setLengthEnabled(boolean state) {
@@ -80,6 +89,9 @@ public abstract class Voice implements ISoundProvider {
 	}
 
 	public void setEnabled(boolean enabled) {
+		if (GBAPU.TRACE && TRACE) {
+			System.out.println(getName() + " enabled = " + enabled);
+		}
 		m_enabled = enabled;
 	}
 
@@ -87,23 +99,25 @@ public abstract class Voice implements ISoundProvider {
 		m_value = value;
 	}
 
-	@Override
+	/**
+	 * @return the voice value encoded in 4 bits (i.e oscillator value ranges between 0 and 15)
+	 */
 	public final int getValue() {
 		return m_enabled ? m_value : 0;
 	}
 	
 	public abstract boolean isPlaying();
 
-	public float getLengthInSeconds() {
-		return m_lengthInSeconds;
-	}
+//	public float getLengthInSeconds() {
+//		return m_lengthInSeconds;
+//	}
 
-	public void step() {
+	public final void step() {
+		m_frameSequencer.step();
+		
 		if (!m_enabled) {
 			return;
 		}
-		
-		m_frameSequencer.step();
 		
 		stepImpl();
 	}

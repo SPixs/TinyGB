@@ -17,8 +17,6 @@ public final class Voice3 extends Voice {
 
 	private boolean m_playback;
 
-	private LengthCounter m_lengthCounter;
-	
 	//	 =========================== Constructor =============================
 
 	public Voice3() {
@@ -71,7 +69,7 @@ public final class Voice3 extends Voice {
 			int sample = (m_samplePosition % 2 == 0) ? ((samplePair >> 4) & 0x0F) : (samplePair & 0x0F);
 			m_samplePosition = (m_samplePosition + 1) % 32;
 
-			byte outputSample = (byte) ((sample >> m_volumeShift[getOutputLevel()]) - (8 >> m_volumeShift[getOutputLevel()]));
+			byte outputSample = (byte) (sample >> m_volumeShift[getOutputLevel()]);
 			setOutputValue(outputSample);
 		}
 	}

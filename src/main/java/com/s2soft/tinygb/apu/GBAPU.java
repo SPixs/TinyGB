@@ -1,7 +1,5 @@
 package com.s2soft.tinygb.apu;
 
-import java.util.ArrayList;
-
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.mmu.GBMemory;
@@ -45,11 +43,11 @@ public class GBAPU {
 		
 		for (int i=0;i<4;i++) {
 			m_switch[i] = new Switch("Left channel, voice " + i); // left channel switch for voice i
-			m_switch[i].setInput(m_voices[i]);
+			m_switch[i].setInput(m_voices[i].getDAC());
 			m_leftMixer.addInput(m_switch[i]);
 			m_switch[i+4] = new Switch("Right channel, voice " + i); // right channel switch for voice i
+			m_switch[i+4].setInput(m_voices[i].getDAC());
 			m_rightMixer.addInput(m_switch[i+4]);
-			m_switch[i+4].setInput(m_voices[i]);
 		}
 	}
 
@@ -57,35 +55,6 @@ public class GBAPU {
 
 	//	 ========================= Treatment methods =========================
 
-	public static void main(String[] args) {
-		for (int j=0;j<10;j++) {
-			Voice voice = new Voice1();
-			voice.setEnabled(true);
-			long start = System.currentTimeMillis();
-			for (long i=0;i<500000000;i++) {
-				voice.step();
-			}
-			long d1 = System.currentTimeMillis()-start;
-			System.out.println(d1);
-
-			for (int k=0;k<5;k++) {
-	//			ArrayList<Voice> voices = new ArrayList<Voice>();
-				Voice tmpVoice = new Voice1();
-				tmpVoice.setEnabled(true);
-	//			voices.add(tmpVoice);
-	//			voices.get(0).setEnabled(true);
-	//			Voice1 myVoice = (Voice1) voices.get(0);
-				long start2 = System.currentTimeMillis();
-				for (long i=0;i<500000000;i++) {
-					tmpVoice.step();
-				}
-				long d2 = System.currentTimeMillis()-start2;
-				System.out.println(d2);
-				System.out.println("+"+Math.round((d2-d1)*100.0d/d1)+"%");
-			}
-		}
-	}
-	
 	public void step() {
 		if (!m_soundEnable) {
 			return;
@@ -95,23 +64,20 @@ public class GBAPU {
 		m_voice2.step();
 		m_voice3.step();
 		m_voice4.step();
-//		for (Voice voice : m_voices) {
-//			voice.step();
-//		}
 		
 		if (m_gameBoy.getEmulationSyncShift() > -5) {
-			m_gameBoy.getAudioDevice().putSample(
-					(byte)(getLeftChannelValue() >> 3), 
-					(byte)(getRightChannelValue() >> 3));
+			final double leftChannelValue = getLeftChannelValue();
+			final double rightChannelValue = getRightChannelValue();
+			m_gameBoy.getAudioDevice().putSample(leftChannelValue / 3.0, rightChannelValue / 3.0);
 		}
 	}
 
 	
-	public int getLeftChannelValue() {
+	public double getLeftChannelValue() {
 		return m_leftMixer.getValue();
 	}
 	
-	public int getRightChannelValue() {
+	public double getRightChannelValue() {
 		return m_rightMixer.getValue();
 	}
 
@@ -206,7 +172,7 @@ public class GBAPU {
 		boolean wasEnabled = m_soundEnable;
 		boolean soundEnable = BitUtils.isSet(v, 7);
 		if (TRACE) {
-			System.out.println("Turning sound : " + (m_soundEnable ? "ON" : "OFF"));
+			System.out.println("Turning sound : " + (soundEnable ? "ON" : "OFF"));
 		}
 		if (wasEnabled && !soundEnable) {
 			m_gameBoy.getAudioDevice().stop();
@@ -223,9 +189,8 @@ public class GBAPU {
 		byte result = (byte) 0xFF;
 		result = BitUtils.setBit(result, 7, m_soundEnable);
 		for (int i=0;i<4;i++) {
-			result = BitUtils.setBit(result, i, m_voices[i].isPlaying());
+			result = BitUtils.setBit(result, i, m_voices[i].isEnabled() && m_voices[i].getDAC().isEnabled());
 		}
-//		System.out.println("READ NR52 " + Instruction.toHexByte(result));
 		return result;
 	}
 	
@@ -255,6 +220,9 @@ public class GBAPU {
 	 * @param v content of NR11 register 
 	 */
 	public void setNR10(byte v) {
+		if (TRACE) {
+			System.out.println("NR10="+Instruction.toHexByte(v));
+		}
 		if (!m_soundEnable) { return; }
 		byte sweepShift = (byte)(v & 0x07);
 		boolean increase = BitUtils.isSet(v, 3);
@@ -280,9 +248,13 @@ public class GBAPU {
 	 * @param v content of NR11 register 
 	 */
 	public void setNR30(byte v) {
+		if (TRACE) {
+			System.out.println("NR30="+Instruction.toHexByte(v));
+		}
 		if (!m_soundEnable) { return; }
 		boolean playback = BitUtils.isSet(v, 7);
 		m_voice3.setPlayback(playback);
+		m_voice3.getDAC().setEnabled(playback);
 	}
 	
 	public byte getNR30() {
@@ -307,6 +279,10 @@ public class GBAPU {
 	 * @param v content of NR11 register 
 	 */
 	public void setNR11(byte v) {
+		if (TRACE) {
+			System.out.println("NR11="+Instruction.toHexByte(v));
+		}
+		
 		if (!m_soundEnable) { return; }
 		setNRX1(m_voice1, v);
 	}
@@ -332,6 +308,9 @@ public class GBAPU {
 	 * @param v
 	 */
 	public void setNR31(byte v) {
+		if (TRACE) {
+			System.out.println("NR31="+Instruction.toHexByte(v));
+		}
 		if (!m_soundEnable) { return; }
 		m_voice3.setRawLength(v);
 	}
@@ -406,7 +385,10 @@ public class GBAPU {
 	 * @param v content of NR12 register 
 	 */
 	public void setNR12(byte v) {
-		 if (!m_soundEnable) { return; }
+		if (TRACE) {
+			System.out.println("NR12="+Instruction.toHexByte(v));
+		}
+		if (!m_soundEnable) { return; }
 		setNRX2(m_voice1, v);	
 	}
 	
@@ -453,6 +435,7 @@ public class GBAPU {
 		int envelopeSweep = v & 0x07;
 		boolean increase = BitUtils.isSet(v, 3);
 		int initialEnvelopeVolume = (v >> 4) & 0x0F; // 0 = No sound
+		voice.getDAC().setEnabled((v & 0b11111000) != 0);
 		
 		// Note : 
 		// By Setting the envelope register only nothing will be reflected in the output.
@@ -622,6 +605,9 @@ public class GBAPU {
 	 * @param v content of NR14 register 
 	 */ 
 	public void setNR14(byte v) {
+		if (TRACE) {
+			System.out.println("NR14="+Instruction.toHexByte(v));
+		}
 		if (!m_soundEnable) { return; }
 		setNRX4(m_voice1, v);
 	}

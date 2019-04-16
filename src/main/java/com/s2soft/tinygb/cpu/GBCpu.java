@@ -300,11 +300,7 @@ public class GBCpu {
 		processInterrupts();
 		
 //		startTrace = /*!m_memory.isBootROMLock() &&*/ (
-//				(getPC() <= 0x000A) ||
-//				(getPC() >= 0xC317 && getPC() <= 0xC321) ||
-//				(getPC() == 0xC32F) ||
-//				(getPC() >= 0xC33D && getPC() <= 0xC33F) ||
-//				(getPC() >= 0xC34E && getPC() <= 0xC352));
+//				(getPC() >= 0xC203 && getPC() <= 0xC225));
 //		startTrace = true;
 		
 //		if (getPC() == 0x0028) {
@@ -393,7 +389,6 @@ public class GBCpu {
 			}
 			disassembledLine += " Cycles=" + m_cyclesCount;
 			System.out.println(disassembledLine);
-			Thread.yield();
 		}
 		
 		setPC(getPC() + 1);
@@ -409,9 +404,6 @@ public class GBCpu {
 		try {
 			executionCycles = instruction.execute(opcode, this, additionalBytes);
 			m_cyclesCount += executionCycles;
-			if (instruction instanceof InstrRETI) {
-				Thread.yield();
-			}
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();

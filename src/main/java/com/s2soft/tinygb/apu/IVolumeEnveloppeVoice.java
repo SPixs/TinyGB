@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.apu;
 
-public interface IVolumeEnveloppeVoice {
+public interface IVolumeEnveloppeVoice extends IVoice {
 	
 	void setEnvelopeIncrease(boolean increase);
 	boolean isEnvelopeIncrease();
@@ -10,6 +10,6 @@ public interface IVolumeEnveloppeVoice {
 
 	void setEnvelopeSweep(int envelopeSweep);
 	int getEnvelopeSweep();
-
+	
 }
 

@@ -44,24 +44,19 @@ public final class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 
 	private int[] PRESCALER_VALUES = new int[] { 8, 16, 32, 48, 64, 80, 96, 112 };
 
-	private LengthCounter m_lengthCounter;
-
 	//	 =========================== Constructor =============================
 
 	public Voice4() {
 		m_envelope = new VolumeEnveloppe();
 		getFrameSequencer().setVolumeEnvelope(m_envelope);
 		m_counter = 0;
-		
-		m_lengthCounter = new LengthCounter(this, 64);
-		getFrameSequencer().setLengthCounter(m_lengthCounter);
 	}
 	
 	//	 ========================== Access methods ===========================
 
 	@Override
 	public boolean isPlaying() {
-		return isEnabled();
+		return isEnabled();// && m_envelope.getVolume() != 0; 
 	}
 	
 	//	 ========================= Treatment methods =========================
@@ -70,7 +65,7 @@ public final class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 	public final void stepImpl() {
 		if (m_counter-- == 0) {
 			m_counter = PRESCALER_VALUES[getDividingRatio()] * (1 << getShiftClockFrequency()) - 1; // reset value of polynomial counter's clock
-			byte value = (byte) (clockLFSR() ? 1 : -1);
+			byte value = (byte) (clockLFSR() ? 0 : 1);
 			setOutputValue(value * getEnvelopeValue()); 
 		}
 	}

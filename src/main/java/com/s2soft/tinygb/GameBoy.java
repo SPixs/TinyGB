@@ -1,10 +1,13 @@
 package com.s2soft.tinygb;
 
+import java.util.TreeSet;
+
 import com.s2soft.tinygb.apu.GBAPU;
 import com.s2soft.tinygb.audio.IAudioDevice;
 import com.s2soft.tinygb.control.IJoypad;
 import com.s2soft.tinygb.control.JoypadHandler;
 import com.s2soft.tinygb.cpu.GBCpu;
+import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.display.IDisplay;
 import com.s2soft.tinygb.dma.DMA;
 import com.s2soft.tinygb.gpu.GBGPU;
@@ -92,7 +95,7 @@ public class GameBoy {
 	
 	private void setEmulationSyncShift(long shift) {
 		if (shift < 0 && shift != m_emulationSyncShift) {
-			System.out.println("Warning : emulation too SLOW " + shift + "ms");
+//			System.out.println("Warning : emulation too SLOW " + shift + "ms");
 		}
 		m_emulationSyncShift = shift;
 	}
@@ -125,6 +128,8 @@ public class GameBoy {
 
 	public void start() {
 		
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		
 		// CPU is running at 4.194304Mhz (Clock cycles) or 1.048576Mhz (Machine cycles) 
 		// Cpu and instruction speed are described in machine cycles
 		long machineClock = 4194304;
@@ -139,7 +144,7 @@ public class GameBoy {
 			// CPU is running at 4.194304Mhz but instructions take a multiple of 4 to be executed.
 			// Hence, the CPU behaves as clocked at 1.048576Mhz
 			cpuClockCount += m_cpu.step();
-
+			
 			while(m_clockCount < cpuClockCount) {
 				m_gpu.step();
 				m_timers.step();
@@ -147,7 +152,7 @@ public class GameBoy {
 				m_apu.step();
 				
 				// Ensure emulation is synchronized with real time
-				if (m_clockCount % 500 == 0 || m_emulationSyncShift < 0) {
+				if (m_clockCount % 10 == 0 || m_emulationSyncShift < 0) {
 					long elapsed = System.currentTimeMillis() - runStartTimer;
 					
 					// Clock speed on DMG GB is 4.19430Mhz

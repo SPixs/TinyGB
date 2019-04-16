@@ -1,6 +1,6 @@
-package com.s2soft.tinygb;
+package com.s2soft.tinygb.audio;
 
-public class DefaultConfiguration implements IConfiguration {
+public class NullAudioDevice implements IAudioDevice {
 
 	//   ============================ Constants ==============================
 
@@ -13,8 +13,15 @@ public class DefaultConfiguration implements IConfiguration {
 	//	 ========================= Treatment methods =========================
 
 	@Override
-	public boolean useBootRom() {
-		return false;
+	public void start() throws Exception {
+	}
+
+	@Override
+	public void stop() {
+	}
+
+	@Override
+	public void putSample(double leftSample, double rightSample) {
 	}
 }
 

@@ -9,7 +9,9 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.s2soft.tinygb.audio.AudioDevice;
+import com.s2soft.tinygb.audio.NullAudioDevice;
 import com.s2soft.tinygb.display.BufferedLCDDisplay;
+import com.s2soft.tinygb.display.NullDisplay;
 
 public class Main {
 
@@ -26,18 +28,20 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 //		LCDDisplay lcdDisplay = new LCDDisplay();
 		BufferedLCDDisplay lcdDisplay = new BufferedLCDDisplay();
-		AudioDevice audioDevice = new AudioDevice(44100);
+		AudioDevice audioDevice = new AudioDevice(44100, 16);
 		SwingJoypad joypad = new SwingJoypad();
 		IConfiguration configuration = new DefaultConfiguration();
+		
 		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, audioDevice, joypad);
 		
 		Cartidge cartidge = new Cartidge();
-		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
 
 //		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb")); // OK
 //		cartidge.read(new FileInputStream("testROM/Blargg/instr_timing/instr_timing.gb")); // OK
 
-		//		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/01-registers.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/01-registers.gb")); // OK
+		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/rom_singles/02-len ctr.gb")); 
 		
 //		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/01-special.gb"));
 //		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/individual/02-interrupts.gb")); // OK

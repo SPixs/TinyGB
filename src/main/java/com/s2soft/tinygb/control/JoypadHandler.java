@@ -1,5 +1,6 @@
 package com.s2soft.tinygb.control;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,12 +31,8 @@ public class JoypadHandler implements IJoypadButtonListener {
 		for (JoypadButton pressedButton : m_pressedButton) {
 			if ((pressedButton.getJ() &  m_matrixColumnSelection) == 0) {
 				result &= ~pressedButton.getI();
-				Thread.yield();
 			}
 		}
-//		if (!m_pressedButton.isEmpty()) {
-//			System.out.println(Instruction.toHexByte(result) + " " + Integer.toBinaryString(result & 0x0FF) + " " + m_pressedButton.iterator().next());
-//		}
 		return result;
 	}
 

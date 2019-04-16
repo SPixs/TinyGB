@@ -3,9 +3,11 @@ package com.s2soft.tinygb.cpu;
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.IConfiguration;
 import com.s2soft.tinygb.audio.IAudioDevice;
+import com.s2soft.tinygb.audio.NullAudioDevice;
 import com.s2soft.tinygb.control.IJoypad;
 import com.s2soft.tinygb.control.IJoypadButtonListener;
 import com.s2soft.tinygb.display.IDisplay;
+import com.s2soft.tinygb.display.NullDisplay;
 
 import junit.framework.TestCase;
 
@@ -221,31 +223,11 @@ public class TestInstructionLength extends TestCase {
 	}
 
 	private IAudioDevice getNullAudioDevice() {
-		return new IAudioDevice() {
-			
-			@Override
-			public void stop() {}
-			
-			@Override
-			public void start() throws Exception {}
-			
-			@Override
-			public void putSample(byte leftSample, byte rightSample) {}
-		};
+		return new NullAudioDevice();
 	}
 
 	private IDisplay getNullDisplay() {
-		return new IDisplay() {
-			
-			@Override
-			public void setEnable(boolean enabled) {}
-			
-			@Override
-			public void refresh() {}
-			
-			@Override
-			public void putPixel(byte pixel) {}
-		};
+		return new NullDisplay();
 	}
 
 	private IConfiguration getNullConfiguration() {

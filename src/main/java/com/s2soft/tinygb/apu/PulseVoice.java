@@ -26,16 +26,11 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 
 	private VolumeEnveloppe m_envelope;
 	
-	private LengthCounter m_lengthCounter;
-	
 	//	 =========================== Constructor =============================
 	
 	public PulseVoice() {
 		m_envelope = new VolumeEnveloppe();
 		getFrameSequencer().setVolumeEnvelope(m_envelope);
-		
-		m_lengthCounter = new LengthCounter(this, 64);
-		getFrameSequencer().setLengthCounter(m_lengthCounter);
 	}
 
 	//	 ========================== Access methods ===========================
@@ -82,7 +77,7 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 	
 	@Override
 	public boolean isPlaying() {
-		return isEnabled();
+		return isEnabled();// && m_envelope.getVolume() != 0;
 	}
 
 	@Override
@@ -94,7 +89,7 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 			// A duty cycle step is 4 * (2048 - m_rawFrequency) machine cycles (8 steps in a full cycle)
 			// Four kind of duty cycles are available, each waveform taking 8 frequency timer clocks to cycle through
 			m_counter = 4 * (2048 - getRawFrequency()) - 1;
-			int oscillatorValue = BitUtils.isSet(m_dutyCycles[getRawDuty()], 7-m_dutyPosition) ? 1 : -1;
+			int oscillatorValue = BitUtils.isSet(m_dutyCycles[getRawDuty()], 7-m_dutyPosition) ? 1 : 0;
 			m_dutyPosition = (m_dutyPosition + 1) % 8; // progress into duty cycle
 			
 			setOutputValue(oscillatorValue * getEnvelopeValue());

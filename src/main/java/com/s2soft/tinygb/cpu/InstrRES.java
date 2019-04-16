@@ -8,6 +8,17 @@ public class InstrRES extends Instruction {
 	//   ============================ Constants ==============================
 
 	//	 =========================== Attributes ==============================
+	
+	private IAddressingMode[] m_allModes = new IAddressingMode[] {
+			RegisterAddressingMode.B,
+			RegisterAddressingMode.C,
+			RegisterAddressingMode.D,
+			RegisterAddressingMode.E,
+			RegisterAddressingMode.H,
+			RegisterAddressingMode.L,
+			IndirectAddressMode.HL,
+			RegisterAddressingMode.A
+	};
 
 	//	 =========================== Constructor =============================
 
@@ -32,19 +43,8 @@ public class InstrRES extends Instruction {
 	}
 	
 	private IAddressingMode getAddressingMode(byte opcode) {
-		IAddressingMode[] allModes = new IAddressingMode[] {
-				RegisterAddressingMode.B,
-				RegisterAddressingMode.C,
-				RegisterAddressingMode.D,
-				RegisterAddressingMode.E,
-				RegisterAddressingMode.H,
-				RegisterAddressingMode.L,
-				IndirectAddressMode.HL,
-				RegisterAddressingMode.A
-		};
-		
 		int lowerNibble = (opcode & 0x0F);
-		return allModes[lowerNibble & 0x07];
+		return m_allModes[lowerNibble & 0x07];
 	}
 
 	@Override

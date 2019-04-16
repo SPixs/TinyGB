@@ -55,12 +55,12 @@ public class Mixer implements ISoundProvider {
 	}
 	
 	@Override
-	public int getValue() {
-		int result = 0;
+	public double getValue() {
+		float result = 0;
 		for (int i=0;i<m_inputs.size();i++) {
 			result += m_inputs.get(i).getValue();
 		}
-		result *= (m_volume + 1);
+		result = (result * (m_volume + 1)) / (8 * m_inputs.size());
 		return result;
 	}
 }
