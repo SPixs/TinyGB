@@ -91,7 +91,7 @@ public class FrameSequencer {
 		if (GBAPU.TRACE) {
 			System.out.println(m_voice.getName() + " trigger");
 		}
-		m_lengthCounter.trigger();
+//		m_lengthCounter.trigger();
 		if (m_volumeEnvelope != null) {
 			m_volumeEnvelope.init();
 		}

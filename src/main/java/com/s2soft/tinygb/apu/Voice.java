@@ -63,8 +63,8 @@ public abstract class Voice implements IVoice {
 //		m_lengthCounter.reload();
 	}
 	
-	public void setLengthEnabled(boolean state) {
-		m_lengthCounter.setEnabled(state);
+	public void setLengthEnabled(boolean state, boolean trigger) {
+		m_lengthCounter.setEnabled(state, trigger);
 //		m_lengthEnabled = state;
 		if (GBAPU.TRACE && TRACE) {
 			System.out.println(getName()+". Length enabled = " + state);

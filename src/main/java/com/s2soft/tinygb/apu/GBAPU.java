@@ -654,7 +654,7 @@ public class GBAPU {
 	 */ 
 	public void setNR44(byte v) {
 		if (!m_soundEnable) { return; }
-		m_voice4.setLengthEnabled(BitUtils.isSet(v, 6));
+		m_voice4.setLengthEnabled(BitUtils.isSet(v, 6), BitUtils.isSet(v, 7));
 		if (BitUtils.isSet(v, 7)) {
 			m_voice4.setEnabled(true);
 			m_voice4.trigger();
@@ -666,7 +666,7 @@ public class GBAPU {
 		int frequency = voice.getRawFrequency() & 0x0FF;
 		frequency |= (v & 0x07) << 8;
 		voice.setRawFrequency(frequency);
-		voice.setLengthEnabled(BitUtils.isSet(v, 6));
+		voice.setLengthEnabled(BitUtils.isSet(v, 6), BitUtils.isSet(v, 7));
 		if (BitUtils.isSet(v, 7)) {
 			voice.setEnabled(true);
 			voice.trigger();
