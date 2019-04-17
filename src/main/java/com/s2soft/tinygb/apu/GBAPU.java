@@ -9,7 +9,7 @@ public class GBAPU {
 
 	//   ============================ Constants ==============================
 
-	public final static boolean TRACE = false;
+	public final static boolean TRACE = true;
 
 	//	 =========================== Attributes ==============================
 
@@ -175,9 +175,11 @@ public class GBAPU {
 			System.out.println("Turning sound : " + (soundEnable ? "ON" : "OFF"));
 		}
 		if (wasEnabled && !soundEnable) {
-			m_gameBoy.getAudioDevice().stop();
 			// destroys the contents of all sound registers
-			reset();
+			stopSound();
+		}
+		else if (!wasEnabled && soundEnable) {
+			startSound();
 		}
 		m_soundEnable = soundEnable;
 	}
@@ -655,7 +657,7 @@ public class GBAPU {
 		m_voice4.setLengthEnabled(BitUtils.isSet(v, 6));
 		if (BitUtils.isSet(v, 7)) {
 			m_voice4.setEnabled(true);
-			m_voice4.init();
+			m_voice4.trigger();
 		}
 	}
 	
@@ -667,7 +669,7 @@ public class GBAPU {
 		voice.setLengthEnabled(BitUtils.isSet(v, 6));
 		if (BitUtils.isSet(v, 7)) {
 			voice.setEnabled(true);
-			voice.init();
+			voice.trigger();
 		}
 	}
 
@@ -715,8 +717,19 @@ public class GBAPU {
 	public byte getWAVData(int index) {
 		return m_voice3.getWAVData(index);
 	}
+	
+	private void startSound() {
+		try { m_gameBoy.getAudioDevice().start(); }
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		for (Voice voice : m_voices) {
+			voice.start();
+		}
+	}
 
-	public void reset() {
+	public void stopSound() {
+		m_gameBoy.getAudioDevice().stop();
 		m_leftMixer.setVolume(0);
 		m_rightMixer.setVolume(0);
 		for (Switch voiceSwitch : m_switch) {

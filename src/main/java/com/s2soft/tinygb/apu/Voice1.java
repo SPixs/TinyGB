@@ -53,8 +53,8 @@ public final class Voice1 extends PulseVoice {
 	//	 ========================= Treatment methods =========================
 
 	@Override
-	public void init() {
-		super.init();
+	public void trigger() {
+		super.trigger();
 		m_frequencySweep.init();
 	}
 	

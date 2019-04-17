@@ -66,13 +66,13 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 		}
 	}
 
-	public void init() {
+	public void trigger() {
 		float frequency = 4194304.0f / (4 * 8 * (2048 - getRawFrequency()));
 		if (GBAPU.TRACE && TRACE) {
 			System.out.println(getName()+". Init. Frequency = " + frequency);
 		}
 		m_counter = 0; // the duty cycle starts immediately 
-		getFrameSequencer().init();
+		getFrameSequencer().trigger();
 	}
 	
 	@Override

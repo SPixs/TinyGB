@@ -84,8 +84,8 @@ public final class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 		return !BitUtils.isSet(m_lfsr, 0);
 	}
 	
-	public void init() {
-		getFrameSequencer().init();
+	public void trigger() {
+		getFrameSequencer().trigger();
 		m_lfsr = 0x7FFF;
 		m_counter = 0;
 	}

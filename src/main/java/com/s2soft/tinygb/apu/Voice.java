@@ -17,7 +17,7 @@ public abstract class Voice implements IVoice {
 	
 	private int m_value;
 	
-	private boolean m_lengthEnabled;
+//	private boolean m_lengthEnabled;
 
 	private int m_rawFrequency;
 	
@@ -64,14 +64,15 @@ public abstract class Voice implements IVoice {
 	}
 	
 	public void setLengthEnabled(boolean state) {
-		m_lengthEnabled = state;
+		m_lengthCounter.setEnabled(state);
+//		m_lengthEnabled = state;
 		if (GBAPU.TRACE && TRACE) {
 			System.out.println(getName()+". Length enabled = " + state);
 		}
 	}
 
 	public boolean isLengthEnabled() {
-		return m_lengthEnabled;
+		return m_lengthCounter.isEnabled();//m_lengthEnabled;
 	}
 
 	public int getRawFrequency() {
@@ -126,8 +127,10 @@ public abstract class Voice implements IVoice {
 
 	protected abstract String getName();
 
-	public abstract void init();
-	
-	
+	public abstract void trigger();
+
+	public void start() {
+		m_frameSequencer.reset();
+	}
 }
 

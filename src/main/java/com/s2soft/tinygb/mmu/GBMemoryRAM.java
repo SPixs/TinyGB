@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.mmu;
 
+import com.s2soft.tinygb.cpu.Instruction;
+
 public final class GBMemoryRAM implements IAddressable {
 
 	//   ============================ Constants ==============================
@@ -20,6 +22,10 @@ public final class GBMemoryRAM implements IAddressable {
 
 	public void setByte(int address, byte b) {
 		m_memory[address] = b;
+		if (address == 0xD880) {
+			System.out.println(">>> BLARGG test n° " + Instruction.toHexByte(b));
+		}
+
 //		if (address == 0xFFE1) {
 //			System.out.println(">>> Tetris set machine state : " + Instruction.toHexByte(b));
 //		}

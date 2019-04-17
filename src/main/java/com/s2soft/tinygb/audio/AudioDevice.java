@@ -75,8 +75,10 @@ public class AudioDevice implements IAudioDevice {
 	
 	@Override
 	public void stop() {
-		m_auline.flush();
-		m_auline.close();
+		if (m_auline != null) {
+			m_auline.flush();
+			m_auline.close();
+		}
 	}
 
 	public byte[] getSample(double normalizedValue) {

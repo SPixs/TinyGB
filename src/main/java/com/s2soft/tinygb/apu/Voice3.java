@@ -74,8 +74,8 @@ public final class Voice3 extends Voice {
 		}
 	}
 	
-	public void init() {
-		getFrameSequencer().init();
+	public void trigger() {
+		getFrameSequencer().trigger();
 		m_counter = 0; // the sampling replay starts immediately
 		m_samplePosition = 0;
 	}

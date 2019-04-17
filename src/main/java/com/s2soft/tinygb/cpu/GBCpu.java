@@ -332,6 +332,10 @@ public class GBCpu {
 		
 //		startTrace = (getPC() == 0xDEFA /*|| getPC() == 0xDEF8*/) && (getMemory().getByte(0xDEF8) == (byte)0xDE);
 		
+		if (getPC() == 0xC20D) {
+			System.out.println("BLARGG. Execute SHOULD_BE_ALMOST_OFF");
+		}
+		
 		// Check for interrupt
 		if (isInterruptEnabled() && getMemory().isInterruptRequested()) {
 			// keep interrupts that are not masked

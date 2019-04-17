@@ -60,7 +60,6 @@ public class FrameSequencer {
 
 	public void step() {
 		if (m_counter-- == 0) {
-			
 			int sequenceStep = (m_sequenceStep++) % 8;
 			if (sequenceStep == 2 || sequenceStep == 6) { stepSweep(); }
 			if (sequenceStep % 2 == 0) { stepLength(); }
@@ -87,15 +86,27 @@ public class FrameSequencer {
 		}
 	}
 
-	public void init() {
-		m_counter = (4194304 / 512) - 1;//0;
-		m_lengthCounter.init();
+	public void trigger() {
+//		m_counter = (4194304 / 512) - 1;//0;
+		if (GBAPU.TRACE) {
+			System.out.println(m_voice.getName() + " trigger");
+		}
+		m_lengthCounter.trigger();
 		if (m_volumeEnvelope != null) {
 			m_volumeEnvelope.init();
 		}
 		if (m_frequencySweep != null) {
 			m_frequencySweep.init();
 		}
+	}
+
+	public boolean isLengthCounterInFirstHalf() {
+		// TODO Auto-generated method stub
+		return m_sequenceStep % 2 == 0;
+	}
+
+	public void reset() {
+		m_counter = (4194304 / 512) - 1;//0;
 	}
 }
 

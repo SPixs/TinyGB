@@ -115,7 +115,7 @@ public class GameBoy {
 		m_clockCount = 0;
 		m_cpu.reset();
 		m_gpu.reset();
-		m_apu.reset();
+		m_apu.stopSound();
 		
 		if (!m_configuration.useBootRom()) {
 			m_memory.setBootROMLock(false);
