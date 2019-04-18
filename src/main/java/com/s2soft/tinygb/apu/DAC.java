@@ -25,7 +25,9 @@ public class DAC implements ISoundProvider {
 			m_voice.setEnabled(false);
 		}
 		m_enabled = enabled;
-		System.out.println(m_voice.getName() + ". DAC enabled = " + m_enabled);
+		if (GBAPU.TRACE) {
+			System.out.println(m_voice.getName() + ". DAC enabled = " + m_enabled);
+		}
 	}
 
 	public boolean isEnabled() {

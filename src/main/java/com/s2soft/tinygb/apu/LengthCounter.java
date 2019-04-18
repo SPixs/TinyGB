@@ -71,7 +71,9 @@ public class LengthCounter {
 
 	public void setEnabled(boolean enable, boolean trigger) {
 
-		System.out.println(m_voice.getName() + " Writing to length counter : enabled = " + enable + ", trigger = " + trigger + ", current length counter = " + m_counter);
+		if (GBAPU.TRACE) {
+			System.out.println(m_voice.getName() + " Writing to length counter : enabled = " + enable + ", trigger = " + trigger + ", current length counter = " + m_counter);
+		}
 
 		boolean nextSequencerStepDoesNotClock = !m_voice.getFrameSequencer().isLengthCounterInFirstHalf();
 		
@@ -83,8 +85,10 @@ public class LengthCounter {
 			if (!m_enabled && enable) {
 				if (m_counter > 0) {
 					m_counter--;
-					System.out.println(m_voice.getName() + " Extra length clocking occurs while enabling length, causing counter = " + m_counter);
-
+					if (GBAPU.TRACE) {
+						System.out.println(m_voice.getName() + " Extra length clocking occurs while enabling length, causing counter = " + m_counter);
+					}
+					
 					// If this decrement makes it zero and trigger is clear, the channel is disabled
 					if (m_counter == 0 && !trigger) {
 						m_voice.setEnabled(false);
