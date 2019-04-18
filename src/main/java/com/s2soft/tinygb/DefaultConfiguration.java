@@ -14,7 +14,7 @@ public class DefaultConfiguration implements IConfiguration {
 
 	@Override
 	public boolean useBootRom() {
-		return false;
+		return true;
 	}
 }
 

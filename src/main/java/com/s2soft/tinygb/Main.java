@@ -36,7 +36,12 @@ public class Main {
 		
 		Cartidge cartidge = new Cartidge();
 		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
-
+		
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Alleyway (W) [!].gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Artic Zone (Sachen 4-in-1 Vol. 5) (Unl) [!].gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Tasmania Story (U) [!].gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Bomb Jack (U).gb"));
+		
 //		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb")); // OK
 //		cartidge.read(new FileInputStream("testROM/Blargg/instr_timing/instr_timing.gb")); // OK
 
