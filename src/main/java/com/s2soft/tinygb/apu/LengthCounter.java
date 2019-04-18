@@ -38,20 +38,25 @@ public class LengthCounter {
 	public void step() {
 //		System.out.println(m_voice.getName() + " Length Step, counter = " + m_counter);
 		if (m_enabled) {
-			int old = m_counter;
+//			int old = m_counter;
 			m_counter = (m_counter - 1) & (m_maxLength - 1); 
-			if (m_voice.getName().contains("1"))
-				System.out.println(old + " >> " +m_counter);
+//			if (m_voice.getName().contains("1"))
+//				System.out.println(old + " >> " +m_counter);
+			
+			// A length counter disables a channel when it decrements to zero.
 			if (m_counter == 0) {
-				if (!m_voice.isLengthEnabled()) {
-				}
-				else {
+				if (m_voice.isLengthEnabled()) {
 					m_voice.setEnabled(false);
 				}
 			}
 		}
 	}
 
+	/**
+	 * The counter can be reloaded at any time.
+	 * 
+	 * @param length
+	 */
 	public void setValue(int length) {
 		m_counter = m_maxLength - length;
 		if (GBAPU.TRACE) {
@@ -59,33 +64,48 @@ public class LengthCounter {
 			System.out.println(m_voice.getName()+". Set length = " + length +", " + lengthInSeconds + "s, counter = " + m_counter);
 		}
 	}
+	
+	public int getValue() {
+		return m_maxLength - m_counter;
+	}
 
 	public void setEnabled(boolean enable, boolean trigger) {
 
-		if (trigger && m_counter == 0 && !m_enabled && !enable) {
-			m_counter = m_maxLength; 
-			return;
-		}
+		System.out.println(m_voice.getName() + " Writing to length counter : enabled = " + enable + ", trigger = " + trigger + ", current length counter = " + m_counter);
+
+		boolean nextSequencerStepDoesNotClock = !m_voice.getFrameSequencer().isLengthCounterInFirstHalf();
 		
-		// TODO : implement ->
-		// If a channel is triggered when the frame sequencer's next step is one that doesn't clock the length counter 
-		// and the length counter is now enabled and length is being set to 64 (256 for wave channel) because it was 
-		// previously zero, it is set to 63 instead (255 for wave channel).
-		
-		
-		// Extra length clocking occurs when writing to NRx4 when the frame sequencer's next step 
+		// Extra length clocking occurs when writing to NRx4 when the frame sequencer's next step
 		// is one that doesn't clock the length counter. 
-		// In this case, if the length counter was PREVIOUSLY disabled and now enabled and the length 
-		// counter is not zero, it is decremented.
-		boolean lengthCounterInFirstHalf = !m_voice.getFrameSequencer().isLengthCounterInFirstHalf();
-		if (lengthCounterInFirstHalf &&  !m_enabled && enable && m_counter > 0) {
-			m_counter = (m_counter - 1) & (m_maxLength - 1); 
-			System.out.println(m_voice.getName() + " Extra length clocking occurs while enabling length, causing counter = " + m_counter);
-			if (m_counter == 0 && !trigger) {
-				m_voice.setEnabled(false);
-				System.out.println(m_voice.getName() + " Extra length clocking led to disabling voice");
+		if (nextSequencerStepDoesNotClock) {
+			
+			// In this case, if the length counter was PREVIOUSLY disabled and now enabled and the length counter is not zero, it is decremented.
+			if (!m_enabled && enable) {
+				if (m_counter > 0) {
+					m_counter--;
+					System.out.println(m_voice.getName() + " Extra length clocking occurs while enabling length, causing counter = " + m_counter);
+
+					// If this decrement makes it zero and trigger is clear, the channel is disabled
+					if (m_counter == 0 && !trigger) {
+						m_voice.setEnabled(false);
+						System.out.println(m_voice.getName() + " Extra length clocking led to disabling voice");
+					}
+				}		
 			}
+			
+			// If a channel is triggered  and the length counter is now enabled and 
+			// length is being set to 64 (256 for wave channel) because it was 
+			// previously zero, it is set to 63 instead (255 for wave channel).
+			if (trigger && m_counter == 0) {
+				m_counter = m_maxLength;
+				if (enable) { m_counter--; }
+			}
+			
+			m_enabled = enable;
+			return;
+
 		}
+		
 		m_enabled = enable;
 	}
 

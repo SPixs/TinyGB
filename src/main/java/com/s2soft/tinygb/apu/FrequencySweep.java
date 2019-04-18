@@ -34,6 +34,12 @@ public class FrequencySweep {
 	private int m_counter = 0;
 
 	private boolean m_overflow;
+	
+	private byte m_sweepTime;
+	private boolean m_increase;
+	private byte m_sweepShift;
+
+	private boolean m_hasPerformedOneNegate;
 
 	//	 =========================== Constructor =============================
 
@@ -44,15 +50,48 @@ public class FrequencySweep {
 
 	//	 ========================== Access methods ===========================
 
+	public void setSweepShift(byte sweepShift) {
+		m_sweepShift = sweepShift;
+	}
+
+	public void setSweepIncrease(boolean increase) {
+		m_increase = increase;
+		
+		// Clearing the sweep negate mode bit in NR10 after at least one sweep calculation has 
+		// been made using the negate mode since the last trigger causes the channel to be immediately disabled. 
+		// This prevents you from having the sweep lower the frequency then raise the frequency without a trigger inbetween.
+		if (increase && m_hasPerformedOneNegate) {
+			m_voice.setEnabled(false);
+		}
+	}
+
+	public void setSweepTime(byte sweepTime) {
+		m_sweepTime = sweepTime;
+	}
+
+	public byte getSweepTime() {
+		return m_sweepTime;
+	}
+
+	public int getSweepShift() {
+		return m_sweepShift;
+	}
+
+	public boolean isSweepIncrease() {
+		return m_increase;
+	}
+
 	//	 ========================= Treatment methods =========================
 
 	public void step() {
-		if (m_enabled) {
-			if (m_counter == 0) {
-				m_voice.setRawFrequency(m_shadowFrequency);
-				return;
-			}
-			if (--m_counter == 0) {
+		
+		if (!m_enabled) return;
+
+		// When sweep timer generates a clock and the sweep's internal enabled flag is set and the sweep period is not zero, 
+		// a new frequency is calculated and the overflow check is performed. 
+		if (--m_counter == 0) {
+			m_counter = m_voice.getSweepTime() == 0 ? 8 : m_voice.getSweepTime();
+			if (m_voice.getSweepTime() != 0) {
 				// Compute new frequency
 				int newFrequency = computeNextFrequency();
 				if (newFrequency < 0) {
@@ -62,8 +101,7 @@ public class FrequencySweep {
 					m_shadowFrequency = newFrequency;
 				}
 				m_voice.setRawFrequency(m_shadowFrequency);
-				
-				m_counter = m_voice.getSweepTime();
+				computeNextFrequency();
 			}
 		}
 	}
@@ -76,6 +114,7 @@ public class FrequencySweep {
 	private int computeNextFrequency() {
 		int newFrequency = m_shadowFrequency + ((m_shadowFrequency >> m_voice.getSweepShift()) *
 				(m_voice.isSweepIncrease() ? 1 : -1));
+		if (!m_increase) m_hasPerformedOneNegate = true;
 		if (newFrequency > 2047) {
 			m_overflow = true;
 			m_enabled = false;
@@ -92,13 +131,16 @@ public class FrequencySweep {
 	 * The internal enabled flag is set if either the sweep period or shift are non-zero, cleared otherwise.
 	 * If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
 	 */
-	public void init() {
+	public void trigger() {
 		m_shadowFrequency = m_voice.getRawFrequency();
-		m_counter = m_voice.getSweepTime();
+		// The volume envelope and sweep timers treat a period of 0 as 8.
+		m_counter = m_voice.getSweepTime() == 0 ? 8 : m_voice.getSweepTime();
 		m_enabled  = m_voice.getSweepTime() != 0 || m_voice.getSweepShift() != 0;
 		m_overflow = false;
-		if (m_enabled && m_voice.getSweepShift() != 0) {
-//			computeNextFrequency(); // @TODO This  cause issue with Tetris (piece rotate sound is not performed) ...
+		m_hasPerformedOneNegate = false;
+		// If the sweep shift is non-zero, frequency calculation and the overflow check are performed immediately.
+		if (m_voice.getSweepShift() != 0) {
+			computeNextFrequency();
 		}
 	}
 }

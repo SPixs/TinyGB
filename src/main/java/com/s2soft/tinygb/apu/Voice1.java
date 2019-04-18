@@ -8,10 +8,6 @@ public final class Voice1 extends PulseVoice {
 
 	private FrequencySweep m_frequencySweep;
 	
-	private byte m_sweepTime;
-	private boolean m_increase;
-	private byte m_sweepShift;
-
 	//	 =========================== Constructor =============================
 
 	public Voice1() {
@@ -27,27 +23,27 @@ public final class Voice1 extends PulseVoice {
 	}
 
 	public void setSweepShift(byte sweepShift) {
-		m_sweepShift = sweepShift;
+		m_frequencySweep.setSweepShift(sweepShift);
 	}
 
 	public void setSweepIncrease(boolean increase) {
-		m_increase = increase;
+		m_frequencySweep.setSweepIncrease(increase);
 	}
 
 	public void setSweepTime(byte sweepTime) {
-		m_sweepTime = sweepTime;
+		m_frequencySweep.setSweepTime(sweepTime);
 	}
 
 	public byte getSweepTime() {
-		return m_sweepTime;
+		return m_frequencySweep.getSweepTime();
 	}
 
 	public int getSweepShift() {
-		return m_sweepShift;
+		return m_frequencySweep.getSweepShift();
 	}
 
 	public boolean isSweepIncrease() {
-		return m_increase;
+		return m_frequencySweep.isSweepIncrease();
 	}
 	
 	//	 ========================= Treatment methods =========================
@@ -55,8 +51,7 @@ public final class Voice1 extends PulseVoice {
 	@Override
 	public void trigger() {
 		super.trigger();
-		m_frequencySweep.init();
+//		m_frequencySweep.init();
 	}
-	
 }
 

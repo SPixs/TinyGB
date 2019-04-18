@@ -63,6 +63,10 @@ public abstract class Voice implements IVoice {
 //		m_lengthCounter.reload();
 	}
 	
+	public int getRawLength() {
+		return m_lengthCounter.getValue();
+	}
+	
 	public void setLengthEnabled(boolean state, boolean trigger) {
 		m_lengthCounter.setEnabled(state, trigger);
 //		m_lengthEnabled = state;
@@ -107,7 +111,7 @@ public abstract class Voice implements IVoice {
 		return m_enabled ? m_value : 0;
 	}
 	
-	public abstract boolean isPlaying();
+//	public abstract boolean isPlaying();
 
 //	public float getLengthInSeconds() {
 //		return m_lengthInSeconds;

@@ -75,15 +75,15 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 		getFrameSequencer().trigger();
 	}
 	
-	@Override
-	public boolean isPlaying() {
-		return isEnabled();// && m_envelope.getVolume() != 0;
-	}
+//	@Override
+//	public boolean isPlaying() {
+//		return isEnabled();// && m_envelope.getVolume() != 0;
+//	}
 
 	@Override
 	public final void stepImpl() {
 
-		if (m_counter-- == 0) {
+		if (isEnabled() && m_counter-- == 0) {
 			// A square channel's frequency timer period is set to (2048-frequency)*4. 
 			// A full duty cycle period is 8 * 4 * (2048 - m_rawFrequency) machine cycles
 			// A duty cycle step is 4 * (2048 - m_rawFrequency) machine cycles (8 steps in a full cycle)

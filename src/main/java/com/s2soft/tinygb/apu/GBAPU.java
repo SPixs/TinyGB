@@ -230,7 +230,7 @@ public class GBAPU {
 		boolean increase = BitUtils.isSet(v, 3);
 		byte sweepTime = (byte)((v >> 4) & 0x07);
 		m_voice1.setSweepShift(sweepShift);
-		m_voice1.setSweepIncrease(increase);
+		m_voice1.setSweepIncrease(!increase);
 		m_voice1.setSweepTime(sweepTime);
 	}
 
@@ -238,7 +238,7 @@ public class GBAPU {
 		byte result = (byte) 0b10000000;
 		result |= (m_voice1.getSweepShift() & 0x07);
 		result |= ((m_voice1.getSweepTime() & 0x07) << 4) ;
-		result = BitUtils.setBit(result, 3, m_voice1.isSweepIncrease());
+		result = BitUtils.setBit(result, 3, !m_voice1.isSweepIncrease());
 		return result;
 	}
 	
@@ -255,13 +255,13 @@ public class GBAPU {
 		}
 		if (!m_soundEnable) { return; }
 		boolean playback = BitUtils.isSet(v, 7);
-		m_voice3.setPlayback(playback);
+//		m_voice3.setPlayback(playback);
 		m_voice3.getDAC().setEnabled(playback);
 	}
 	
 	public byte getNR30() {
 		byte result = (byte) 0xFF;
-		result = BitUtils.setBit(result, 7, m_voice3.isPlayback());
+		result = BitUtils.setBit(result, 7, m_voice3.getDAC().isEnabled());
 		return result;
 	}
 
@@ -285,7 +285,9 @@ public class GBAPU {
 			System.out.println("NR11="+Instruction.toHexByte(v));
 		}
 		
-		if (!m_soundEnable) { return; }
+		// Write is allowed even if APU is off (DMG only !)
+//		if (!m_soundEnable) { return; }
+		if (!m_soundEnable) { v &= 0x3F; } // clear square duty
 		setNRX1(m_voice1, v);
 	}
 	
@@ -296,7 +298,9 @@ public class GBAPU {
 	 * @param v
 	 */
 	public void setNR21(byte v) {
-		if (!m_soundEnable) { return; }
+		// Write is allowed even if APU is off (DMG only !)
+//		if (!m_soundEnable) { return; }
+		if (!m_soundEnable) { v &= 0x3F; } // clear square duty
 		setNRX1(m_voice2, v);
 	}
 	
@@ -313,8 +317,9 @@ public class GBAPU {
 		if (TRACE) {
 			System.out.println("NR31="+Instruction.toHexByte(v));
 		}
-		if (!m_soundEnable) { return; }
-		m_voice3.setRawLength(v);
+		// Write is allowed even if APU is off (DMG only !)
+//		if (!m_soundEnable) { return; }
+		m_voice3.setRawLength(v & 0xFF);
 	}
 	
 	/**
@@ -326,7 +331,8 @@ public class GBAPU {
 	 * @param v
 	 */
 	public void setNR41(byte v) {
-		if (!m_soundEnable) { return; }
+		// Write is allowed even if APU is off (DMG only !)
+//		if (!m_soundEnable) { return; }
 		m_voice4.setRawLength(v & 0b00111111);
 	}
 
@@ -739,26 +745,32 @@ public class GBAPU {
 			voice.setEnabled(false);
 		}
 		byte nullValue = 0;
+
 		setNR10(nullValue);
-		setNR11(nullValue);
+		setNR11((byte) (m_voice1.getRawLength() & 0x3F)); // Not reset for DMG
+//		setNR11(nullValue);
 		setNR12(nullValue);
 		setNR13(nullValue);
 		setNR14(nullValue);
-		setNR21(nullValue);
+		setNR21((byte) (m_voice2.getRawLength() & 0x3F)); // Not reset for DMG
+//		setNR21(nullValue);
 		setNR22(nullValue);
 		setNR23(nullValue);
 		setNR24(nullValue);
 		setNR30(nullValue);
-		setNR31(nullValue);
+		setNR31((byte) (m_voice3.getRawLength())); // Not reset for DMG
+//		setNR31(nullValue);
 		setNR32(nullValue);
 		setNR33(nullValue);
 		setNR34(nullValue);
-		setNR41(nullValue);
+		setNR41((byte) (m_voice4.getRawLength() & 0x3F)); // Not reset for DMG
+//		setNR41(nullValue);
 		setNR42(nullValue);
 		setNR43(nullValue);
 		setNR44(nullValue);
 		setNR50(nullValue);
 		setNR51(nullValue);
+		
 		m_soundEnable = false;
 	}
 }

@@ -54,10 +54,10 @@ public final class Voice4 extends Voice implements IVolumeEnveloppeVoice {
 	
 	//	 ========================== Access methods ===========================
 
-	@Override
-	public boolean isPlaying() {
-		return isEnabled();// && m_envelope.getVolume() != 0; 
-	}
+//	@Override
+//	public boolean isPlaying() {
+//		return isEnabled();// && m_envelope.getVolume() != 0; 
+//	}
 	
 	//	 ========================= Treatment methods =========================
 
