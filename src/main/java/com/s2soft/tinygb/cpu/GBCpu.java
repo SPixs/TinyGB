@@ -300,7 +300,7 @@ public class GBCpu {
 		processInterrupts();
 		
 //		startTrace = /*!m_memory.isBootROMLock() &&*/ (
-//				(getPC() >= 0xC203 && getPC() <= 0xC225));
+//				(getPC() >= 0xC1A6 && getPC() <= 0xC1A6));
 //		startTrace = true;
 		
 //		if (getPC() == 0x0028) {
@@ -406,6 +406,9 @@ public class GBCpu {
 		int executionCycles = 0;
 		
 		try {
+			if (startTrace) {
+				Thread.yield();
+			}
 			executionCycles = instruction.execute(opcode, this, additionalBytes);
 			m_cyclesCount += executionCycles;
 		}

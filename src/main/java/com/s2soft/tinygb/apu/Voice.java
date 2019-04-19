@@ -94,9 +94,9 @@ public abstract class Voice implements IVoice {
 	}
 
 	public void setEnabled(boolean enabled) {
-		if (GBAPU.TRACE && TRACE) {
-			System.out.println(getName() + " enabled = " + enabled);
-		}
+//		if (GBAPU.TRACE && TRACE) {
+//			System.out.println(getName() + " enabled = " + enabled);
+//		}
 		m_enabled = enabled;
 	}
 

@@ -120,10 +120,11 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 		
 		do {
 			Graphics2D g2d = (Graphics2D) m_strategy.getDrawGraphics();
+
 			m_pixelIndex = 0;
-			if (m_strategy.contentsLost()) {
+//			while (m_strategy.contentsLost()) {
 				g2d.drawImage(m_gameboyPocketEnclosure, 0, 0, null);
-			}
+//			}
 			g2d.drawImage(m_displayImage, 65, 38, 160 * m_scaleFactor, 144 * m_scaleFactor, null);
 			g2d.drawImage(m_gameboyPocketLCD, 0, 0, null);
 			

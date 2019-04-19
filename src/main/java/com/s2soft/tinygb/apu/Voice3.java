@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.apu;
 
+import com.s2soft.tinygb.cpu.Instruction;
+
 public final class Voice3 extends Voice {
 
 	//   ============================ Constants ==============================
@@ -18,7 +20,9 @@ public final class Voice3 extends Voice {
 	private int m_stepsSinceLastRead = 255;
 	private int m_lastReadIndex;
 
-//	private boolean m_playback;
+	private byte m_lastSamplePairPlayed;
+
+	private boolean m_justTriggered;
 
 	//	 =========================== Constructor =============================
 
@@ -28,14 +32,6 @@ public final class Voice3 extends Voice {
 	}
 	
 	//	 ========================== Access methods ===========================
-
-//	public boolean isPlayback() {
-//		return m_playback;
-//	}
-
-//	public void setPlayback(boolean playback) {
-//		m_playback = playback;
-//	}
 
 	public void setOutputLevel(int level) {
 		m_outputLevel = level;
@@ -48,6 +44,7 @@ public final class Voice3 extends Voice {
 	public void setWAVData(int index, byte v) {
 		if (!isEnabled()) {
 			m_samples[index] = v;
+			return;
 		}
 		if (m_stepsSinceLastRead < 2) {
 			m_samples[m_lastReadIndex] = v;
@@ -91,17 +88,54 @@ public final class Voice3 extends Voice {
 			m_lastReadIndex = m_samplePosition / 2;
 			byte samplePair = m_samples[m_samplePosition / 2];
 			int sample = (m_samplePosition % 2 == 0) ? ((samplePair >> 4) & 0x0F) : (samplePair & 0x0F);
-			m_samplePosition = (m_samplePosition + 1) % 32;
+			
+			m_samplePosition = (m_samplePosition + 1) & 0x1F;
 
 			byte outputSample = (byte) (sample >> m_volumeShift[getOutputLevel()]);
+
+			// When triggering the wave channel, the first sample to play is the previous one still in the high nibble 
+			// of the sample buffer, and the next sample is the second nibble from the wave table. 
+			// This is because it doesn't load the first byte on trigger like it "should". 
+			// The first nibble from the wave table is thus not played until the waveform loops.
+			if (m_justTriggered) {
+				outputSample = (byte) (((m_lastSamplePairPlayed >> 4) & 0x0F) >> m_volumeShift[getOutputLevel()]);
+				m_justTriggered = false;
+			}
+			
+			m_lastSamplePairPlayed = samplePair;
+
 			setOutputValue(outputSample);
 		}
 	}
 	
 	public void trigger() {
+		// Triggering the wave channel on the DMG while it reads a sample byte will alter the first four bytes of wave RAM
+		if (isEnabled() && getDAC().isEnabled() && m_counter == 2) { // No idea why this counter value is required... But required for BLARGG dmg test N°10
+			//  If the channel was reading one of the first four bytes, the only first 
+			// byte will be rewritten with the byte being read.
+			int index = m_samplePosition / 2;
+			if (index < 4) {
+				m_samples[0] = m_samples[index];
+			}
+			// If the channel was reading one of the later 12 bytes, the first FOUR bytes of wave RAM will be rewritten 
+			// with the four aligned bytes that the read was from (bytes 4-7, 8-11, or 12-15)
+			else {
+				System.arraycopy(m_samples, index & ~0x03, m_samples, 0, 4);
+			}
+		}
+		
+		setEnabled(true);
+		m_justTriggered = true; // required for the first sample to play weird behavior
 		getFrameSequencer().trigger();
-		m_counter = 6; // the sampling replay starts with a small delay
+		m_counter = 6; // the sampling replay starts with a small delay (NO DOC ABOUT THIS !!!?)
 		m_samplePosition = 0;
+	}
+	
+	@Override
+	public void start() {
+		m_lastSamplePairPlayed = 0;
+		m_justTriggered = false;
+		super.start();
 	}
 	
 	@Override

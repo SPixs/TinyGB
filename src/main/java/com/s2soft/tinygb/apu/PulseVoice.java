@@ -72,6 +72,7 @@ public abstract class PulseVoice extends Voice implements IVolumeEnveloppeVoice 
 			System.out.println(getName()+". Init. Frequency = " + frequency);
 		}
 		m_counter = 0; // the duty cycle starts immediately 
+		setEnabled(true);
 		getFrameSequencer().trigger();
 	}
 	

@@ -250,9 +250,9 @@ public class GBAPU {
 	 * @param v content of NR11 register 
 	 */
 	public void setNR30(byte v) {
-		if (TRACE) {
-			System.out.println("NR30="+Instruction.toHexByte(v));
-		}
+//		if (TRACE) {
+//			System.out.println("NR30="+Instruction.toHexByte(v));
+//		}
 		if (!m_soundEnable) { return; }
 		boolean playback = BitUtils.isSet(v, 7);
 //		m_voice3.setPlayback(playback);
@@ -644,6 +644,7 @@ public class GBAPU {
 	 * @param v content of NR34 register 
 	 */ 
 	public void setNR34(byte v) {
+//		System.out.println("NR34="+Instruction.toHexByte(v));
 		if (!m_soundEnable) { return; }
 		setNRX4(m_voice3, v);
 	}
@@ -662,7 +663,7 @@ public class GBAPU {
 		if (!m_soundEnable) { return; }
 		m_voice4.setLengthEnabled(BitUtils.isSet(v, 6), BitUtils.isSet(v, 7));
 		if (BitUtils.isSet(v, 7)) {
-			m_voice4.setEnabled(true);
+			m_voice4.setEnabled(true);//m_voice4.getDAC().isEnabled());
 			m_voice4.trigger();
 		}
 	}
@@ -674,7 +675,6 @@ public class GBAPU {
 		voice.setRawFrequency(frequency);
 		voice.setLengthEnabled(BitUtils.isSet(v, 6), BitUtils.isSet(v, 7));
 		if (BitUtils.isSet(v, 7)) {
-			voice.setEnabled(true);
 			voice.trigger();
 		}
 	}
