@@ -81,7 +81,7 @@ public final class GBMemoryIO implements IAddressable {
 		addRegister(0xFF47, "BGP", () -> m_gpu.getBGPaletteData() , (v) -> { m_gpu.setBGPaletteData(v); });
 		addRegister(0xFF48, "OBP0", () -> m_gpu.getOMAPalette1Data() , (v) -> { m_gpu.setOMAPalette1Data(v); });
 		addRegister(0xFF49, "0BP1", () -> m_gpu.getOMAPalette2Data() , (v) -> { m_gpu.setOMAPalette2Data(v); });
-		addRegister(0xFF50, "BOOTRomLock", () -> m_bootROMLockRegister , (v) -> { setBootRommLockRegister(v); });
+		addRegister(0xFF50, "BOOTRomLock", () -> (byte)0xFF , (v) -> { setBootRommLockRegister(v); });
 		
 		// 16 registers for sound WAV RAM
 		for (int i=0xFF30;i<0xFF40;i++) {
@@ -156,6 +156,7 @@ public final class GBMemoryIO implements IAddressable {
 	private byte getTimerControl() {
 		byte timerControl = m_gameBoy.getTimers().getInputClock();
 		timerControl = BitUtils.setBit(timerControl, 3, m_gameBoy.getTimers().isTimerEnabled());
+		timerControl |= 0b11111000;
 		return timerControl;
 	}
 

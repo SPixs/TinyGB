@@ -172,7 +172,7 @@ public class GBGPU {
 	}
 
 	public byte getLCDStatus() {
-		return m_lcdStatus;
+		return (byte) (m_lcdStatus | 0b10000000);
 	}
 
 	public void setLCDStatus(byte v) {

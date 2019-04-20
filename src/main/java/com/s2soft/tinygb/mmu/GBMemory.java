@@ -94,13 +94,13 @@ public class GBMemory {
     }
 	
 	public byte getInterruptFlag() {
-//		System.out.println("Read interrupt flag " + Instruction.toHexByte(m_interruptFlag));
-		return m_interruptFlag;
+//		System.out.println("Read interrupt flag " + Instruction.toHexByte((byte) (m_interruptFlag | 0b11100000)));
+		return (byte) (m_interruptFlag | 0b11100000);
 	}
 
 	public void setInterruptFlag(byte flags) {
 //		System.out.println("Write interrupt flag " + Instruction.toHexByte(flags));
-		m_interruptFlag = flags;
+		m_interruptFlag = (byte) (flags & 0b00011111);
 	}
 	
 	public byte getInterruptEnable() {

@@ -1,4 +1,6 @@
 package com.s2soft.tinygb.cpu;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -66,11 +68,20 @@ public class GBCpu {
 	private Instruction[] m_instructionsArray;
 	private Instruction[] m_extraInstructionsArray;
 	private final byte[][] m_additionalBytes = new byte[3][];
+
+//	private PrintStream m_out;
 	
 	public GBCpu(GameBoy gameBoy) {
 		m_memory = gameBoy.getMemory();
 		initInstructions();
 		reset();
+		
+//		try {
+//			m_out = new PrintStream("ouput_tinyGB.txt");
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	// ================================ access methods ==================================
@@ -289,6 +300,8 @@ public class GBCpu {
 		m_halted = true;
 	}
 	
+	boolean debug = true;
+	
 	public int step() {
 		
 		if (m_halted & !getMemory().isInterruptRequested()) {
@@ -301,7 +314,8 @@ public class GBCpu {
 		
 //		startTrace = /*!m_memory.isBootROMLock() &&*/ (
 //				(getPC() >= 0xC1A6 && getPC() <= 0xC1A6));
-//		startTrace = true;
+//		debug &= getPC() != 0xC4A0;
+//		startTrace = getPC() >= 0xC000 && debug;
 		
 //		if (getPC() == 0x0028) {
 //			System.out.println(">>> Tetris main loop");
@@ -332,8 +346,8 @@ public class GBCpu {
 		
 //		startTrace = (getPC() == 0xDEFA /*|| getPC() == 0xDEF8*/) && (getMemory().getByte(0xDEF8) == (byte)0xDE);
 		
-		if (getPC() == 0xC20D) {
-			System.out.println("BLARGG. Execute SHOULD_BE_ALMOST_OFF");
+		if (getPC() == 0xC22C) {
+			System.out.println("BLARGG. Execute TEST_INTERRUPT " + m_cyclesCount);
 		}
 		
 		// Check for interrupt
@@ -394,6 +408,9 @@ public class GBCpu {
 			disassembledLine += " Cycles=" + m_cyclesCount;
 			System.out.println(disassembledLine);
 		}
+		
+//		disassembledLine = ">$" + Disassembler.shortToHex(getPC()) + " " + instruction.disassemble(m_memory, getPC()) + " Cycles=" + m_cyclesCount;
+//		m_out.println(disassembledLine);
 		
 		setPC(getPC() + 1);
 		int lengthInBytes = instruction.getLengthInBytes(opcode);
