@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Instruction;
 
 public class JoypadHandler implements IJoypadButtonListener {
@@ -12,13 +13,16 @@ public class JoypadHandler implements IJoypadButtonListener {
 
 	//	 =========================== Attributes ==============================
 
+	private GameBoy m_gameBoy;
+	
 	private Set<JoypadButton> m_pressedButton = new HashSet<JoypadButton>();
 	
 	private byte m_matrixColumnSelection = 0;
-	
+
 	//	 =========================== Constructor =============================
 
-	public JoypadHandler(IJoypad joypad) {
+	public JoypadHandler(GameBoy gameBoy, IJoypad joypad) {
+		m_gameBoy = gameBoy;
 		joypad.addButtonListener(this);
 	}
 
@@ -44,6 +48,7 @@ public class JoypadHandler implements IJoypadButtonListener {
 	public synchronized void buttonPressed(JoypadButton button) {
 		// @TODO We should also generate an interrupt here
 		m_pressedButton.add(button);
+		m_gameBoy.getGpu().getMemory().requestInterrupt(4); // Joypad interrupt request
 	}
 
 	@Override

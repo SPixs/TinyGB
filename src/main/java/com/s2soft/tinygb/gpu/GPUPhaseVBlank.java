@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.gpu;
 
+import com.s2soft.utils.BitUtils;
+
 /**
  * GPU mode 1
  *
@@ -13,8 +15,8 @@ public class GPUPhaseVBlank extends GPUPhase {
 
 	//	 =========================== Constructor =============================
 
-	public GPUPhaseVBlank(String name) {
-		super(name);
+	public GPUPhaseVBlank(String name, int number) {
+		super(name, number);
 	}
 
 	//	 ========================== Access methods ===========================
@@ -23,9 +25,15 @@ public class GPUPhaseVBlank extends GPUPhase {
 	
 	@Override
 	protected void enterImpl() {
-		byte lcdStatus = getGpu().getLCDStatus();
-		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x01));
+//		byte lcdStatus = getGpu().getLCDStatus();
+//		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x01));
 		getGpu().getMemory().requestInterrupt(0); // VBlank interrupt request
+
+		// Rise a LCD status interrupt if configured to do so
+		if (BitUtils.isSet(getGpu().getLCDStatus(), 4)) {
+			getGpu().getMemory().requestInterrupt(1);
+		}
+		
 		getGpu().getDisplay().refresh();
 	}
 	

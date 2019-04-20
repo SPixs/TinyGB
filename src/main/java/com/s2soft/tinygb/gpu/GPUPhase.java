@@ -7,9 +7,12 @@ public abstract class GPUPhase {
 	private long m_enterClock;
 
 	private String m_name;
+	
+	private int m_number = 0; // the phase (Mode) number as used in STAT register
 
-	public GPUPhase(String name) {
+	public GPUPhase(String name, int number) {
 		m_name = name;
+		m_number = number;
 	}
 
 	public String getName() {
@@ -45,6 +48,10 @@ public abstract class GPUPhase {
 	}
 	
 	protected abstract void stepImpl(long elapsedClockCount);
+
+	public int getNumber() {
+		return m_number;
+	}
 
 }
 

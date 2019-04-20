@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-import com.s2soft.tinygb.Cartidge;
+import com.s2soft.tinygb.cartidge.Cartidge;
 
 public final class GBRomCartidge implements IAddressable {
 
@@ -22,23 +22,7 @@ public final class GBRomCartidge implements IAddressable {
 
 	@Override
 	public void setByte(int address, byte b) {
-		if (address <= 0x1FFF) {
-			System.out.println("Cartidge RAM enabled : " + ((b == (byte)0x0A) ? true : false ));
-			return;
-		}
-		if (address >= 0x2000 && address <= 0x3FFF) {
-			System.out.println("Writing ROM bank number : " + b);
-			return;
-		}
-		if (address >= 0x4000 && address <= 0x5FFF) {
-			System.out.println("Writing RAM bank number or Upper bits of ROM bank number : " + b);
-			return;
-		}
-		if (address >= 0x6000 && address <= 0x7FFF) {
-			System.out.println("Writing ROM/RAM Mode select : " + b);
-			return;
-		}
-		throw new IllegalStateException("Cannot write to ROM");
+		m_cartidge.setROMByte(address, b);
 	}
 
 	@Override

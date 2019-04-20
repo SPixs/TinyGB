@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.gpu;
 
+import com.s2soft.utils.BitUtils;
+
 /**
  * GPU mode 2
  *
@@ -15,8 +17,8 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 
 	//	 =========================== Constructor =============================
 
-	public GPUPhaseFetchOAM(String name) {
-		super(name);
+	public GPUPhaseFetchOAM(String name, int number) {
+		super(name, number);
 	}
 
 	//	 ========================== Access methods ===========================
@@ -26,11 +28,16 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 	@Override
 	protected void enterImpl() {
 		byte lcdStatus = getGpu().getLCDStatus();
-		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x02));
+//		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x02));
 		getGpu().setLineStartClock(getEnterClock());
 		getGpu().clearVisibleSprites();
 		getGpu().getPixelsFifo().clear();
 		getGpu().getFetcher().resetState();
+		
+		// Rise a LCD status interrupt if configured to do so
+		if (BitUtils.isSet(getGpu().getLCDStatus(), 5)) {
+			getGpu().getMemory().requestInterrupt(1);
+		}
 	}
 
 	@Override

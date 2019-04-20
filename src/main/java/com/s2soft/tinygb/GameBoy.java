@@ -4,6 +4,7 @@ import java.util.TreeSet;
 
 import com.s2soft.tinygb.apu.GBAPU;
 import com.s2soft.tinygb.audio.IAudioDevice;
+import com.s2soft.tinygb.cartidge.Cartidge;
 import com.s2soft.tinygb.control.IJoypad;
 import com.s2soft.tinygb.control.JoypadHandler;
 import com.s2soft.tinygb.cpu.GBCpu;
@@ -45,7 +46,7 @@ public class GameBoy {
 		m_cpu = new GBCpu(this);
 		m_dma = new DMA(this);
 		m_configuration = configuration;
-		m_joypadHandler = new JoypadHandler(joypad);
+		m_joypadHandler = new JoypadHandler(this, joypad);
 		m_timers = new Timers(this);
 		reset();
 	}

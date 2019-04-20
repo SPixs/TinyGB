@@ -25,7 +25,7 @@ public class BitUtils {
 	}
 
 	public static int toUInt(byte v) {
-		return 0x00FF & v;
+		return 0xFF & v;
 	}
 
 	public static byte setBit(byte status, int index, boolean value) {
@@ -43,7 +43,7 @@ public class BitUtils {
 	}
 
 	public static int toUShort(byte lsb, byte msb) {
-		return (lsb & 0x00FF) | msb << 8;
+		return (lsb & 0xFF) | msb << 8;
 	}
 }
 

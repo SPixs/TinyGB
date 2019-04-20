@@ -106,6 +106,7 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 		pixels |= pixel;
 		m_videoMemory[m_pixelIndex / 4] = pixels;
 		m_pixelIndex++;
+//		m_pixelIndex = m_pixelIndex % (m_videoMemory.length * 4); // REMOOOOOOOOOOOOOVE ME ! should not happen....
 	}
 
 	@Override

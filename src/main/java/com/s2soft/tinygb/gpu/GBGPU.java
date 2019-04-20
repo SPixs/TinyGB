@@ -15,10 +15,10 @@ public class GBGPU {
 	
 	public final static boolean TRACE = false;
 	
-	public final static GPUPhase PHASE_FETCH_OAM = new GPUPhaseFetchOAM("OAM[mode2]");
-	public final static GPUPhase PHASE_READ_VRAM = new GPUPhaseReadVRAM("VRAM[mode3]");
-	public final static GPUPhase PHASE_HBLANK = new GPUPhaseHBlank("HBlank[mode0]");
-	public final static GPUPhase PHASE_VBLANK = new GPUPhaseVBlank("VBlank[mode1]");
+	public final static GPUPhase PHASE_FETCH_OAM = new GPUPhaseFetchOAM("OAM[mode2]", 2);
+	public final static GPUPhase PHASE_READ_VRAM = new GPUPhaseReadVRAM("VRAM[mode3]", 3);
+	public final static GPUPhase PHASE_HBLANK = new GPUPhaseHBlank("HBlank[mode0]", 0);
+	public final static GPUPhase PHASE_VBLANK = new GPUPhaseVBlank("VBlank[mode1]", 1);
 
 	//	 =========================== Attributes ==============================
 
@@ -46,6 +46,8 @@ public class GBGPU {
 	private GPUSprite[] m_sprites;
 	private ArrayList<GPUSprite> m_visibleSprites = new ArrayList<GPUSprite>(10);
 
+	private byte m_scanLineCompare;
+
 	//	 =========================== Constructor =============================
 
 	public GBGPU(GameBoy gameBoy) {
@@ -70,11 +72,23 @@ public class GBGPU {
 		if (TRACE) {
 			System.out.println("GPU new line : " + scanLine);
 		}
+		boolean generateInterrupt = (m_scanLine != scanLine) && BitUtils.isSet(m_lcdStatus, 6) && scanLine == m_scanLineCompare;
 		m_scanLine = scanLine;
+		if (generateInterrupt) {
+			getMemory().requestInterrupt(1); // LCD status interrupt request
+		}
 	}
 
 	public int getScanLine() {
 		return m_scanLine;
+	}
+
+	public byte getLCDYCompare() {
+		return m_scanLineCompare;
+	}
+
+	public void setLCDYCompare(byte line) {
+		m_scanLineCompare = line;
 	}
 
 	public int getScrollY() {
@@ -113,7 +127,8 @@ public class GBGPU {
 		m_lcdControl = v;
 		if (BitUtils.isSet(oldControl, 7) != BitUtils.isSet(m_lcdControl, 7)) {
 			if (!BitUtils.isSet(m_lcdControl, 7)) {
-				setScanLine(0);
+//				setScanLine(0);
+				m_scanLine = 0;
 				getDisplay().setEnable(false);
 			}
 			else {
@@ -172,7 +187,11 @@ public class GBGPU {
 	}
 
 	public byte getLCDStatus() {
-		return (byte) (m_lcdStatus | 0b10000000);
+		byte result = (byte) (m_lcdStatus | 0b10000000);
+		result = (byte) ((result & 0b11111000) | m_phase.getNumber());
+		result = BitUtils.setBit(result, 2, m_scanLine == m_scanLineCompare);
+
+		return result;
 	}
 
 	public void setLCDStatus(byte v) {
@@ -265,20 +284,23 @@ public class GBGPU {
 			}
 		}
 
+//		if (System.currentTimeMillis() % 50 == 0)
+//			System.out.println(pixelsCount + " " + m_scanLine + " " + m_phase.getName());
+		if (pixelsCount > 0 && pixelsCount % 160 == 0) {
+			if (TRACE & elapsedClockCountInPhase != 172) {
+				System.out.println("Elapsed clock in ReadVRAM : " + elapsedClockCountInPhase);
+			}
+			pixelsCount = 0;
+			pixelsTrashed = 0;
+			enterPhase(PHASE_HBLANK);
+		}
+
 		// Each access to VRAM (B, 0, 1, s) takes 2 cycles to occur.  A "cycle" is
 		// exactly 1 period of the main input clock to the gameboy CPU chip.  This
 		// is nominally 4.19MHz approximately.
 		// Skip odd clock to run the GPU at 2.097152Mhz
 //		if (((m_gameBoy.getClockCount() - m_phase.getEnterClock()) % 2) == 0) {
 		if (elapsedClockCountInPhase % 2 == 0) {
-			if (pixelsCount > 0 && pixelsCount % 160 == 0) {
-				if (TRACE & elapsedClockCountInPhase != 172) {
-					System.out.println("Elapsed clock in ReadVRAM : " + elapsedClockCountInPhase);
-				}
-				pixelsCount = 0;
-				pixelsTrashed = 0;
-				enterPhase(PHASE_HBLANK);
-			}
 			m_phase.step();
 		}
 	}
@@ -304,6 +326,5 @@ public class GBGPU {
 		setScanLine(0);
 		enterPhase(PHASE_FETCH_OAM);
 	}
-
 }
 

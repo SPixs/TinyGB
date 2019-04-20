@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-import com.s2soft.tinygb.Cartidge;
+import com.s2soft.tinygb.cartidge.Cartidge;
 
 public final class GBRamCartidge implements IAddressable {
 
@@ -23,7 +23,7 @@ public final class GBRamCartidge implements IAddressable {
 	@Override
 	public void setByte(int address, byte b) {
 		if (m_cartidge != null) {
-			m_cartidge.setRAMByte(address);
+			m_cartidge.setRAMByte(address - 0xA000, b);
 		}
 	}
 
@@ -32,7 +32,7 @@ public final class GBRamCartidge implements IAddressable {
 		if (m_cartidge == null) {
 			return (byte) 0xFF;
 		}
-		return m_cartidge.getRAMByte(address);
+		return m_cartidge.getRAMByte(address - 0xA000);
 	}
 }
 

@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 
 import com.s2soft.tinygb.audio.AudioDevice;
 import com.s2soft.tinygb.audio.NullAudioDevice;
+import com.s2soft.tinygb.cartidge.Cartidge;
 import com.s2soft.tinygb.display.BufferedLCDDisplay;
 import com.s2soft.tinygb.display.NullDisplay;
 
@@ -36,7 +37,9 @@ public class Main {
 		
 		Cartidge cartidge = new Cartidge();
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
-
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Legend of Zelda, The - Link's Awakening (France).gb"));
+		cartidge.read(Main.class.getResourceAsStream("/rom/Super Mario Land (World).gb"));
+		
 //		cartidge.read(Main.class.getResourceAsStream("/rom/dist.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Bc.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Ls.gb"));
@@ -72,13 +75,17 @@ public class Main {
 		
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/bits/reg_f.gb")); // OK
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/bits/mem_oam.gb")); // OK
-		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/bits/unused_hwio-GS.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/bits/unused_hwio-GS.gb")); // OK
+
+//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/oam_dma/basic.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/oam_dma/reg_read.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/oam_dma/sources-dmgABCmgbS.gb")); // OK
 
 		///////////////// BLARGG //////////////////
 		
 //		cartidge.read(new FileInputStream("testROM/Blargg/cpu_instrs/cpu_instrs.gb")); // OK
 //		cartidge.read(new FileInputStream("testROM/Blargg/instr_timing/instr_timing.gb")); // OK
-//		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/dmg_sound.gb")); // FAILED ! but all units pass... Check bank switching
+//		cartidge.read(new FileInputStream("testROM/Blargg/dmg_sound/dmg_sound.gb")); // OK
 	
 	
 //		cartidge.read(new FileInputStream("testROM/Blargg/mem_timing/individual/01-read_timing.gb"));  // FAILED 

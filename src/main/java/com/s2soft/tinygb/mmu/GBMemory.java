@@ -3,8 +3,8 @@ package com.s2soft.tinygb.mmu;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import com.s2soft.tinygb.Cartidge;
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.cartidge.Cartidge;
 import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.utils.BitUtils;
 

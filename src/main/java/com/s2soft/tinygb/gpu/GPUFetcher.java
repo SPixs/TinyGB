@@ -57,6 +57,9 @@ public class GPUFetcher {
 	}
 
 	public void setTileAddress(int tileAddress) {
+		if (tileAddress < 0x9800 || tileAddress >= 0xA000) {
+			throw new IllegalArgumentException("Tile map start address of fetcher out of bounds : " +  Integer.toHexString(tileAddress));
+		}
 		m_tileAddress = tileAddress;
 	}
 
