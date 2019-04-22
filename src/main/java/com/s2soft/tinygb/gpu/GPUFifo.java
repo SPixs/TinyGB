@@ -148,6 +148,12 @@ public class GPUFifo {
 					entry.m_pixelColorIndex = spritePixel;
 				}
 			}
+			
+			// TODO : check this rule :
+			// The priority calculation between sprites disregards OBJ-to-BG Priority (attribute bit 7).
+			// Only the highest-priority nonzero sprite pixel at any given point is compared against the background. 
+			// Thus if a sprite with a higher priority (based on OAM index) but with OBJ-to-BG Priority turned on overlaps a sprite 
+			// with a lower priority and a nonzero background pixel, the background pixel is displayed regardless of the lower-priority sprite's OBJ-to-BG Priority.
 		}
 	}
 }

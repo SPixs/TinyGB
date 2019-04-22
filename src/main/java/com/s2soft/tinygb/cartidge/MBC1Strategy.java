@@ -98,6 +98,7 @@ public class MBC1Strategy extends CartidgeStrategy {
 		}
 		
 		getRAM()[getRAMBank() * 0x2000 + address] = value;
+		getCartidge().setRamModified(true);
 	}
 
 	@Override

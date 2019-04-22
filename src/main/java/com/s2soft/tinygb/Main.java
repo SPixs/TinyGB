@@ -35,7 +35,7 @@ public class Main {
 		
 		GameBoy gameBoy = new GameBoy(configuration, lcdDisplay, audioDevice, joypad);
 		
-		Cartidge cartidge = new Cartidge();
+		Cartidge cartidge = new Cartidge(gameBoy);
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
 		cartidge.read(Main.class.getResourceAsStream("/rom/Legend of Zelda, The - Link's Awakening (France).gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Super Mario Land (World).gb"));

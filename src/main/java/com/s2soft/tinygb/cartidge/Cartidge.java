@@ -4,7 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.IConfiguration;
 import com.s2soft.tinygb.cpu.Instruction;
+import com.s2soft.utils.BitUtils;
 import com.s2soft.utils.StreamCopier;
 
 public class Cartidge {
@@ -65,10 +68,25 @@ public class Cartidge {
 
 	private int m_romBanks;
 
+	private boolean m_ramModified;
+	
+	private String m_manufacturerCode;
+	private String m_licenseeCode;
+	private byte m_headerChecksum;
+
+	private String m_cartidgeID;
+
+	private GameBoy m_gameboy;
+
+	private int m_globalChecksum;
 
 	//	 =========================== Constructor =============================
 
 	//	 ========================== Access methods ===========================
+
+	public Cartidge(GameBoy gameboy) {
+		m_gameboy = gameboy;
+	}
 
 	public int getRomBanks() {
 		return m_romBanks;
@@ -76,6 +94,10 @@ public class Cartidge {
 
 	public byte[] getROM() { return m_rom; }
 	public byte[] getRAM() { return m_ram; }
+
+	public void setRamModified(boolean ramModified) {
+		m_ramModified = ramModified;
+	}
 
 	//	 ========================= Treatment methods =========================
 
@@ -102,6 +124,11 @@ public class Cartidge {
 		m_name = titleBuffer;
 		System.out.println("Cartidge name : " + m_name);
 		
+		// Parse manufacturer code
+		byte[] manufacturerCode = new byte[4];
+		System.arraycopy(m_rom, 0x013F, manufacturerCode, 0, 4);
+		m_manufacturerCode = new String(manufacturerCode);
+
 		// Read gameboy model
 		switch (m_rom[0x0143]) {
 			case (byte)0x80 : m_gameboyModel = GameboyModel.BOTH; break;
@@ -111,6 +138,11 @@ public class Cartidge {
 		if (m_gameboyModel == GameboyModel.CGB) {
 			throw new IllegalStateException("Color gameboy cartidge not handled yet");
 		}
+		
+		// Licensee code
+		byte[] licenseeCode = new byte[2];
+		System.arraycopy(m_rom, 0x0144, licenseeCode, 0, 2);
+		m_licenseeCode = new String(licenseeCode);
 		
 		// Cartidge type (ROM, MBC1, ...)
 		Type type = Type.fromValue(m_rom[0x0147]);
@@ -125,6 +157,18 @@ public class Cartidge {
 		int ramSize = getRamSize(m_rom[0x0149]) * 1024;
 		System.out.println("Cartidge RAM size : " + ramSize + " bytes");
 		m_ram = new byte[ramSize];
+		
+		// Parse checksum
+		m_headerChecksum = m_rom[0x014D];
+		m_globalChecksum = BitUtils.toUShort(m_rom[0x14F], m_rom[0x14E]);
+		
+		// Unique ID used to create RAM save file
+		m_cartidgeID = Instruction.toHexShort(m_globalChecksum).substring(1) + "-" + Instruction.toHexByte(m_headerChecksum).substring(1);
+		
+		byte[] savedRAM = m_gameboy.getLastRAMSave(m_cartidgeID);
+		if (savedRAM != null && savedRAM.length == ramSize) {
+			m_ram = savedRAM;
+		}
 	}
 	
 	/**
@@ -191,6 +235,13 @@ public class Cartidge {
 	 */
 	public void setRAMByte(int address, byte value) { 
 		m_strategy.writeRAM(address, value);
+	}
+	
+	public void saveRAM() {
+		if (m_ramModified) {
+			m_gameboy.save(this, m_cartidgeID);
+		}
+		m_ramModified = false;
 	}
 }
 

@@ -1,5 +1,10 @@
 package com.s2soft.tinygb;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.TreeSet;
 
 import com.s2soft.tinygb.apu.GBAPU;
@@ -14,6 +19,7 @@ import com.s2soft.tinygb.dma.DMA;
 import com.s2soft.tinygb.gpu.GBGPU;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.tinygb.timer.Timers;
+import com.s2soft.utils.StreamCopier;
 
 public class GameBoy {
 
@@ -34,6 +40,9 @@ public class GameBoy {
 	private IConfiguration m_configuration;
 	private GBAPU m_apu;
 	private long m_emulationSyncShift;
+	
+	private File m_saveFolder;
+	private Cartidge m_cartidge;
 
 	//	 =========================== Constructor =============================
 
@@ -48,6 +57,10 @@ public class GameBoy {
 		m_configuration = configuration;
 		m_joypadHandler = new JoypadHandler(this, joypad);
 		m_timers = new Timers(this);
+		
+		m_saveFolder = new File("sav");
+		if (!m_saveFolder.exists()) { m_saveFolder.mkdir(); }
+		
 		reset();
 	}
 
@@ -108,6 +121,7 @@ public class GameBoy {
 	//	 ========================= Treatment methods =========================
 
 	public void setCartidge(Cartidge cartidge) {
+		m_cartidge = cartidge;
 		m_memory.setCartidge(cartidge);
 	}
 	
@@ -159,9 +173,12 @@ public class GameBoy {
 					// Clock speed on DMG GB is 4.19430Mhz
 					long wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
 					setEmulationSyncShift(wait);
-					if (wait > 0) {
+					while (wait > 0) {
+						m_cartidge.saveRAM();
 						try { Thread.sleep(wait); } 	
 						catch (InterruptedException e) {}
+						elapsed = System.currentTimeMillis() - runStartTimer;
+						wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
 					}
 					
 	//				System.out.println("CPU freq : " + (1000.0 * cpuClockCount / elapsed));
@@ -171,6 +188,32 @@ public class GameBoy {
 				m_clockCount++;
 			}
 		}
+	}
+
+	public byte[] getLastRAMSave(String cartidgeID) {
+		try {
+			FileInputStream input = new FileInputStream(new File(m_saveFolder, cartidgeID+".sav"));
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			StreamCopier.copy(input, byteArrayOutputStream);
+			input.close();
+			return byteArrayOutputStream.toByteArray();
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
+	public void save(Cartidge cartidge, String cartidgeID) {
+		try {
+			System.out.println("Save cartidge RAM");
+			FileOutputStream output = new FileOutputStream(new File(m_saveFolder, cartidgeID+".sav"));
+			output.write(cartidge.getRAM());
+			output.flush();
+			output.close();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}	
 	}
 }
 
