@@ -54,6 +54,8 @@ public class GBGPU {
 	int m_linePixelsCount = 0;
 	int m_linePixelsTrashed = 0;
 
+	private boolean m_renderingWindow;
+
 	//	 =========================== Constructor =============================
 
 	public GBGPU(GameBoy gameBoy) {
@@ -314,7 +316,10 @@ public class GBGPU {
 		if (m_pixelsFifo.isEnabled() && m_pixelsFifo.canPull() && m_phase == PHASE_READ_VRAM) {
 //			System.out.println("Elapsed clock in ReadVRAM : " + m_phase.getElapsedClockCountInPhase());
 			byte pixel = m_pixelsFifo.pullPixel();
-			if (m_linePixelsCount == 0 && m_linePixelsTrashed < getScrollX() % 8) {
+			if (m_linePixelsCount == 0 && isRenderingWindow() && m_linePixelsTrashed < 7 - getWindowX()) {
+				m_linePixelsTrashed++;
+			}
+			else if (!isRenderingWindow() && m_linePixelsCount == 0 && m_linePixelsTrashed < getScrollX() % 8) {
 				m_linePixelsTrashed++;
 			}
 			else {
@@ -364,6 +369,14 @@ public class GBGPU {
 		m_linePixelsCount = 0;
 		setScanLine(0);
 		enterPhase(PHASE_FETCH_OAM);
+	}
+
+	public void setRenderingWindow(boolean state) {
+		m_renderingWindow = state;
+	}
+	
+	public boolean isRenderingWindow() {
+		return m_renderingWindow;
 	}
 
 }

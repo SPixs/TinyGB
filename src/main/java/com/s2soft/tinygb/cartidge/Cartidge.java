@@ -32,7 +32,10 @@ public class Cartidge {
 		ROM_ONLY(0x00, (c) -> new RomOnlyCartidgeStrategy(c)),
 		MBC1(0x01, (c) -> new MBC1Strategy(c, false, false)),
 		MBC1_RAM(0x02, (c) -> new MBC1Strategy(c, true, false)),
-		MBC1_RAM_BATTERY(0x03, (c) -> new MBC1Strategy(c, true, true));
+		MBC1_RAM_BATTERY(0x03, (c) -> new MBC1Strategy(c, true, true)),
+		MBC5(0x19, (c) -> new MBC5Strategy(c, false, false)),
+		MBC5_RAM(0x1A, (c) -> new MBC5Strategy(c, true, false)),
+		MBC5_RAM_BATTERY(0x1B, (c) -> new MBC5Strategy(c, true, true));
 		
 		private int type;
 		private IStrategyFactory strategyFactory;

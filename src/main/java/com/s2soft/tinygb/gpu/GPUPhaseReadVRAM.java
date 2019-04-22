@@ -11,8 +11,6 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 
 	//	 =========================== Attributes ==============================
 
-	private boolean m_renderWindow;
-
 	//	 =========================== Constructor =============================
 
 	public GPUPhaseReadVRAM(String name, int number) {
@@ -35,8 +33,8 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 		int scrollY = getGpu().getScrollY();
 		int tileX = (scrollX / 8) % 32;
 		int tileY = ((currentLine + scrollY) / 8) % 32;
-		getGpu().getFetcher().setTileAddress(tilesBaseAddress + tileY * 32, tileX);
-		m_renderWindow = false;
+		getGpu().getFetcher().setTileAddress(tilesBaseAddress + tileY * 32, tileX, scrollY % 8);
+		getGpu().setRenderingWindow(false);
 	}
 
 	@Override
@@ -50,13 +48,13 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 		
 		int currentLine = getGpu().getScanLine();
 //		System.out.println(((getGpu().getWindowX() & 0xFF) - 7) + " " + (getGpu().getWindowY() & 0xFF) + " " + getGpu().getCurrentX());
-		if (getGpu().isWindowEnabled() && !m_renderWindow && getGpu().getCurrentX() >= (getGpu().getWindowX() - 7) && currentLine >= getGpu().getWindowY()) {
+		if (getGpu().isWindowEnabled() && !getGpu().isRenderingWindow() && getGpu().getCurrentX() >= (getGpu().getWindowX() - 7) && currentLine >= getGpu().getWindowY()) {
 			int windowTilesBaseAddress = (getGpu().getWindowMapIndex() == 0) ? 0x09800 : 0x09C00;
 			getGpu().getPixelsFifo().clear();
 			int tileX = ((getGpu().getCurrentX() + 7 - getGpu().getWindowX()) / 8);
 			int tileY = ((currentLine - getGpu().getWindowY()) / 8);
-			getGpu().getFetcher().setTileAddress(windowTilesBaseAddress + tileY * 32, tileX);
-			m_renderWindow = true;
+			getGpu().getFetcher().setTileAddress(windowTilesBaseAddress + tileY * 32, tileX, 0);
+			getGpu().setRenderingWindow(true);
 		}
 		
 			getGpu().getFetcher().step();

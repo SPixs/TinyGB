@@ -15,6 +15,7 @@ public class GPUFifo {
 		protected int m_pixelColorIndex;
 		protected int m_palette;
 		protected boolean m_isBackground;
+		protected boolean m_processed;
 		
 	}
 	
@@ -101,6 +102,7 @@ public class GPUFifo {
 			m_queue[m_usedSpace].m_pixelColorIndex = pixelValue;
 			m_queue[m_usedSpace].m_isBackground = true;
 			m_queue[m_usedSpace].m_palette = m_gpu.getBGPaletteData();
+			m_queue[m_usedSpace].m_processed = false;
 			m_usedSpace++;
 		}
 	}
@@ -140,12 +142,13 @@ public class GPUFifo {
 			spritePixel |= BitUtils.isSet(spriteSecondBitplaneData, index) ? 0b10 : 0b00;
 			FifoEntry entry = m_queue[7-i];
 			
-			if (entry.m_isBackground) {
+			if (entry.m_isBackground && !entry.m_processed) {
 				boolean writeSprite = (!scheduledSprite.getPriority() && spritePixel != 0) || (scheduledSprite.getPriority() && entry.m_pixelColorIndex == 0);
 				if (writeSprite) {
 					entry.m_isBackground = false;
 					entry.m_palette = scheduledSprite.getPalette() ? m_gpu.getOMAPalette2Data() : m_gpu.getOMAPalette1Data();
 					entry.m_pixelColorIndex = spritePixel;
+					entry.m_processed = true;
 				}
 			}
 			

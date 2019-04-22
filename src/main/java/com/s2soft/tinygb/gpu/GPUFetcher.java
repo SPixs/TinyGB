@@ -44,6 +44,8 @@ public class GPUFetcher {
 
 	private int m_tileX;
 
+	private int m_tileLine;
+
 
 	//	 =========================== Constructor =============================
 	
@@ -58,12 +60,13 @@ public class GPUFetcher {
 		m_state = STATE.READ_TILE_ID;
 	}
 
-	public void setTileAddress(int tileAddress, int tileX) {
+	public void setTileAddress(int tileAddress, int tileX, int tileLine) {
 		if (tileAddress < 0x9800 || tileAddress >= 0xA000) {
 			throw new IllegalArgumentException("Tile map start address of fetcher out of bounds : " +  Integer.toHexString(tileAddress));
 		}
 		m_tileAddress = tileAddress;
 		m_tileX = tileX;
+		m_tileLine = tileLine;
 	}
 
 //	public int getTileAddress() {
@@ -121,7 +124,7 @@ public class GPUFetcher {
 	}
 
 	private byte readBitPlane(int bitPlaneIndex) {
-		int lineInTile = (m_gpu.getScanLine() + m_gpu.getScrollY()) % 8;
+		int lineInTile = (m_gpu.getScanLine() + m_tileLine) % 8;
 		int bgTilesAreaIndex = m_gpu.getBGTilesAreaIndex();
 		if (bgTilesAreaIndex == 0) {
 			int tileOffsetInData = 16 * (byte)(m_tileIndex & 0xFF);

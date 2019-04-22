@@ -109,7 +109,7 @@ public class GameBoy {
 	
 	private void setEmulationSyncShift(long shift) {
 		if (shift < 0 && shift != m_emulationSyncShift) {
-//			System.out.println("Warning : emulation too SLOW " + shift + "ms");
+			System.out.println("Warning : emulation too SLOW " + shift + "ms");
 		}
 		m_emulationSyncShift = shift;
 	}
@@ -165,20 +165,22 @@ public class GameBoy {
 				m_timers.step();
 				m_dma.step();
 				m_apu.step();
+
+				if (m_clockCount % 8000000 == 0) {
+					m_cartidge.saveRAM();
+				}
 				
 				// Ensure emulation is synchronized with real time
-				if (m_clockCount % 10 == 0 || m_emulationSyncShift < 0) {
+				if (m_clockCount % 100 == 0 || m_emulationSyncShift < 0) {
 					long elapsed = System.currentTimeMillis() - runStartTimer;
 					
 					// Clock speed on DMG GB is 4.19430Mhz
 					long wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
 					setEmulationSyncShift(wait);
-					while (wait > 0) {
-						m_cartidge.saveRAM();
+					if (wait > 0) {
 						try { Thread.sleep(wait); } 	
 						catch (InterruptedException e) {}
 						elapsed = System.currentTimeMillis() - runStartTimer;
-						wait = (long) (m_clockCount * (1000.0/machineClock) - elapsed);
 					}
 					
 	//				System.out.println("CPU freq : " + (1000.0 * cpuClockCount / elapsed));

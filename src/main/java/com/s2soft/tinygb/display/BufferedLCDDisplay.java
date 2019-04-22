@@ -72,7 +72,8 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 		m_displayImage = new BufferedImage(colorModel, raster, false, null);
 		
 		m_gameboyPocketEnclosure = ImageIO.read(getClass().getResourceAsStream("/pocket_enclosure.png"));
-		m_gameboyPocketLCD = ImageIO.read(getClass().getResourceAsStream("/pocket_lcd_alpha_25.png"));
+//		m_gameboyPocketLCD = ImageIO.read(getClass().getResourceAsStream("/pocket_lcd_alpha_25.png"));
+		m_gameboyPocketLCD = ImageIO.read(getClass().getResourceAsStream("/pocket_lcd_alpha.png"));
 		
 		setPreferredSize(new Dimension(m_gameboyPocketEnclosure.getWidth(), m_gameboyPocketEnclosure.getHeight()));
 		
@@ -85,7 +86,7 @@ public class BufferedLCDDisplay extends Canvas implements IDisplay {
 
 	@Override
 	public void setEnable(boolean enabled) {
-		System.out.println("LCD DISPLAY : " + enabled);
+//		System.out.println("LCD DISPLAY : " + enabled);
 		m_enabled = enabled;
 		if (!enabled) {
 			m_pixelIndex = 0;
