@@ -42,6 +42,8 @@ public class GPUFetcher {
 
 	private GPUSprite m_scheduledSprite;
 
+	private int m_tileX;
+
 
 	//	 =========================== Constructor =============================
 	
@@ -56,22 +58,30 @@ public class GPUFetcher {
 		m_state = STATE.READ_TILE_ID;
 	}
 
-	public void setTileAddress(int tileAddress) {
+	public void setTileAddress(int tileAddress, int tileX) {
 		if (tileAddress < 0x9800 || tileAddress >= 0xA000) {
 			throw new IllegalArgumentException("Tile map start address of fetcher out of bounds : " +  Integer.toHexString(tileAddress));
 		}
 		m_tileAddress = tileAddress;
+		m_tileX = tileX;
 	}
 
-	public int getTileAddress() {
-		return m_tileAddress;
-	}
+//	public int getTileAddress() {
+//		return m_tileAddress;
+//	}
 	
 	public void step() {
 		switch (m_state) {
 			case READ_TILE_ID:
-				m_tileIndex = m_gpu.getMemory().getByte(m_tileAddress) & 0x0FF;
-				m_state = STATE.READ_FIRST_BITPLANE;
+				if (!m_gpu.isBGEnabled()) {
+					if (m_gpu.getPixelsFifo().canPut()) {
+						m_gpu.getPixelsFifo().putPixels((byte)0, (byte)0);
+					}
+				}
+				else {
+					m_tileIndex = m_gpu.getMemory().getByte(m_tileAddress + m_tileX) & 0x0FF;
+					m_state = STATE.READ_FIRST_BITPLANE;
+				}
 				break;
 			case READ_FIRST_BITPLANE:
 				m_firstBitplaneData = readBitPlane(0);
@@ -84,7 +94,7 @@ public class GPUFetcher {
 			case IDLE:
 				if (m_gpu.getPixelsFifo().canPut()) {
 					m_gpu.getPixelsFifo().putPixels(m_firstBitplaneData, m_secondBitplaneData);
-					m_tileAddress++;
+					m_tileX = (m_tileX + 1) % 32;
 					resetState();
 					step();
 				}

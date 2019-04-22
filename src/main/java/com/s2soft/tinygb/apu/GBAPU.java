@@ -68,7 +68,7 @@ public class GBAPU {
 		if (m_gameBoy.getEmulationSyncShift() > -5) {
 			final double leftChannelValue = getLeftChannelValue();
 			final double rightChannelValue = getRightChannelValue();
-			m_gameBoy.getAudioDevice().putSample(leftChannelValue / 3.0, rightChannelValue / 3.0);
+			m_gameBoy.getAudioDevice().putSample(leftChannelValue / 2.0, rightChannelValue / 2.0);
 		}
 	}
 

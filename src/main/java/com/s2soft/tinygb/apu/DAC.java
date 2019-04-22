@@ -50,7 +50,8 @@ public class DAC implements ISoundProvider {
 	public double getValue() {
 		int value = m_voice.getValue();
 		if (value != (value & 0x0F)) throw new IllegalStateException();
-		return (m_enabled /*&& m_voice.isEnabled()*/) ? passHigh(-1.0 + 2* (value / 15.0f)) : 0;
+		double voiceDigitalOutput = -1.0 + 2* (value / 15.0f);
+		return (m_enabled /*&& m_voice.isEnabled()*/) ? passHigh(voiceDigitalOutput) : 0;
 //		return (m_enabled /*&& m_voice.isEnabled()*/) ? (-1.0 + 2* (value / 15.0f)) : 0;
 	}
 	

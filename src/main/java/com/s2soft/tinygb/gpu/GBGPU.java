@@ -48,6 +48,12 @@ public class GBGPU {
 
 	private byte m_scanLineCompare;
 
+	private int m_windowY;
+	private int m_windowX;
+
+	int m_linePixelsCount = 0;
+	int m_linePixelsTrashed = 0;
+
 	//	 =========================== Constructor =============================
 
 	public GBGPU(GameBoy gameBoy) {
@@ -83,6 +89,10 @@ public class GBGPU {
 		return m_scanLine;
 	}
 
+	public int getCurrentX() {
+		return m_linePixelsCount;
+	}
+	
 	public byte getLCDYCompare() {
 		return m_scanLineCompare;
 	}
@@ -152,6 +162,14 @@ public class GBGPU {
 	
 	/**
      * 
+	 * @return 0 if WindowTileMap is at $9800-$9BFF, 1 if WindowTileMap is at $9C00-$9FFF
+	 */
+	public int getWindowMapIndex() {
+		return BitUtils.isSet(getLCDControl(), 6) ? 1 : 0;
+	}
+
+	/**
+     * 
 	 * @return 0 if BGTilesData is at $8800-$97FF, 1 if BGTilesData is at $8000-$8FFF
 	 */
 	public int getBGTilesAreaIndex() {
@@ -170,12 +188,12 @@ public class GBGPU {
 		m_bgPalette = v;
 	}
 	
-	public byte getOMAPalette1Data() {
-		return m_oamPalette1;
+	public void setOMAPalette1Data(byte v) {
+		m_oamPalette1 = v;
 	}
 
-	public void setOMAPalette1Data(byte v) {
-		m_oamPalette2 = v;
+	public byte getOMAPalette1Data() {
+		return m_oamPalette1;
 	}
 
 	public void setOMAPalette2Data(byte v) {
@@ -220,6 +238,14 @@ public class GBGPU {
 	public boolean areSpritesEnabled() {
 		return BitUtils.isSet(getLCDControl(), 1);
 	}
+	
+	public boolean isBGEnabled() {
+		return BitUtils.isSet(getLCDControl(), 0);
+	}
+	
+	public boolean isWindowEnabled() {
+		return BitUtils.isSet(getLCDControl(), 5);
+	}
 
 	public void setLineStartClock(long enterClock) {
 		m_lineStartClock = enterClock;
@@ -237,6 +263,22 @@ public class GBGPU {
 		return m_fetcher;
 	}
 
+	public void setWindowX(int x) {
+		m_windowX = x;
+	}
+
+	public int getWindowX() {
+		return m_windowX & 0xFF;
+	}
+
+	public void setWindowY(int y) {
+		m_windowY = y;
+	}
+		
+	public int getWindowY() {
+		return m_windowY & 0xFF;
+	}
+
 	//	 ========================= Treatment methods =========================
 
 	public void enterPhase(GPUPhase phase) {
@@ -247,9 +289,6 @@ public class GBGPU {
 		m_phase.enter(this);
 	}
 	
-	int pixelsCount = 0;
-	int pixelsTrashed = 0;
-
 	public void step() {
 		if (!isLCDEnabled()) { 
 			return; 
@@ -261,7 +300,7 @@ public class GBGPU {
 			GPUSprite visibleSprite = null;
 			for (int i=0;i<m_visibleSprites.size();i++) {
 				GPUSprite sprite = m_visibleSprites.get(i);
-				if (!m_fetcher.hasScheduledSprite() && sprite.getX() - 8 == pixelsCount) { // TODO : handle offscreen sprites with partial visibility
+				if (!m_fetcher.hasScheduledSprite() && sprite.getX() - 8 == m_linePixelsCount) { // TODO : handle offscreen sprites with partial visibility
 					m_fetcher.scheduleSprite(sprite);
 					visibleSprite = sprite;
 				}
@@ -272,26 +311,26 @@ public class GBGPU {
 		m_pixelsFifo.setEnabled(!m_fetcher.hasScheduledSprite());
 		
 		// Fifo is running at machine clock speed (4.194304Mhz)
-		if (m_pixelsFifo.isEnabled() && m_pixelsFifo.canPull()) {
+		if (m_pixelsFifo.isEnabled() && m_pixelsFifo.canPull() && m_phase == PHASE_READ_VRAM) {
 //			System.out.println("Elapsed clock in ReadVRAM : " + m_phase.getElapsedClockCountInPhase());
 			byte pixel = m_pixelsFifo.pullPixel();
-			if (pixelsTrashed < getScrollX()) {
-				pixelsTrashed++;
+			if (m_linePixelsCount == 0 && m_linePixelsTrashed < getScrollX() % 8) {
+				m_linePixelsTrashed++;
 			}
 			else {
 				getDisplay().putPixel(pixel);
-				pixelsCount++;
+				m_linePixelsCount++;
 			}
 		}
 
 //		if (System.currentTimeMillis() % 50 == 0)
 //			System.out.println(pixelsCount + " " + m_scanLine + " " + m_phase.getName());
-		if (pixelsCount > 0 && pixelsCount % 160 == 0) {
+		if (m_linePixelsCount > 0 && m_linePixelsCount % 160 == 0) {
 			if (TRACE & elapsedClockCountInPhase != 172) {
 				System.out.println("Elapsed clock in ReadVRAM : " + elapsedClockCountInPhase);
 			}
-			pixelsCount = 0;
-			pixelsTrashed = 0;
+			m_linePixelsCount = 0;
+			m_linePixelsTrashed = 0;
 			enterPhase(PHASE_HBLANK);
 		}
 
@@ -322,9 +361,11 @@ public class GBGPU {
 
 	public void reset() {
 		m_pixelsFifo.setEnabled(true);
-		pixelsCount = 0;
+		m_linePixelsCount = 0;
 		setScanLine(0);
 		enterPhase(PHASE_FETCH_OAM);
 	}
+
 }
+
 

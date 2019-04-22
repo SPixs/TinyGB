@@ -110,6 +110,10 @@ public class AudioDevice implements IAudioDevice {
 	public void putSample(double leftSignal, double rightSignal) {
 		m_counter = m_counter % (int)(4194304 / m_format.getSampleRate());
 		if (m_counter == 0) {
+			
+			if (Math.abs(leftSignal) > 1 || Math.abs(rightSignal) > 1) {
+				System.out.println("!!!! Audio SATURATION");
+			}
 
 			leftSignal = Math.min(Math.max(-1, leftSignal), 1);
 			rightSignal = Math.min(Math.max(-1, rightSignal), 1);

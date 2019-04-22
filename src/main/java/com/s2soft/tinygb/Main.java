@@ -37,8 +37,8 @@ public class Main {
 		
 		Cartidge cartidge = new Cartidge();
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Tetris.gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/rom/Legend of Zelda, The - Link's Awakening (France).gb"));
-		cartidge.read(Main.class.getResourceAsStream("/rom/Super Mario Land (World).gb"));
+		cartidge.read(Main.class.getResourceAsStream("/rom/Legend of Zelda, The - Link's Awakening (France).gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/Super Mario Land (World).gb"));
 		
 //		cartidge.read(Main.class.getResourceAsStream("/rom/dist.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Bc.gb"));
