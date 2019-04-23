@@ -315,7 +315,7 @@ public class GBCpu {
 //		startTrace = /*!m_memory.isBootROMLock() &&*/ (
 //				(getPC() >= 0xC1A6 && getPC() <= 0xC1A6));
 //		debug &= getPC() != 0xC4A0;
-//		startTrace = getPC() >= 0xC000 && debug;
+//		startTrace = true;//getPC() >= 0xC000;
 		
 //		if (getPC() == 0x0028) {
 //			System.out.println(">>> Tetris main loop");
@@ -346,9 +346,9 @@ public class GBCpu {
 		
 //		startTrace = (getPC() == 0xDEFA /*|| getPC() == 0xDEF8*/) && (getMemory().getByte(0xDEF8) == (byte)0xDE);
 		
-		if (getPC() == 0xC22C) {
-			System.out.println("BLARGG. Execute TEST_INTERRUPT " + m_cyclesCount);
-		}
+//		if (getPC() == 0xC22C) {
+//			System.out.println("BLARGG. Execute TEST_INTERRUPT " + m_cyclesCount);
+//		}
 		
 		// Check for interrupt
 		if (isInterruptEnabled() && getMemory().isInterruptRequested()) {

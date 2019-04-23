@@ -15,10 +15,12 @@ public class DMA {
 	private int m_startAddress;
 	private boolean m_transfertInProgress;
 	private int m_elpasedTicks;
+	private GameBoy m_gameBoy;
 
 	//	 =========================== Constructor =============================
 
 	public DMA(GameBoy gameBoy) {
+		m_gameBoy = gameBoy;
 		m_memory = gameBoy.getMemory();
 	}
 
@@ -28,11 +30,15 @@ public class DMA {
 
 	public void step() {
 		if (m_transfertInProgress) {
-			if (m_elpasedTicks % 4 == 0) {
+			if (m_elpasedTicks % 4 == 0) { // 4 machine clocks for 1 DMA transfert step
 				int offset = m_elpasedTicks >> 2;
-				byte value = m_memory.getByte(m_startAddress + offset);
-				m_memory.setByte(0xFE00 + offset, value);
-//				System.out.println("DMA copy from " + Instruction.toHexShort(m_startAddress + offset) + " to " +
+				int sourceAddress = m_startAddress + offset;
+				if (sourceAddress >= 0xE000) {
+					sourceAddress &= ~0x2000;
+				}
+				byte value = m_memory.getByte(sourceAddress, true);
+				m_memory.setByte(0xFE00 + offset, value, true);
+//				System.out.println("DMA copy from " + Instruction.toHexShort(sourceAddress) + " to " +
 //						Instruction.toHexShort(0xFE00 + offset) + ", value " + Instruction.toHexByte(value));
 			}
 			m_elpasedTicks++;
@@ -43,6 +49,7 @@ public class DMA {
 	}
 
 	public void start(byte startPageIndex) {
+//		System.out.println("Starting DMA at line " + m_gameBoy.getGpu().getScanLine());
 		m_startAddress = (startPageIndex << 8) & 0xFFFF;
 		m_transfertInProgress = true;
 		m_elpasedTicks = 0;

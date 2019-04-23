@@ -97,10 +97,10 @@ public class GPUSprite {
 	//	 ========================= Treatment methods =========================
 	
 	public void update() {
-		m_y = m_memory.getByte(getOAMAddress()) & 0xFF;
-		m_x = m_memory.getByte(getOAMAddress() + 1) & 0xFF;
-		m_tileIndex = m_memory.getByte(getOAMAddress() + 2) & 0xFF;
-		byte options = m_memory.getByte(getOAMAddress() + 3);
+		m_y = m_memory.getByte(getOAMAddress(), false) & 0xFF;
+		m_x = m_memory.getByte(getOAMAddress() + 1, false) & 0xFF;
+		m_tileIndex = m_memory.getByte(getOAMAddress() + 2, false) & 0xFF;
+		byte options = m_memory.getByte(getOAMAddress() + 3, false);
 		m_priority = BitUtils.isSet(options, 7);
 		m_yFlip = BitUtils.isSet(options, 6);
 		m_xFlip = BitUtils.isSet(options, 5);

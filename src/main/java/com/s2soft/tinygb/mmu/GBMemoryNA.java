@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-public class GBMemoryNA implements IAddressable {
+public class GBMemoryNA extends AbstractAddressable {
 
 	//   ============================ Constants ==============================
 

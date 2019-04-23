@@ -69,12 +69,12 @@ public class GBMemory {
 		m_cartidgeROM = new GBRomCartidge();
 		m_cartidgeRAM = new GBRamCartidge();
 		
-		m_vramTiles = new GBMemoryVRAMTiles();
-		m_vramMaps = new GBMemoryVRAMMaps();
+		m_vramTiles = new GBMemoryVRAMTiles(gameBoy);
+		m_vramMaps = new GBMemoryVRAMMaps(gameBoy);
 		m_ramMemory = new GBMemoryRAM();
 		m_hram = new GBMemoryRAM();
 		m_ieMemory = new GBMemoryIE(this);
-		m_oam = new GBMemoryOAM();
+		m_oam = new GBMemoryOAM(gameBoy);
 		m_naMemory = new GBMemoryNA();
 		m_ramMirror = new GBMemoryMirror(m_ramMemory, -0x2000);
 	}
@@ -170,17 +170,25 @@ public class GBMemory {
 	}
 	
 	public void setByte(int address, byte b) {
+		setByte(address, b, true);
+	}
+
+	public void setByte(int address, byte b, boolean fromCPU) {
 		final IAddressable addressable = getAddressable(address);
 		if (addressable == null) {
 			throw new IllegalStateException("No memory mapped at : " + Instruction.toHexShort(address));
 		}
-		addressable.setByte(address, b);
+		addressable.setByte(address, b, fromCPU);
 	}
 	
 	public byte getByte(int address) {
 		return getAddressable(address).getByte(address);
 	}
 	
+	public byte getByte(int address,boolean fromCPU) {
+		return getAddressable(address).getByte(address, fromCPU);
+	}
+
 	public short getShort(int address) {
 		return (short) ((getByte(address) << 8) | (getByte(address+1) & 0x00FF)); 
 	}

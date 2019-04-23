@@ -14,7 +14,7 @@ import com.s2soft.utils.BitUtils;
  * 
  * @author smametz
  */
-public final class GBMemoryIO implements IAddressable {
+public final class GBMemoryIO extends AbstractAddressable {
 
 	//   ============================ Constants ==============================
 	

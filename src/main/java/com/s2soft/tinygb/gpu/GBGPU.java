@@ -214,6 +214,14 @@ public class GBGPU {
 		return result;
 	}
 
+	public GPUPhase getPhase() {
+		return m_phase;
+	}
+
+	public void setPhase(GPUPhase phase) {
+		m_phase = phase;
+	}
+
 	public void setLCDStatus(byte v) {
 		m_lcdStatus = v;
 	}
@@ -337,6 +345,12 @@ public class GBGPU {
 			m_linePixelsCount = 0;
 			m_linePixelsTrashed = 0;
 			enterPhase(PHASE_HBLANK);
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 
 		// Each access to VRAM (B, 0, 1, s) takes 2 cycles to occur.  A "cycle" is
@@ -346,7 +360,12 @@ public class GBGPU {
 //		if (((m_gameBoy.getClockCount() - m_phase.getEnterClock()) % 2) == 0) {
 		if (elapsedClockCountInPhase % 2 == 0) {
 			m_phase.step();
+			elapsedClockCountInPhase = m_phase.getElapsedClockCountInPhase();
 		}
+		
+//		if (getPhase() == PHASE_READ_VRAM) {
+//			System.out.println(m_linePixelsCount + "pixels, cycles=" + elapsedClockCountInPhase + ", fifo used="+m_pixelsFifo.getUsedSpace());
+//		}
 	}
 
 	/**

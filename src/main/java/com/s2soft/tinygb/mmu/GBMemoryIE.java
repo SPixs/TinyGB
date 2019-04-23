@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-public final class GBMemoryIE implements IAddressable {
+public final class GBMemoryIE extends AbstractAddressable {
 
 	//   ============================ Constants ==============================
 

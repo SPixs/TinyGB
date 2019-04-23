@@ -2,7 +2,7 @@ package com.s2soft.tinygb.mmu;
 
 import com.s2soft.tinygb.cartidge.Cartidge;
 
-public final class GBRamCartidge implements IAddressable {
+public final class GBRamCartidge extends AbstractAddressable {
 
 	//   ============================ Constants ==============================
 

@@ -109,7 +109,7 @@ public class GameBoy {
 	
 	private void setEmulationSyncShift(long shift) {
 		if (shift < 0 && shift != m_emulationSyncShift) {
-			System.out.println("Warning : emulation too SLOW " + shift + "ms");
+//			System.out.println("Warning : emulation too SLOW " + shift + "ms");
 		}
 		m_emulationSyncShift = shift;
 	}

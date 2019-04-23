@@ -76,15 +76,15 @@ public class GPUFetcher {
 	public void step() {
 		switch (m_state) {
 			case READ_TILE_ID:
-				if (!m_gpu.isBGEnabled()) {
+				/*if (!m_gpu.isBGEnabled()) {
 					if (m_gpu.getPixelsFifo().canPut()) {
 						m_gpu.getPixelsFifo().putPixels((byte)0, (byte)0);
 					}
 				}
-				else {
-					m_tileIndex = m_gpu.getMemory().getByte(m_tileAddress + m_tileX) & 0x0FF;
+				else {*/
+					m_tileIndex = m_gpu.getMemory().getByte(m_tileAddress + m_tileX, false) & 0x0FF;
 					m_state = STATE.READ_FIRST_BITPLANE;
-				}
+				//}
 				break;
 			case READ_FIRST_BITPLANE:
 				m_firstBitplaneData = readBitPlane(0);
@@ -128,11 +128,11 @@ public class GPUFetcher {
 		int bgTilesAreaIndex = m_gpu.getBGTilesAreaIndex();
 		if (bgTilesAreaIndex == 0) {
 			int tileOffsetInData = 16 * (byte)(m_tileIndex & 0xFF);
-			return m_gpu.getMemory().getByte(0x9000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
+			return m_gpu.getMemory().getByte(0x9000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex, false);
 		}
 		else {
 			int tileOffsetInData = 16 * (int)(m_tileIndex & 0x0FF);
-			return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
+			return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex, false);
 		}
 	}
 	
@@ -142,7 +142,7 @@ public class GPUFetcher {
 			lineInTile = sprite.getHeight() - lineInTile - 1;
 		}
 		int tileOffsetInData = 16 * (sprite.getTileIndex() & 0x0FF);
-		return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex);
+		return m_gpu.getMemory().getByte(0x8000 + tileOffsetInData + 2 * lineInTile + bitPlaneIndex, false);
 	}
 
 	public boolean hasScheduledSprite() {

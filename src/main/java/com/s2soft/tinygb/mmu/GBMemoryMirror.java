@@ -1,6 +1,6 @@
 package com.s2soft.tinygb.mmu;
 
-public class GBMemoryMirror implements IAddressable {
+public class GBMemoryMirror extends AbstractAddressable {
 
 	//   ============================ Constants ==============================
 

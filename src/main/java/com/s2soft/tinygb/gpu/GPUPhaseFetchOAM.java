@@ -44,7 +44,7 @@ public class GPUPhaseFetchOAM extends GPUPhase {
 	protected void stepImpl(long elapsedClockCount) {
 		if (elapsedClockCount >= 80) {
 			setPhase(GBGPU.PHASE_READ_VRAM);
-			getGpu().step();
+			GBGPU.PHASE_READ_VRAM.step();
 		}
 		else {
 			if (getGpu().areSpritesEnabled() && elapsedClockCount % 2 == 0) {
