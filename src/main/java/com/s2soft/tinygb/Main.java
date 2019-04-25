@@ -46,7 +46,8 @@ public class Main {
 //		cartidge.read(Main.class.getResourceAsStream("/rom/demos/pocket.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/demos/gejmboj.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/demos/oh.gb"));
-		cartidge.read(Main.class.getResourceAsStream("/rom/20y.gb"));
+		cartidge.read(Main.class.getResourceAsStream("/rom/games/Donkey Kong (JU) (V1.1) [S][!].gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/20y.gb"));
 		
 		
 //		cartidge.read(Main.class.getResourceAsStream("/rom/dist.gb"));

@@ -42,12 +42,12 @@ public class GBAPU {
 		m_memory = m_gameBoy.getMemory();
 		
 		for (int i=0;i<4;i++) {
-			m_switch[i] = new Switch("Left channel, voice " + i); // left channel switch for voice i
+			m_switch[i] = new Switch("Right channel, voice " + i); // right channel switch for voice i
 			m_switch[i].setInput(m_voices[i].getDAC());
-			m_leftMixer.addInput(m_switch[i]);
-			m_switch[i+4] = new Switch("Right channel, voice " + i); // right channel switch for voice i
+			m_rightMixer.addInput(m_switch[i]);
+			m_switch[i+4] = new Switch("Left channel, voice " + i); // left channel switch for voice i
 			m_switch[i+4].setInput(m_voices[i].getDAC());
-			m_rightMixer.addInput(m_switch[i+4]);
+			m_leftMixer.addInput(m_switch[i+4]);
 		}
 	}
 
