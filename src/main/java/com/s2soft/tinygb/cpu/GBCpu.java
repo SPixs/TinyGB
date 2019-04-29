@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.s2soft.tinygb.GameBoy;
+import com.s2soft.tinygb.gpu.GBGPU;
+import com.s2soft.tinygb.gpu.GPUPhase;
+import com.s2soft.tinygb.gpu.GPUPhaseHBlank;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.utils.BitUtils;
 
@@ -69,9 +72,12 @@ public class GBCpu {
 	private Instruction[] m_extraInstructionsArray;
 	private final byte[][] m_additionalBytes = new byte[3][];
 
+	private GameBoy m_gameBoy;
+
 //	private PrintStream m_out;
 	
 	public GBCpu(GameBoy gameBoy) {
+		m_gameBoy = gameBoy;
 		m_memory = gameBoy.getMemory();
 		initInstructions();
 		reset();
@@ -317,6 +323,10 @@ public class GBCpu {
 //		debug &= getPC() != 0xC4A0;
 //		startTrace = true;//getPC() >= 0xC000;
 		
+//		if (getPC() == 0x0167) {
+//			startTrace = true;
+//		}
+		
 //		if (getPC() == 0x0028) {
 //			System.out.println(">>> Tetris main loop");
 //		}
@@ -349,7 +359,7 @@ public class GBCpu {
 //		if (getPC() == 0xC22C) {
 //			System.out.println("BLARGG. Execute TEST_INTERRUPT " + m_cyclesCount);
 //		}
-		
+//		startTrace = false;
 		// Check for interrupt
 		if (isInterruptEnabled() && getMemory().isInterruptRequested()) {
 			// keep interrupts that are not masked
@@ -358,14 +368,17 @@ public class GBCpu {
 			// For the moment, only handle VBL interrupts
 			for (int i=0;i<=4;i++) {
 				if (BitUtils.isSet(interruptsToHandle, i)) {
+
 					// Clear this interrupt flag
 					getMemory().setInterruptFlag(BitUtils.setBit(getMemory().getInterruptFlag(), i, false));
+//					startTrace = true;
 					
 					// Disable further interrupts
 		    	    setInterruptEnabled(false, false);
 		    	    pushShort(getPC());
 		    	    setPC(0x0040+i*8);
-		    	    return 12; // 12 cycles to process interrupt flag
+//		    	    return 12; // 12 cycles to process interrupt flag
+		    	    return 20;
 				}
 			}
 		}
@@ -406,6 +419,9 @@ public class GBCpu {
 				disassembledLine += " " + reg16.name()+"="+Instruction.toHexShort(reg16.getValue(this));
 			}
 			disassembledLine += " Cycles=" + m_cyclesCount;
+			disassembledLine += " Internal divider=" + Instruction.toHexLong(4 + m_cyclesCount / 2);
+			if (m_gameBoy.getGpu().getPhase() instanceof GPUPhaseHBlank) { disassembledLine += " Elapsed IN HBlank : " + ((GPUPhaseHBlank)m_gameBoy.getGpu().getPhase()).m_elapsedClockCount; }
+			disassembledLine += " LY=" + m_gameBoy.getGpu().getScanLine();
 			System.out.println(disassembledLine);
 		}
 		

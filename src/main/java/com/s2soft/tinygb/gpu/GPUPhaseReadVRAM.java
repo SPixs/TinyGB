@@ -1,5 +1,7 @@
 package com.s2soft.tinygb.gpu;
 
+import com.s2soft.tinygb.cpu.Instruction;
+
 /**
  * GPU mode 3
  * 
@@ -25,6 +27,8 @@ public class GPUPhaseReadVRAM extends GPUPhase {
 	protected void enterImpl() {  
 //		byte lcdStatus = getGpu().getLCDStatus();
 //		getGpu().setLCDStatus((byte) ((lcdStatus & ~0x03) | 0x03));
+		
+//		System.out.println("Line " + getGpu().getScanLine() + " BGP=" + Instruction.toHexByte(getGpu().getBGPaletteData()));
 
 		// compute base BG tile address for current line
 		int tilesBaseAddress = (getGpu().getBGMapIndex() == 0) ? 0x09800 : 0x09C00;

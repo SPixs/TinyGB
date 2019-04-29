@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.s2soft.tinygb.GameBoy;
 import com.s2soft.tinygb.cpu.Disassembler;
+import com.s2soft.tinygb.cpu.Instruction;
 import com.s2soft.tinygb.display.IDisplay;
 import com.s2soft.tinygb.mmu.GBMemory;
 import com.s2soft.utils.BitUtils;
@@ -46,7 +47,7 @@ public class GBGPU {
 	private GPUSprite[] m_sprites;
 	private ArrayList<GPUSprite> m_visibleSprites = new ArrayList<GPUSprite>(10);
 
-	private byte m_scanLineCompare;
+	private int m_scanLineCompare;
 
 	private int m_windowY;
 	private int m_windowX;
@@ -56,6 +57,8 @@ public class GBGPU {
 
 	private boolean m_renderingWindow;
 
+	private boolean m_lyMatch = false;
+	
 	//	 =========================== Constructor =============================
 
 	public GBGPU(GameBoy gameBoy) {
@@ -80,7 +83,12 @@ public class GBGPU {
 		if (TRACE) {
 			System.out.println("GPU new line : " + scanLine);
 		}
-		boolean generateInterrupt = (m_scanLine != scanLine) && BitUtils.isSet(m_lcdStatus, 6) && scanLine == m_scanLineCompare;
+//		if (scanLine == 0 || scanLine == 1) {
+//			System.out.println("GPU new line : " + scanLine);
+//			Thread.yield();
+//		}
+		m_lyMatch = (scanLine == m_scanLineCompare);
+		boolean generateInterrupt = (m_scanLine != scanLine) && BitUtils.isSet(m_lcdStatus, 6) && m_lyMatch;
 		m_scanLine = scanLine;
 		if (generateInterrupt) {
 			getMemory().requestInterrupt(1); // LCD status interrupt request
@@ -96,11 +104,15 @@ public class GBGPU {
 	}
 	
 	public byte getLCDYCompare() {
-		return m_scanLineCompare;
+		return (byte) m_scanLineCompare;
 	}
 
 	public void setLCDYCompare(byte line) {
-		m_scanLineCompare = line;
+//		System.out.println("Set LYC="+line+ " while LY="+m_scanLine);
+		m_scanLineCompare = line & 0xFF;
+		if (isLCDEnabled()) {
+			m_lyMatch = (m_scanLine == m_scanLineCompare);
+		}
 	}
 
 	public int getScrollY() {
@@ -141,10 +153,14 @@ public class GBGPU {
 			if (!BitUtils.isSet(m_lcdControl, 7)) {
 //				setScanLine(0);
 				m_scanLine = 0;
+				enterPhase(PHASE_HBLANK);
 				getDisplay().setEnable(false);
 			}
 			else {
-				enterPhase(PHASE_FETCH_OAM);
+				m_lyMatch = (m_scanLine == m_scanLineCompare);
+//				enterPhase(PHASE_FETCH_OAM);
+				enterPhase(PHASE_HBLANK);
+				setLineStartClock(getClockCount() - 456 + 250);
 				getDisplay().setEnable(true);
 			}
 		}
@@ -187,6 +203,7 @@ public class GBGPU {
 	}
 
 	public void setBGPaletteData(byte v) {
+//		System.out.println(Instruction.toHexByte(v) + " @ " + m_scanLine);
 		m_bgPalette = v;
 	}
 	
@@ -209,7 +226,7 @@ public class GBGPU {
 	public byte getLCDStatus() {
 		byte result = (byte) (m_lcdStatus | 0b10000000);
 		result = (byte) ((result & 0b11111000) | m_phase.getNumber());
-		result = BitUtils.setBit(result, 2, m_scanLine == m_scanLineCompare);
+		result = BitUtils.setBit(result, 2, m_lyMatch);
 
 		return result;
 	}
@@ -336,8 +353,6 @@ public class GBGPU {
 			}
 		}
 
-//		if (System.currentTimeMillis() % 50 == 0)
-//			System.out.println(pixelsCount + " " + m_scanLine + " " + m_phase.getName());
 		if (m_linePixelsCount > 0 && m_linePixelsCount % 160 == 0) {
 			if (TRACE & elapsedClockCountInPhase != 172) {
 				System.out.println("Elapsed clock in ReadVRAM : " + elapsedClockCountInPhase);
@@ -345,12 +360,6 @@ public class GBGPU {
 			m_linePixelsCount = 0;
 			m_linePixelsTrashed = 0;
 			enterPhase(PHASE_HBLANK);
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 		}
 
 		// Each access to VRAM (B, 0, 1, s) takes 2 cycles to occur.  A "cycle" is

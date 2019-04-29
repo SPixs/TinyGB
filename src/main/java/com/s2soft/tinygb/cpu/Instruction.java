@@ -57,5 +57,10 @@ public abstract class Instruction {
 	public abstract int execute(byte opcode, GBCpu cpu, byte[] additionalBytes);
 
 	public abstract int getLengthInBytes(byte opcode);
+
+	public static String toHexLong(long value) {
+		String result = Long.toHexString(value).toUpperCase();
+		return "$" + StringUtils.padLeft(result, '0', 8);
+	}
 	
 }

@@ -34,19 +34,23 @@ public class GPUPhaseVBlank extends GPUPhase {
 			getGpu().getMemory().requestInterrupt(1);
 		}
 		
+//		System.out.println("VBL");
 		getGpu().getDisplay().refresh();
 	}
 	
 	@Override
 	protected void stepImpl(long elapsedClockCount) {
-		if (elapsedClockCount > 0 && (elapsedClockCount % 456) == 0) {
-			final int scanLine = getGpu().getScanLine();
-			getGpu().setScanLine(scanLine+1);
-		}
 		if (elapsedClockCount >= 4560) {
-			getGpu().setScanLine(0);
 			setPhase(GBGPU.PHASE_FETCH_OAM);
 			getGpu().step();
+		}
+		else if (elapsedClockCount > 0 && (elapsedClockCount % 456) == 0) {
+			final int scanLine = getGpu().getScanLine() + 1;
+			getGpu().setScanLine(scanLine);
+			// during scanLine 153, LY register contains line 0
+			if (scanLine == 153) {
+				getGpu().setScanLine(0);
+			}
 		}
 	}
 }

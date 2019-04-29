@@ -39,15 +39,16 @@ public class Main {
 //		cartidge.read(Main.class.getResourceAsStream("/rom/games/Tetris.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/games/Legend of Zelda, The - Link's Awakening (France).gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Super Mario Land (World).gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/rom/Mega Man II (Europe).gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/games/Mega Man II (Europe).gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/games/Bomb Jack (U).gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/games/Pokemon - Version Rouge (France) (SGB Enhanced).gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Pocket Monsters - Red Version (J) (V1.0) [S].gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/Pokemon - Red Version (UE) [S][!].gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/demos/pocket.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/demos/gejmboj.gb"));
 //		cartidge.read(Main.class.getResourceAsStream("/rom/demos/oh.gb"));
-		cartidge.read(Main.class.getResourceAsStream("/rom/games/Donkey Kong (JU) (V1.1) [S][!].gb"));
-//		cartidge.read(Main.class.getResourceAsStream("/rom/20y.gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/games/Donkey Kong (JU) (V1.1) [S][!].gb"));
+//		cartidge.read(Main.class.getResourceAsStream("/rom/demos/20y.gb"));
 		
 		
 //		cartidge.read(Main.class.getResourceAsStream("/rom/dist.gb"));
@@ -79,9 +80,10 @@ public class Main {
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/timer/tima_write_reloading.gb")); // OK
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/timer/tma_write_reloading.gb")); // OK
 
+//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_1_2_timing-GS.gb")); // OK
+//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_2_0_timing.gb")); // OK
+
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/hblank_ly_scx_timing-GS.gb")); // Failed
-//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_1_2_timing-GS.gb")); // Failed
-//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_2_0_timing.gb")); // Failed
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_2_mode0_timing_sprites.gb")); // Failed
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_2_mode0_timing.gb")); // Failed
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/intr_2_mode3_timing.gb")); // Failed
@@ -89,7 +91,7 @@ public class Main {
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/lcdon_timing-dmgABCmgbS.gb")); // Failed
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/lcdon_write_timing-GS.gb")); // Failed
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/stat_irq_blocking.gb")); // Failed
-//		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/stat_lyc_onoff.gb")); // Failed
+		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/stat_lyc_onoff.gb")); // Failed
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/ppu/vblank_stat_intr-GS.gb")); // Failed
 
 //		cartidge.read(new FileInputStream("testROM/mooneye/acceptance/add_sp_e_timing.gb"));
